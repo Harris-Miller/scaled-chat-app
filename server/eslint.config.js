@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import harrisConfigBase from 'eslint-config-harris/base';
 import globals from 'globals';
 
@@ -15,9 +16,11 @@ const eslintConfig = [
   {
     rules: {
       'no-console': 'off',
+      'no-param-reassign': 'off',
+      'require-atomic-updates': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
       // 'func-names': ['error', 'as-needed'], // I think this is weird with generators, need to double check
       // '@typescript-eslint/explicit-module-boundary-types': 'off',
-      // '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
   {

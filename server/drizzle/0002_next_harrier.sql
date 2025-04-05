@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "token" varchar(26) NOT NULL;

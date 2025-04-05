@@ -9,6 +9,7 @@ export const usersTable = pgTable('users', {
   id: uuid('id')
     .$defaultFn(() => ulid())
     .primaryKey(),
+  token: varchar({ length: 26 }).notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
@@ -20,10 +21,6 @@ export const charactersTable = pgTable('characters', {
   name: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  characters: many(charactersTable),
-}));
 
 export const campaignsTable = pgTable('campaigns', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -43,12 +40,6 @@ export const encountersTable = pgTable('encounters', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const campaignsRelations = relations(campaignsTable, ({ one, many }) => ({
-  characters: many(charactersTable),
-  encounters: many(encountersTable),
-  owner: one(usersTable),
-}));
-
 export const monstersTable = pgTable('encounters', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   id: uuid('id')
@@ -57,6 +48,21 @@ export const monstersTable = pgTable('encounters', {
   name: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+//
+// Relations
+//
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  campaigns: many(campaignsTable),
+  characters: many(charactersTable),
+}));
+
+export const campaignsRelations = relations(campaignsTable, ({ one, many }) => ({
+  characters: many(charactersTable),
+  encounters: many(encountersTable),
+  owner: one(usersTable),
+}));
 
 export const encountersRelations = relations(encountersTable, ({ many }) => ({
   monsters: many(monstersTable),
