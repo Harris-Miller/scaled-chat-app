@@ -1,0 +1,38 @@
+{
+  "name": "encounter-backend",
+  "private": true,
+  "type": "module",
+  "module": "src/main.ts",
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "lint": "eslint .",
+    "migrate": "drizzle-kit migrate",
+    "start": "bun run ./src/main.ts",
+    "studio": "drizzle-kit studio",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.41.0",
+    "elysia": "^1.2.25",
+    "neverthrow": "^8.2.0",
+    "pg": "^8.14.1",
+    "ramda": "^0.30.1",
+    "ts-pattern": "^5.7.0",
+    "ulid": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.11.11",
+    "@types/ramda": "^0.30.2",
+    "drizzle-kit": "^0.30.6",
+    "eslint": "^9.24.0",
+    "eslint-config-harris": "^5.0.0-beta.2",
+    "globals": "^16.0.0",
+    "tsx": "^4.19.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
