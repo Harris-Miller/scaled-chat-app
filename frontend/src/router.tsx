@@ -6,6 +6,7 @@ import { AppWrapper } from './components/AppWrapper';
 import { CharacterCreator } from './components/characterCreator/CharacterCreator';
 import { Characters } from './components/Characters';
 import { DbExplorer } from './components/dbExplorer/DbExplorer';
+import { EncounterCreator } from './components/EncounterCreator';
 import { Home } from './components/Home';
 
 const rootRoute = createRootRoute({
@@ -23,6 +24,12 @@ const indexRoute = createRoute({
   component: Home,
   getParentRoute: () => rootRoute,
   path: '/',
+});
+
+const encounterCreatorRoute = createRoute({
+  component: EncounterCreator,
+  getParentRoute: () => rootRoute,
+  path: '/encounter-creator',
 });
 
 const dbExplorerRoute = createRoute({
@@ -45,6 +52,7 @@ const characterCreatorRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  encounterCreatorRoute,
   dbExplorerRoute,
   charactersRoute.addChildren([characterCreatorRoute]),
 ]);

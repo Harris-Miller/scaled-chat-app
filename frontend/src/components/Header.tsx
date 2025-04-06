@@ -1,4 +1,4 @@
-import { Menu as MenuIcon } from '@mui/icons-material';
+import { Login as LoginIcon, Menu as MenuIcon, Person as PersonIcon } from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -12,8 +12,14 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import axios from 'axios';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
+
+import { getProfile, signIn, signOut, signUp } from '../api/user';
+import type { User } from '../store/userData';
+import { userAtom } from '../store/userData';
 
 const handle =
   (fn: Dispatch<SetStateAction<string>>): ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =>
@@ -25,42 +31,57 @@ export const Header: FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<Error | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [user, setUser] = useAtom(userAtom);
 
-  // const [session, setSession] = useState<Session | null>(null);
+  useEffect(() => {
+    axios
+      .get<User>('/api/user/profile')
+      .then(resp => {
+        console.log(resp);
+        setUser(resp.data);
+      })
+      .catch((resp: unknown) => {
+        console.log(resp);
+      });
+  }, [setUser]);
 
-  // useEffect(() => {
-  //   supabase.auth.getSession().then(({ data }) => {
-  //     setSession(data.session);
-  //   });
-
-  //   supabase.auth.onAuthStateChange((_event, s) => {
-  //     // console.log('session updated', s);
-  //     setSession(s);
-  //   });
-  // }, []);
-
-  const login = () => {
-    // noop for now
-    // console.log(`Signing in with ${email} / ${password}`);
-    // supabase.auth
-    //   .signInWithPassword({ email, password })
-    //   .then(({ error: signInError }) => {
-    //     if (signInError) {
-    //       throw signInError;
-    //     }
-    //     setDialogOpen(false);
-    //   })
-    //   .catch((e: unknown) => {
-    //     const err = e as Error;
-    //     console.error(err);
-    //     setError(err);
-    //   });
+  const signUpHandler = () => {
+    signUp(email, password)
+      .andThen(() => getProfile())
+      .then(result => {
+        if (result.isErr()) {
+          console.log(result.error);
+          setErrorMessage(result.error.response?.data.message ?? 'Unable to reach server');
+        } else {
+          console.log(result.value);
+          setUser(result.value.data);
+          setDialogOpen(false);
+        }
+      });
   };
 
-  // const logout = () => {
-  //   supabase.auth.signOut();
-  // };
+  const signInHandler = () => {
+    signIn(email, password)
+      .andThen(() => getProfile())
+      .then(result => {
+        if (result.isErr()) {
+          console.log(result.error);
+          setErrorMessage(result.error.response?.data.message ?? 'Unable to reach server');
+        } else {
+          console.log(result.value);
+          setUser(result.value.data);
+          setDialogOpen(false);
+        }
+      });
+  };
+
+  const logoutHandler = () => {
+    signOut().then(() => {
+      // even if it fails, assume no session
+      setUser(null);
+    });
+  };
 
   return (
     <>
@@ -70,7 +91,7 @@ export const Header: FC = () => {
             <IconButton aria-label="menu" color="inherit" edge="start" size="large" sx={{ mr: 2 }}>
               <MenuIcon />
             </IconButton>
-            {/* {session ? (
+            {user != null ? (
               <>
                 <IconButton
                   aria-label="menu"
@@ -84,8 +105,8 @@ export const Header: FC = () => {
                 >
                   <PersonIcon />
                 </IconButton>
-                <Typography>{session.user.email}</Typography>
-                <Button onClick={logout} variant="outlined">
+                <Typography>{user.email}</Typography>
+                <Button onClick={logoutHandler} variant="outlined">
                   Logout
                 </Button>
               </>
@@ -95,20 +116,21 @@ export const Header: FC = () => {
                 color="inherit"
                 edge="start"
                 onClick={() => {
-                  setDialogOpen(true);
+                  // TODO
                 }}
                 size="large"
                 sx={{ mr: 2 }}
               >
                 <LoginIcon />
               </IconButton>
-            )} */}
+            )}
           </Toolbar>
         </AppBar>
       </Box>
       <Dialog open={dialogOpen}>
-        <DialogTitle>Login</DialogTitle>
+        <DialogTitle>Auth</DialogTitle>
         <DialogContent>
+          <Typography>Sign Up</Typography>
           <TextField label="E-mail" onChange={handle(setEmail)} value={email} variant="outlined" />
           <TextField
             label="Password"
@@ -117,18 +139,19 @@ export const Header: FC = () => {
             value={password}
             variant="outlined"
           />
-          {error ? <Typography>{error.message}</Typography> : null}
+          {errorMessage ?? <Typography component="div">{errorMessage}</Typography>}
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
               setDialogOpen(false);
-              setError(null);
+              setErrorMessage(null);
             }}
           >
             Cancel
           </Button>
-          <Button onClick={login}>Login</Button>
+          <Button onClick={signUpHandler}>Sign Up</Button>
+          <Button onClick={signInHandler}>Sign In</Button>
         </DialogActions>
       </Dialog>
     </>

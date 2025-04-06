@@ -1,3 +1,4 @@
+import { cors } from '@elysiajs/cors';
 import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
 import { swagger } from '@elysiajs/swagger';
@@ -6,6 +7,11 @@ import { Elysia } from 'elysia';
 import { users } from './routes/user';
 
 const app = new Elysia()
+  .use(
+    cors({
+      origin: /localhost/,
+    }),
+  )
   .use(serverTiming())
   .use(opentelemetry())
   .use(swagger())

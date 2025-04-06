@@ -12,6 +12,7 @@ const eslintConfig = [
     rules: {
       'no-console': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      'prefer-arrow/prefer-arrow-functions': 'off',
     },
   },
   {

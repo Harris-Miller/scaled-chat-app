@@ -8,15 +8,13 @@ const userService = new Elysia({ name: 'user/service' })
     user: {} as Record<string, string>,
   })
   .model({
-    session: t.Optional(
-      t.Cookie(
-        {
-          token: t.Number(),
-        },
-        {
-          secrets: 'beyond',
-        },
-      ),
+    session: t.Cookie(
+      {
+        token: t.Optional(t.Number()),
+      },
+      {
+        secrets: 'beyond',
+      },
     ),
     signIn: t.Object({
       email: t.String({ minLength: 3 }),
@@ -53,7 +51,7 @@ export const users = new Elysia({ prefix: '/user' })
   .use(userService)
   .post(
     '/sign-up',
-    async ({ body: { email, password }, store, error }) => {
+    async ({ body: { email, password }, store, error, cookie: { token } }) => {
       if (store.user[email] != null)
         return error(400, {
           message: 'User already exists',
@@ -62,13 +60,18 @@ export const users = new Elysia({ prefix: '/user' })
 
       store.user[email] = await Bun.password.hash(password);
 
+      const key = getRandomValues(new Uint32Array(1))[0]!;
+      store.session[key] = email;
+      token.value = key;
+
       return {
-        message: 'User created',
+        message: `User created. Signed in as ${email}`,
         success: true,
       };
     },
     {
       body: 'signIn',
+      cookie: 'session',
     },
   )
   .post(
@@ -83,8 +86,6 @@ export const users = new Elysia({ prefix: '/user' })
 
       const key = getRandomValues(new Uint32Array(1))[0]!;
       session[key] = email;
-      // TODO, run-time error if we set cookie validation below, but when we don't we get a type error
-      // @ts-expect-error
       token.value = key;
 
       return {
@@ -94,7 +95,7 @@ export const users = new Elysia({ prefix: '/user' })
     },
     {
       body: 'signIn',
-      // cookie: 'optionalSession',
+      cookie: 'session',
     },
   )
   .get(
@@ -114,7 +115,7 @@ export const users = new Elysia({ prefix: '/user' })
   .get(
     '/profile',
     ({ cookie: { token }, store: { session } }) => {
-      const email = session[token.value];
+      const email = session[token.value!];
 
       return {
         email,

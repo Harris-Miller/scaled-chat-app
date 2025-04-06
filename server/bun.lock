@@ -4,6 +4,7 @@
     "": {
       "name": "encounter-backend",
       "dependencies": {
+        "@elysiajs/cors": "^1.2.0",
         "@elysiajs/opentelemetry": "^1.2.0",
         "@elysiajs/server-timing": "^1.2.1",
         "@elysiajs/swagger": "^1.2.2",
@@ -33,6 +34,8 @@
   },
   "packages": {
     "@drizzle-team/brocli": ["@drizzle-team/brocli@0.10.2", "", {}, "sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w=="],
+
+    "@elysiajs/cors": ["@elysiajs/cors@1.2.0", "", { "peerDependencies": { "elysia": ">= 1.2.0" } }, "sha512-qsJwDAg6WfdQRMfj6uSMcDPSpXvm/zQFeAX1uuJXhIgazH8itSfcDxcH9pMuXVRX1yQNi2pPwNQLJmAcw5mzvw=="],
 
     "@elysiajs/opentelemetry": ["@elysiajs/opentelemetry@1.2.0", "", { "dependencies": { "@opentelemetry/api": "^1.9.0", "@opentelemetry/instrumentation": "^0.54.0", "@opentelemetry/sdk-node": "^0.54.0" }, "peerDependencies": { "elysia": ">= 1.2.0" } }, "sha512-xx7hx9efBkqqaeMmIlKYipQHCyEG2lRetKwMFO89vz9KWqpUulr52b3r7sjPBmnas0VD54rCQDlUsG+n8QPdBw=="],
 
