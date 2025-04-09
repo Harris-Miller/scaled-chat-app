@@ -33,11 +33,11 @@ const client = await createClient({
   .connect();
 
 const app = new Elysia()
-  // .use(
-  //   cors({
-  //     origin: /localhost/, // TODO get from process.env
-  //   }),
-  // )
+  .use(
+    cors({
+      origin: /localhost/, // TODO set this up for production
+    }),
+  )
   .use(serverTiming())
   .use(opentelemetry())
   .use(swagger())

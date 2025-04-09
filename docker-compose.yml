@@ -52,7 +52,7 @@ services:
       REDIS_URL: redis://redis:6379
       PORT: 3101
     ports:
-      - 3101:3101
+      - 3101:3101 # port selected to no conflict with local dev port
     restart: on-failure:3
     # command: bun --watch run ./src/main.ts
     develop:
@@ -72,7 +72,7 @@ services:
     depends_on:
       - server
     ports:
-      - 3100:3100
+      - 3100:3100 # port selected to no conflict with local dev port
     develop:
       watch:
         - action: sync
@@ -82,13 +82,3 @@ services:
             - node_modules
         - action: rebuild
           path: ./frontend/package.json
-
-  httpd:
-    build: ./httpd
-    container_name: nginx
-    restart: on-failure:3
-    depends_on:
-      - server
-      - frontend
-    ports:
-      - 80:80
