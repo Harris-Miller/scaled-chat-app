@@ -26,6 +26,7 @@ const userService = new Elysia({ name: 'user/service' })
   })
   .macro({
     isSignIn: (enabled: boolean) => {
+      console.log('macro::inSignIn');
       if (!enabled) return undefined;
 
       return {
@@ -59,6 +60,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   .post(
     '/sign-up',
     async ({ body: { email, password }, store, error, cookie: { token } }) => {
+      console.log('user/sign-up');
       const user = await db.$count(usersTable, eq(usersTable.email, email));
 
       // bail if email already in use
@@ -93,7 +95,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   .post(
     '/sign-in',
     async ({ store: { session }, error, body: { email, password }, cookie: { token } }) => {
-      console.log('in /sign-in');
+      console.log('user/sign-in');
 
       const user = await db
         .select()
@@ -124,6 +126,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   .get(
     '/sign-out',
     ({ cookie: { token } }) => {
+      console.log('user/sign-out');
       token.remove();
 
       return {
@@ -138,6 +141,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   .get(
     '/profile',
     async ({ cookie: { token }, store: { session }, error }) => {
+      console.log('user/profile');
       const email = session[token.value!]!;
 
       const user = await db

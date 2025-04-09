@@ -7,8 +7,19 @@ import { createClient } from 'redis';
 
 import { userRoute } from './routes/user';
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface ProcessEnv {
+      PORT: string;
+      REDIS_URL: string;
+    }
+  }
+}
+
+// TODO: get url/port from process.env
 const client = await createClient({
-  url: 'redis://localhost:6379',
+  url: process.env.REDIS_URL,
 })
   .on('connect', () => {
     console.log('Redis Client connecting');
@@ -22,11 +33,11 @@ const client = await createClient({
   .connect();
 
 const app = new Elysia()
-  .use(
-    cors({
-      origin: /localhost/,
-    }),
-  )
+  // .use(
+  //   cors({
+  //     origin: /localhost/, // TODO get from process.env
+  //   }),
+  // )
   .use(serverTiming())
   .use(opentelemetry())
   .use(swagger())
@@ -35,4 +46,4 @@ const app = new Elysia()
   .onStart(({ server }) => {
     console.log(`🦊 Elysia is running at at ${server?.hostname}:${server?.port}`);
   })
-  .listen(3000);
+  .listen(process.env.PORT);

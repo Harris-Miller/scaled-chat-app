@@ -41,3 +41,54 @@ services:
       - 14269:14269
       - 9411:9411
     restart: on-failure:3
+
+  server:
+    build: ./server
+    container_name: server
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/dnd_encounters?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      PORT: 3101
+    ports:
+      - 3101:3101
+    restart: on-failure:3
+    # command: bun --watch run ./src/main.ts
+    develop:
+      watch:
+        - action: sync
+          path: ./server
+          target: /usr/src/app
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: ./server/package.json
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: on-failure:3
+    depends_on:
+      - server
+    ports:
+      - 3100:3100
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: ./frontend/package.json
+
+  httpd:
+    build: ./httpd
+    container_name: nginx
+    restart: on-failure:3
+    depends_on:
+      - server
+      - frontend
+    ports:
+      - 80:80
