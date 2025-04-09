@@ -32,7 +32,7 @@ const client = await createClient({
   })
   .connect();
 
-const app = new Elysia()
+const app = new Elysia({ prefix: '/api' })
   .use(
     cors({
       origin: /localhost/, // TODO set this up for production
