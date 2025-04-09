@@ -1,11 +1,14 @@
+import { eq } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
 
 import { getRandomValues } from 'node:crypto';
 
+import { db } from '../db';
+import { usersTable } from '../db/schema';
+
 const userService = new Elysia({ name: 'user/service' })
   .state({
     session: {} as Record<number, string>,
-    user: {} as Record<string, string>,
   })
   .model({
     session: t.Cookie(
@@ -27,19 +30,23 @@ const userService = new Elysia({ name: 'user/service' })
 
       return {
         beforeHandle: ({ error, cookie: { token }, store: { session } }) => {
-          if (token?.value == null)
+          if (token?.value == null) {
+            token?.remove();
             return error(401, {
               message: 'Unauthorized',
               success: false,
             });
+          }
 
           const email = session[token.value as unknown as number];
 
-          if (email == null)
+          if (email == null) {
+            token.remove();
             return error(401, {
               message: 'Unauthorized',
               success: false,
             });
+          }
 
           return undefined;
         },
@@ -47,18 +54,27 @@ const userService = new Elysia({ name: 'user/service' })
     },
   });
 
-export const users = new Elysia({ prefix: '/user' })
+export const userRoute = new Elysia({ prefix: '/user' })
   .use(userService)
   .post(
     '/sign-up',
     async ({ body: { email, password }, store, error, cookie: { token } }) => {
-      if (store.user[email] != null)
+      const user = await db.$count(usersTable, eq(usersTable.email, email));
+
+      // bail if email already in use
+      if (user !== 0)
         return error(400, {
           message: 'User already exists',
           success: false,
         });
 
-      store.user[email] = await Bun.password.hash(password);
+      const passwordHash = await Bun.password.hash(password);
+
+      await db.insert(usersTable).values({
+        displayName: '',
+        email,
+        passwordHash,
+      });
 
       const key = getRandomValues(new Uint32Array(1))[0]!;
       store.session[key] = email;
@@ -76,9 +92,16 @@ export const users = new Elysia({ prefix: '/user' })
   )
   .post(
     '/sign-in',
-    async ({ store: { user, session }, error, body: { email, password }, cookie: { token } }) => {
+    async ({ store: { session }, error, body: { email, password }, cookie: { token } }) => {
       console.log('in /sign-in');
-      if (user[email] == null || !(await Bun.password.verify(password, user[email])))
+
+      const user = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email))
+        .then(users => users[0]);
+
+      if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
         return error(400, {
           message: 'Invalid username or password',
           success: false,
@@ -114,8 +137,21 @@ export const users = new Elysia({ prefix: '/user' })
   )
   .get(
     '/profile',
-    ({ cookie: { token }, store: { session } }) => {
-      const email = session[token.value!];
+    async ({ cookie: { token }, store: { session }, error }) => {
+      const email = session[token.value!]!;
+
+      const user = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email))
+        .then(users => users[0]);
+
+      if (user == null) {
+        return error(500, {
+          message: 'Unable to find user for token',
+          success: false,
+        });
+      }
 
       return {
         email,

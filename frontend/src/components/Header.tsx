@@ -98,7 +98,7 @@ export const Header: FC = () => {
                   color="inherit"
                   edge="start"
                   onClick={() => {
-                    setDialogOpen(true);
+                    // TODO
                   }}
                   size="large"
                   sx={{ mr: 2 }}
@@ -116,7 +116,7 @@ export const Header: FC = () => {
                 color="inherit"
                 edge="start"
                 onClick={() => {
-                  // TODO
+                  setDialogOpen(true);
                 }}
                 size="large"
                 sx={{ mr: 2 }}

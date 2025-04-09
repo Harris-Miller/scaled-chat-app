@@ -10,10 +10,18 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
     ports:
-      - 5435:5432
+      - 5432:5432
     restart: on-failure:3
     volumes:
       - db:/var/lib/postgres/data
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+      - 8001:8001
+    restart: on-failure:3
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -32,3 +40,4 @@ services:
       - 14268:14268
       - 14269:14269
       - 9411:9411
+    restart: on-failure:3
