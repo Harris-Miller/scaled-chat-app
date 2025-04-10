@@ -3,6 +3,8 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
 import { AppWrapper } from './components/AppWrapper';
+import { Campaigns } from './components/Campaigns/Campaigns';
+import { Encounters } from './components/Campaigns/Encounters/Encounters';
 import { CharacterCreator } from './components/characterCreator/CharacterCreator';
 import { Characters } from './components/Characters';
 import { DbExplorer } from './components/dbExplorer/DbExplorer';
@@ -26,10 +28,28 @@ const indexRoute = createRoute({
   path: '/',
 });
 
-const encounterCreatorRoute = createRoute({
+const campaignsRoute = createRoute({
+  component: Campaigns,
+  getParentRoute: () => rootRoute,
+  path: '/campaigns',
+});
+
+const campaignRoute = createRoute({
   component: EncounterCreator,
   getParentRoute: () => rootRoute,
-  path: '/encounter-creator',
+  path: '/campaigns/$campaignId',
+});
+
+const encountersRoute = createRoute({
+  component: Encounters,
+  getParentRoute: () => rootRoute,
+  path: '/campaign/$campaignId/encounters',
+});
+
+const encounterRoute = createRoute({
+  component: EncounterCreator,
+  getParentRoute: () => rootRoute,
+  path: '/campaign/$campaignId/encounters/$encounterId',
 });
 
 const dbExplorerRoute = createRoute({
@@ -52,7 +72,10 @@ const characterCreatorRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  encounterCreatorRoute,
+  campaignsRoute,
+  campaignRoute,
+  encountersRoute,
+  encounterRoute,
   dbExplorerRoute,
   charactersRoute.addChildren([characterCreatorRoute]),
 ]);

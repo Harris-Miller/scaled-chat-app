@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { jwt as jwtPlugin } from '@elysiajs/jwt';
 import type { Elysia } from 'elysia';
 

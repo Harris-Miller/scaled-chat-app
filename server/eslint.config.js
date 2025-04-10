@@ -17,7 +17,6 @@ const eslintConfig = [
     rules: {
       'no-console': 'off',
       'no-param-reassign': 'off',
-      'require-atomic-updates': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       'prefer-arrow/prefer-arrow-functions': 'off',
       // 'func-names': ['error', 'as-needed'], // I think this is weird with generators, need to double check

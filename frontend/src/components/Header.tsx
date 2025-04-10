@@ -12,11 +12,14 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useNavigate } from '@tanstack/react-router';
+import type { AxiosError } from 'axios';
 import axios from 'axios';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
 
+import type { ApiError } from '../api/user';
 import { getProfile, signIn, signOut, signUp } from '../api/user';
 import type { User } from '../store/userData';
 import { userAtom } from '../store/userData';
@@ -33,6 +36,7 @@ export const Header: FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [user, setUser] = useAtom(userAtom);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -46,34 +50,29 @@ export const Header: FC = () => {
       });
   }, [setUser]);
 
-  const signUpHandler = () => {
-    signUp(email, password)
-      .andThen(() => getProfile())
-      .then(result => {
-        if (result.isErr()) {
-          console.log(result.error);
-          setErrorMessage(result.error.response?.data.message ?? 'Unable to reach server');
-        } else {
-          console.log(result.value);
-          setUser(result.value.data);
-          setDialogOpen(false);
-        }
-      });
+  const signUpHandler = async () => {
+    try {
+      const response = await signUp(email, password).then(getProfile);
+      console.log(response.data);
+      setUser(response.data);
+      setDialogOpen(false);
+    } catch (err) {
+      console.log(err);
+      setErrorMessage((err as AxiosError<ApiError>).response?.data.message ?? 'Unable to reach server');
+    }
   };
 
-  const signInHandler = () => {
-    signIn(email, password)
-      .andThen(() => getProfile())
-      .then(result => {
-        if (result.isErr()) {
-          console.log(result.error);
-          setErrorMessage(result.error.response?.data.message ?? 'Unable to reach server');
-        } else {
-          console.log(result.value);
-          setUser(result.value.data);
-          setDialogOpen(false);
-        }
-      });
+  const signInHandler = async () => {
+    try {
+      const response = await signIn(email, password).then(getProfile);
+
+      console.log(response);
+      setUser(response.data);
+      setDialogOpen(false);
+    } catch (err) {
+      console.log(err);
+      setErrorMessage((err as AxiosError<ApiError>).response?.data.message ?? 'Unable to reach server');
+    }
   };
 
   const logoutHandler = () => {
@@ -81,6 +80,10 @@ export const Header: FC = () => {
       // even if it fails, assume no session
       setUser(null);
     });
+  };
+
+  const handleNavigate = (path: string) => () => {
+    navigate({ to: `/${path}` });
   };
 
   return (
@@ -124,6 +127,11 @@ export const Header: FC = () => {
                 <LoginIcon />
               </IconButton>
             )}
+            <Box sx={{ display: { md: 'flex', xs: 'none' }, flexGrow: 1 }}>
+              <Button onClick={handleNavigate('campaigns')} sx={{ color: 'white', display: 'block', my: 2 }}>
+                Campaigns
+              </Button>
+            </Box>
           </Toolbar>
         </AppBar>
       </Box>

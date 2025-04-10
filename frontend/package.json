@@ -38,7 +38,7 @@
     "@types/react-dom": "^19.1.1",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.23.0",
-    "eslint-config-harris": "5.0.0-beta.2",
+    "eslint-config-harris": "5.0.0-beta.4",
     "globals": "^16.0.0",
     "typescript": "^5.8.2",
     "vite": "^6.2.5"

@@ -1,6 +1,4 @@
-import type { AxiosError } from 'axios';
 import axios from 'axios';
-import { fromPromise } from 'neverthrow';
 
 export type SuccessMessage = {
   message: string;
@@ -18,29 +16,23 @@ export type ApiError = {
 };
 
 export const getProfile = () => {
-  return fromPromise(axios.get<Profile>('/api/user/profile'), err => err as AxiosError<ApiError>);
+  return axios.get<Profile>('/api/user/profile');
 };
 
 export const signIn = (email: string, password: string) => {
-  return fromPromise(
-    axios.post<SuccessMessage>('/api/user/sign-in', {
-      email,
-      password,
-    }),
-    err => err as AxiosError<ApiError>,
-  );
+  return axios.post<SuccessMessage>('/api/user/sign-in', {
+    email,
+    password,
+  });
 };
 
 export const signUp = (email: string, password: string) => {
-  return fromPromise(
-    axios.post<SuccessMessage>('/api/user/sign-up', {
-      email,
-      password,
-    }),
-    err => err as AxiosError<ApiError>,
-  );
+  return axios.post<SuccessMessage>('/api/user/sign-up', {
+    email,
+    password,
+  });
 };
 
 export const signOut = () => {
-  return fromPromise(axios.get<Profile>('/api/user/sign-out'), err => err as AxiosError<ApiError>);
+  return axios.get<Profile>('/api/user/sign-out');
 };

@@ -6,7 +6,7 @@ import globals from 'globals';
 const eslintConfig = [
   ...harrisConfig,
   {
-    ignores: ['src/database.types.ts', 'src/vite-env.d.ts'],
+    ignores: ['node_modules/', 'src/database.types.ts', 'src/vite-env.d.ts'],
   },
   {
     rules: {
