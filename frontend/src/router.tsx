@@ -43,13 +43,13 @@ const campaignRoute = createRoute({
 const encountersRoute = createRoute({
   component: Encounters,
   getParentRoute: () => rootRoute,
-  path: '/campaign/$campaignId/encounters',
+  path: '/campaigns/$campaignId/encounters',
 });
 
 const encounterRoute = createRoute({
   component: EncounterCreator,
   getParentRoute: () => rootRoute,
-  path: '/campaign/$campaignId/encounters/$encounterId',
+  path: '/campaigns/$campaignId/encounters/$encounterId',
 });
 
 const dbExplorerRoute = createRoute({
