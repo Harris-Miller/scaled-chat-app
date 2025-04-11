@@ -9,6 +9,7 @@ import { seedDb } from './db';
 import { campaignsRoute } from './routes/campaigns';
 import { charactersRoute } from './routes/characters';
 import { userRoute } from './routes/user';
+import { webSocket } from './sockets/ws';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -37,7 +38,13 @@ const client = await createClient({
   })
   .connect();
 
-const app = new Elysia({ prefix: '/api' })
+const api = new Elysia({ prefix: '/api' })
+  .get('/', () => 'Hello Elysia')
+  .use(userRoute)
+  .use(charactersRoute)
+  .use(campaignsRoute);
+
+const app = new Elysia()
   .use(
     cors({
       origin: /localhost/, // TODO set this up for production
@@ -46,10 +53,8 @@ const app = new Elysia({ prefix: '/api' })
   .use(serverTiming())
   .use(opentelemetry())
   .use(swagger())
-  .get('/', () => 'Hello Elysia')
-  .use(userRoute)
-  .use(charactersRoute)
-  .use(campaignsRoute)
+  .use(webSocket)
+  .use(api)
   .onStart(({ server }) => {
     console.log(`🦊 Elysia is running at at ${server?.hostname}:${server?.port}`);
   })
