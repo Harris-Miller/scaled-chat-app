@@ -5,6 +5,8 @@ import { swagger } from '@elysiajs/swagger';
 import { Elysia } from 'elysia';
 import { createClient } from 'redis';
 
+import { seedDb } from './db';
+import { campaignsRoute } from './routes/campaigns';
 import { charactersRoute } from './routes/characters';
 import { userRoute } from './routes/user';
 
@@ -17,6 +19,8 @@ declare global {
     }
   }
 }
+
+await seedDb();
 
 // TODO: get url/port from process.env
 const client = await createClient({
@@ -45,6 +49,7 @@ const app = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')
   .use(userRoute)
   .use(charactersRoute)
+  .use(campaignsRoute)
   .onStart(({ server }) => {
     console.log(`🦊 Elysia is running at at ${server?.hostname}:${server?.port}`);
   })

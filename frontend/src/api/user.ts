@@ -1,18 +1,10 @@
 import axios from 'axios';
 
-export type SuccessMessage = {
-  message: string;
-  success: true;
-};
+import type { SuccessMessage } from './api.types';
 
 export type Profile = {
   email: string;
   success: true;
-};
-
-export type ApiError = {
-  message: string;
-  success: false;
 };
 
 export const getProfile = () => {

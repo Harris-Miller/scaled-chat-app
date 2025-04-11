@@ -19,7 +19,7 @@ import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
 
-import type { ApiError } from '../api/user';
+import type { ApiError } from '../api/api.types';
 import { getProfile, signIn, signOut, signUp } from '../api/user';
 import type { User } from '../store/userData';
 import { userAtom } from '../store/userData';

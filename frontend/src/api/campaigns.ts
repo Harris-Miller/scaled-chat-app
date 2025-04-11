@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export type Character = {
+export type Campaign = {
   createdAt: string;
   id: string;
   name: string;
@@ -8,6 +8,6 @@ export type Character = {
   userId: string;
 };
 
-export const getCharacters = () => {
-  return axios.get<Character[]>('/api/characters');
+export const getCampaigns = () => {
+  return axios.get<Campaign[]>('/api/campaigns');
 };

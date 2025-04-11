@@ -80,6 +80,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const charactersRelations = relations(characters, ({ one }) => ({
+  campaign: one(campaigns, { fields: [characters.campaignId], references: [campaigns.id] }),
   owner: one(users, { fields: [characters.userId], references: [users.id] }),
 }));
 

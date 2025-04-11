@@ -6,14 +6,15 @@ import { db } from '../db';
 import { characters } from '../db/schema';
 
 export const charactersRoute = new Elysia({ prefix: '/characters' }).use(getUser).get(
-  '/:id',
-  async ({ params: { id }, user }) => {
-    console.log('characters/:id', id);
+  '/',
+  async ({ user }) => {
+    console.log('/api/characters');
 
-    // const character = await db.select().from(characters).where();
+    const results = await db.select().from(characters).where(eq(characters.userId, user.id));
 
     return {
-      message: `Test fetch for characters/${id} from user: ${user.email}`,
+      characters: results,
+      message: `Test fetch for /api/characters from user: ${user.email}`,
       success: true,
     };
   },
