@@ -128,6 +128,9 @@ export const Header: FC = () => {
               </IconButton>
             )}
             <Box sx={{ display: { md: 'flex', xs: 'none' }, flexGrow: 1 }}>
+              <Button onClick={handleNavigate('characters')} sx={{ color: 'white', display: 'block', my: 2 }}>
+                Characters
+              </Button>
               <Button onClick={handleNavigate('campaigns')} sx={{ color: 'white', display: 'block', my: 2 }}>
                 Campaigns
               </Button>

@@ -1,67 +1,19 @@
 import { eq } from 'drizzle-orm';
-import { Elysia, t } from 'elysia';
+import { Elysia } from 'elysia';
 
 import { getRandomValues } from 'node:crypto';
 
+import { authService } from '../common/authService';
 import { db } from '../db';
-import { usersTable } from '../db/schema';
-
-const userService = new Elysia({ name: 'user/service' })
-  .state({
-    session: {} as Record<number, string>,
-  })
-  .model({
-    session: t.Cookie(
-      {
-        token: t.Optional(t.Number()),
-      },
-      {
-        secrets: 'beyond',
-      },
-    ),
-    signIn: t.Object({
-      email: t.String({ minLength: 3 }),
-      password: t.String({ minLength: 8 }),
-    }),
-  })
-  .macro({
-    isSignIn: (enabled: boolean) => {
-      console.log('macro::inSignIn');
-      if (!enabled) return undefined;
-
-      return {
-        beforeHandle: ({ error, cookie: { token }, store: { session } }) => {
-          if (token?.value == null) {
-            token?.remove();
-            return error(401, {
-              message: 'Unauthorized',
-              success: false,
-            });
-          }
-
-          const email = session[token.value as unknown as number];
-
-          if (email == null) {
-            token.remove();
-            return error(401, {
-              message: 'Unauthorized',
-              success: false,
-            });
-          }
-
-          return undefined;
-        },
-      };
-    },
-  });
+import { users } from '../db/schema';
 
 export const userRoute = new Elysia({ prefix: '/user' })
-  .use(userService)
+  .use(authService)
   .post(
     '/sign-up',
     async ({ body: { email, password }, store, error, cookie: { token } }) => {
       console.log('user/sign-up');
-      const user = await db.$count(usersTable, eq(usersTable.email, email));
+      const user = await db.$count(users, eq(users.email, email));
 
       // bail if email already in use
       if (user !== 0)
@@ -72,7 +24,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
 
       const passwordHash = await Bun.password.hash(password);
 
-      await db.insert(usersTable).values({
+      await db.insert(users).values({
         displayName: '',
         email,
         passwordHash,
@@ -99,8 +51,8 @@ export const userRoute = new Elysia({ prefix: '/user' })
 
       const user = await db
         .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, email))
+        .from(users)
+        .where(eq(users.email, email))
         .then(users => users[0]);
 
       if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
@@ -146,9 +98,9 @@ export const userRoute = new Elysia({ prefix: '/user' })
 
       const user = await db
         .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, email))
-        .then(users => users[0]);
+        .from(users)
+        .where(eq(users.email, email))
+        .then(results => results[0]);
 
       if (user == null) {
         return error(500, {
