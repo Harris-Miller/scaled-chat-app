@@ -12,14 +12,8 @@ export type Campaign = {
   userId: string;
 };
 
-export type CampaignsSuccess = {
-  campaigns: Campaign[];
-  message: string;
-  success: true;
-};
-
 export const getCampaigns = () => {
-  return axios.get<CampaignsSuccess>('/api/campaigns').then(r => r.data);
+  return axios.get<Campaign[]>('/api/campaigns').then(r => r.data);
 };
 
 export const useCampaigns = () => {
@@ -35,11 +29,22 @@ export const useCampaigns = () => {
       queryClient.invalidateQueries({ queryKey: ['campaign'] });
     } else {
       // console.log(results.data);
-      results.data.campaigns.forEach(c => {
+      results.data.forEach(c => {
         queryClient.setQueryData(['campaign', c.id], c);
       });
     }
   }, [results.isPending]);
 
   return results;
+};
+
+export const getCampaign = (campaignId: string) => {
+  return axios.get<Campaign>(`/api/campaigns/${campaignId}`).then(r => r.data);
+};
+
+export const useCampaign = (campaignId: string) => {
+  return useQuery({
+    queryFn: () => getCampaign(campaignId),
+    queryKey: ['campaign', campaignId],
+  });
 };

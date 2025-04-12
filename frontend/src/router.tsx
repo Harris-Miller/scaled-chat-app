@@ -3,6 +3,7 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
 import { AppWrapper } from './components/AppWrapper';
+import { Campaign } from './components/Campaigns/Campaign';
 import { Campaigns } from './components/Campaigns/Campaigns';
 import { Encounters } from './components/Campaigns/Encounters/Encounters';
 import { CharacterCreator } from './components/characterCreator/CharacterCreator';
@@ -35,7 +36,7 @@ const campaignsRoute = createRoute({
 });
 
 const campaignRoute = createRoute({
-  component: EncounterCreator,
+  component: Campaign,
   getParentRoute: () => rootRoute,
   path: '/campaigns/$campaignId',
 });

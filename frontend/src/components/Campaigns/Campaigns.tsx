@@ -20,7 +20,7 @@ export const Campaigns: FC = () => {
           if (campaigns.isError) {
             return <div>Error</div>;
           }
-          return campaigns.data.campaigns.map(c => (
+          return campaigns.data.map(c => (
             <div key={c.id}>
               <Link params={{ campaignId: c.id }} to="/campaigns/$campaignId">
                 {c.name}
