@@ -13,6 +13,8 @@ const eslintConfig = [
       'no-console': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       'prefer-arrow/prefer-arrow-functions': 'off',
+      // remove once consume next eslint-config-harris
+      '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
     },
   },
   {

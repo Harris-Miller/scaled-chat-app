@@ -1,20 +1,33 @@
 import { Grid, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import { Link } from '@tanstack/react-router';
 import type { FC } from 'react';
 
-import { getCampaigns } from '../../api/campaigns';
+import { useCampaigns } from '../../api/campaigns';
 
 export const Campaigns: FC = () => {
-  useEffect(() => {
-    getCampaigns().then(result => {
-      console.log(result);
-    });
-  }, []);
+  const campaigns = useCampaigns();
 
   return (
     <Grid container>
       <Grid size={12}>
         <Typography variant="h1">Campaigns</Typography>
+      </Grid>
+      <Grid size={12}>
+        {(() => {
+          if (campaigns.isPending) {
+            return <div>Loading...</div>;
+          }
+          if (campaigns.isError) {
+            return <div>Error</div>;
+          }
+          return campaigns.data.campaigns.map(c => (
+            <div key={c.id}>
+              <Link params={{ campaignId: c.id }} to="/campaigns/$campaignId">
+                {c.name}
+              </Link>
+            </div>
+          ));
+        })()}
       </Grid>
     </Grid>
   );
