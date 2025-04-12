@@ -1,9 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { Elysia } from 'elysia';
 
-import { getRandomValues } from 'node:crypto';
-
-import { authService } from '../common/authService';
+import { authService, getUser } from '../common/authService';
 import { db } from '../db';
 import { users } from '../db/schema';
 
@@ -11,7 +9,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   .use(authService)
   .post(
     '/sign-up',
-    async ({ body: { email, password }, store, error, cookie: { token } }) => {
+    async ({ body: { email, password }, createAccessToken, createRefreshToken, error }) => {
       console.log('user/sign-up');
       const user = await db.$count(users, eq(users.email, email));
 
@@ -24,15 +22,19 @@ export const userRoute = new Elysia({ prefix: '/user' })
 
       const passwordHash = await Bun.password.hash(password);
 
-      await db.insert(users).values({
-        displayName: '',
-        email,
-        passwordHash,
-      });
+      const { userId } = await db
+        .insert(users)
+        .values({
+          displayName: '',
+          email,
+          passwordHash,
+        })
+        .returning({ userId: users.id })
+        .then(r => r[0]!); // TODO: is there a better way?
 
-      const key = getRandomValues(new Uint32Array(1))[0]!;
-      store.session[key] = email;
-      token.value = key;
+      const idAsString = userId.toString();
+      await createAccessToken(idAsString);
+      await createRefreshToken(idAsString);
 
       return {
         message: `User created. Signed in as ${email}`,
@@ -41,19 +43,14 @@ export const userRoute = new Elysia({ prefix: '/user' })
     },
     {
       body: 'signIn',
-      cookie: 'session',
     },
   )
   .post(
     '/sign-in',
-    async ({ store: { session }, error, body: { email, password }, cookie: { token } }) => {
+    async ({ error, body: { email, password }, createAccessToken, createRefreshToken }) => {
       console.log('user/sign-in');
 
-      const user = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .then(users => users[0]);
+      const user = await db.query.users.findFirst({ where: eq(users.email, email) });
 
       if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
         return error(400, {
@@ -61,9 +58,9 @@ export const userRoute = new Elysia({ prefix: '/user' })
           success: false,
         });
 
-      const key = getRandomValues(new Uint32Array(1))[0]!;
-      session[key] = email;
-      token.value = key;
+      const idAsString = user.id.toString();
+      await createAccessToken(idAsString);
+      await createRefreshToken(idAsString);
 
       return {
         message: `Signed in as ${email}`,
@@ -72,50 +69,24 @@ export const userRoute = new Elysia({ prefix: '/user' })
     },
     {
       body: 'signIn',
-      cookie: 'session',
     },
   )
-  .get(
-    '/sign-out',
-    ({ cookie: { token } }) => {
-      console.log('user/sign-out');
-      token.remove();
+  .get('/sign-out', ({ cookie: { accessToken, refreshToken } }) => {
+    console.log('user/sign-out');
+    accessToken?.remove();
+    refreshToken?.remove();
 
-      return {
-        message: 'Signed out',
-        success: true,
-      };
-    },
-    {
-      cookie: 'session',
-    },
-  )
-  .get(
-    '/profile',
-    async ({ cookie: { token }, store: { session }, error }) => {
-      console.log('user/profile');
-      const email = session[token.value!]!;
+    return {
+      message: 'Signed out',
+      success: true,
+    };
+  })
+  .use(getUser)
+  .get('/profile', ({ user }) => {
+    console.log('user/profile');
 
-      const user = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .then(results => results[0]);
-
-      if (user == null) {
-        return error(500, {
-          message: 'Unable to find user for token',
-          success: false,
-        });
-      }
-
-      return {
-        email,
-        success: true,
-      };
-    },
-    {
-      cookie: 'session',
-      isSignIn: true,
-    },
-  );
+    return {
+      email: user.email,
+      success: true,
+    };
+  });

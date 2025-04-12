@@ -6,6 +6,7 @@ import { Elysia } from 'elysia';
 import { createClient } from 'redis';
 
 import { seedDb } from './db';
+import { createRedisInstance } from './redis/redisClient';
 import { campaignsRoute } from './routes/campaigns';
 import { charactersRoute } from './routes/characters';
 import { userRoute } from './routes/user';
@@ -22,6 +23,8 @@ declare global {
 }
 
 await seedDb();
+
+await createRedisInstance();
 
 // TODO: get url/port from process.env
 const client = await createClient({
@@ -45,9 +48,17 @@ const api = new Elysia({ prefix: '/api' })
   .use(campaignsRoute);
 
 const app = new Elysia()
+  // .use(
+  //   cors({
+  //     origin: /localhost/,
+  //   }),
+  // )
   .use(
     cors({
-      origin: /localhost/, // TODO set this up for production
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      origin: '*', // TODO set this up for production
+      preflight: true,
     }),
   )
   .use(serverTiming())
