@@ -4,6 +4,7 @@ import { Elysia, t } from 'elysia';
 
 import { db } from '../db';
 import { users } from '../db/schema';
+import { getRedisClient } from '../redis/redisClient';
 
 export const ACCESS_TOKEN_EXP = 60 * 24; // 1 day in seconds
 export const REFRESH_TOKEN_EXP = 60 * 24 * 7; // 7 days in seconds
@@ -69,7 +70,7 @@ export const authService = new Elysia({ name: 'auth/service' })
           value: refreshJWTToken,
         });
 
-        // await getRedisClient().hSet(`user:jwt:${sub}`, 'refresh_token', refreshJWTToken);
+        await getRedisClient().hSet(`user:jwt:${sub}`, 'refresh_token', refreshJWTToken);
 
         return refreshJWTToken;
       },
@@ -106,10 +107,12 @@ export const authService = new Elysia({ name: 'auth/service' })
             // TODO: this should always exist, why is `| undefined`
             await createAccessToken!(jwtPayload.sub!);
 
-            // const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
-            // if (refreshToken.value !== storedRefreshToken) {
-            //   return error(401);
-            // }
+            const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
+            if (refreshToken.value !== storedRefreshToken) {
+              accessToken?.remove();
+              refreshToken.remove();
+              return error(401);
+            }
 
             accessToken?.remove();
             refreshToken.remove();
