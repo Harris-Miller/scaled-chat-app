@@ -30,6 +30,7 @@
     "ramda": "^0.30.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-use-websocket": "^4.13.0",
     "ts-pattern": "^5.7.0"
   },
   "devDependencies": {
@@ -43,5 +44,5 @@
     "typescript": "^5.8.2",
     "vite": "^6.2.5"
   },
-  "packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971"
+  "packageManager": "pnpm@10.8.1"
 }

@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import harrisConfig from 'eslint-config-harris';
 import globals from 'globals';
 
@@ -9,18 +8,23 @@ const eslintConfig = [
     ignores: ['node_modules/', 'src/database.types.ts', 'src/vite-env.d.ts'],
   },
   {
-    rules: {
-      'no-console': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      'prefer-arrow/prefer-arrow-functions': 'off',
-      // remove once consume next eslint-config-harris
-      '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
-    },
-  },
-  {
     files: ['src/**'],
     languageOptions: {
       globals: globals.browser,
+    },
+  },
+  {
+    rules: {
+      'no-console': 'off',
+      'prefer-arrow/prefer-arrow-functions': 'off',
+    },
+  },
+  {
+    files: ['src/**/*.ts'],
+    rules: {
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      // remove once consume next eslint-config-harris
+      '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
     },
   },
 ];

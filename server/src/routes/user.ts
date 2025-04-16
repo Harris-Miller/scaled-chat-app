@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { Elysia } from 'elysia';
+import { Elysia, t } from 'elysia';
 
 import { authService, getUser } from '../common/authService';
 import { db } from '../db';
@@ -7,6 +7,12 @@ import { users } from '../db/schema';
 
 export const userRoute = new Elysia({ prefix: '/user' })
   .use(authService)
+  .model({
+    signIn: t.Object({
+      email: t.String({ minLength: 5 }),
+      password: t.String({ minLength: 8 }),
+    }),
+  })
   .post(
     '/sign-up',
     async ({ body: { email, password }, createAccessToken, createRefreshToken, error }) => {

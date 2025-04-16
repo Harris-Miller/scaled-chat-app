@@ -1,39 +1,32 @@
-import { Box, Container } from '@mui/material';
-import { useEffect } from 'react';
+import { Box, Container, Grid, Typography } from '@mui/material';
 import type { FC, PropsWithChildren } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 import { Header } from './Header';
 
-console.log('new WebSocket()');
-const socket = new WebSocket('ws/ping');
-
-socket.addEventListener('open', event => {
-  console.log(event);
-  socket.send('i am message');
-});
-
-socket.addEventListener('message', event => {
-  console.log(event.data);
-});
+const connectionStatusMap = {
+  [ReadyState.CONNECTING]: 'Connecting',
+  [ReadyState.OPEN]: 'Open',
+  [ReadyState.CLOSING]: 'Closing',
+  [ReadyState.CLOSED]: 'Closed',
+  [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+} as const;
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
-  // useEffect(() => {
-  //   console.log('new WebSocket()');
-  //   const socket = new WebSocket('ws/ping');
+  // const { sendMessage, lastMessage, readyState } = useWebSocket('ws/ping', {
+  //   onMessage: event => {
+  //     console.log('onMessage', event);
+  //     // lastMessage is still previous in this callback, gets updated after
+  //     console.log('lastMessage', lastMessage);
+  //   },
+  //   onOpen: event => {
+  //     console.log('onOpen', event);
+  //     sendMessage('i am message');
+  //   },
+  // });
 
-  //   socket.addEventListener('open', event => {
-  //     console.log(event);
-  //   });
-
-  //   socket.addEventListener('message', event => {
-  //     console.log(event.data);
-  //   });
-
-  //   return () => {
-  //     console.log('socket.close()');
-  //     socket.close();
-  //   };
-  // }, []);
+  const readyState = ReadyState.UNINSTANTIATED;
+  const connectionStatus = connectionStatusMap[readyState];
 
   return (
     <>
@@ -49,7 +42,12 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
           overflow: 'auto',
         }}
       >
-        <Container maxWidth={false}>{children}</Container>
+        <Container maxWidth={false}>
+          <Grid size={12}>
+            <Typography>The WebSocket is currently {connectionStatus}</Typography>
+          </Grid>
+          <Grid size={12}>{children}</Grid>
+        </Container>
       </Box>
     </>
   );

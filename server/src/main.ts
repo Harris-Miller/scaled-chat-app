@@ -5,7 +5,7 @@ import { swagger } from '@elysiajs/swagger';
 import { Elysia } from 'elysia';
 import { createClient } from 'redis';
 
-import { seedDb } from './db';
+// import { seedDb } from './db';
 import { createRedisInstance } from './redis/redisClient';
 import { campaignsRoute } from './routes/campaigns';
 import { charactersRoute } from './routes/characters';
@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-await seedDb();
+// await seedDb();
 
 await createRedisInstance();
 
@@ -48,16 +48,11 @@ const api = new Elysia({ prefix: '/api' })
   .use(campaignsRoute);
 
 const app = new Elysia()
-  // .use(
-  //   cors({
-  //     origin: /localhost/,
-  //   }),
-  // )
   .use(
     cors({
       allowedHeaders: ['Content-Type', 'Authorization'],
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      origin: '*', // TODO set this up for production
+      origin: '*', // origin: /localhost/, // TODO set this up for production
       preflight: true,
     }),
   )

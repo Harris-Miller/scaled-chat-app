@@ -17,10 +17,17 @@ const eslintConfig = [
     rules: {
       'no-console': 'off',
       'no-param-reassign': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
       'prefer-arrow/prefer-arrow-functions': 'off',
       // 'func-names': ['error', 'as-needed'], // I think this is weird with generators, need to double check
+    },
+  },
+  {
+    files: ['**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      // remove once consume next eslint-config-harris
+      '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
     },
   },
   {

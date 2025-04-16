@@ -26,12 +26,6 @@ export const authService = new Elysia({ name: 'auth/service' })
       secret: 'beyond',
     }),
   )
-  .model({
-    signIn: t.Object({
-      email: t.String({ minLength: 5 }),
-      password: t.String({ minLength: 8 }),
-    }),
-  })
   .derive({ as: 'scoped' }, ({ jwt, cookie: { accessToken, refreshToken } }) => {
     return {
       createAccessToken: async (sub: string) => {
@@ -75,68 +69,6 @@ export const authService = new Elysia({ name: 'auth/service' })
         return refreshJWTToken;
       },
     };
-  })
-  .macro({
-    isSignIn: (enabled: boolean) => {
-      if (!enabled) return undefined;
-
-      return {
-        // eslint-disable-next-line complexity
-        beforeHandle: async ({ cookie: { accessToken, refreshToken }, error, jwt, createAccessToken }) => {
-          if (accessToken?.value == null) {
-            if (refreshToken?.value == null) {
-              accessToken?.remove();
-              refreshToken?.remove();
-              return error(401);
-            }
-
-            const jwtPayload = await jwt.verify(refreshToken.value);
-            if (jwtPayload === false) {
-              accessToken?.remove();
-              refreshToken.remove();
-              return error(401);
-            }
-
-            const userId = Number.parseInt(jwtPayload.sub!, 10);
-            if (Number.isNaN(userId)) {
-              accessToken?.remove();
-              refreshToken.remove();
-              return error(401);
-            }
-
-            // TODO: this should always exist, why is `| undefined`
-            await createAccessToken!(jwtPayload.sub!);
-
-            const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
-            if (refreshToken.value !== storedRefreshToken) {
-              accessToken?.remove();
-              refreshToken.remove();
-              return error(401);
-            }
-
-            accessToken?.remove();
-            refreshToken.remove();
-            return error(401);
-          }
-
-          const jwtPayload = await jwt.verify(accessToken.value);
-          if (jwtPayload === false) {
-            accessToken.remove();
-            refreshToken?.remove();
-            return error(401);
-          }
-
-          const userId = Number.parseInt(jwtPayload.sub!, 10);
-          if (Number.isNaN(userId)) {
-            accessToken.remove();
-            refreshToken?.remove();
-            return error(401);
-          }
-
-          return undefined;
-        },
-      };
-    },
   });
 
 export const getUser = new Elysia()
@@ -144,16 +76,72 @@ export const getUser = new Elysia()
   .guard({
     cookie: t.Cookie(
       {
-        accessToken: t.String(),
-        refreshToken: t.String(),
+        accessToken: t.Optional(t.String()),
+        refreshToken: t.Optional(t.String()),
       },
       {
+        httpOnly: true,
         secrets: 'beyond',
+        secure: true,
       },
     ),
-    isSignIn: true,
   })
-  .resolve(async ({ cookie: { accessToken }, jwt, error }) => {
+  .onBeforeHandle(
+    async ({ cookie: { accessToken, refreshToken }, error, jwt, createAccessToken, createRefreshToken }) => {
+      if (accessToken.value == null) {
+        if (refreshToken.value == null) {
+          accessToken.remove();
+          refreshToken.remove();
+          return error(401, 'no access or refresh token');
+        }
+
+        const jwtPayload = await jwt.verify(refreshToken.value);
+        if (jwtPayload === false || jwtPayload.sub == null) {
+          accessToken.remove();
+          refreshToken.remove();
+          return error(401, 'failed to verify refresh token');
+        }
+
+        const userId = Number.parseInt(jwtPayload.sub, 10);
+        if (Number.isNaN(userId)) {
+          accessToken.remove();
+          refreshToken.remove();
+          return error(401, 'failed to validate refresh token');
+        }
+
+        const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
+        if (refreshToken.value !== storedRefreshToken) {
+          accessToken.remove();
+          refreshToken.remove();
+          return error(403, 'you dare! (tampered refresh token)');
+        }
+
+        await createAccessToken(jwtPayload.sub);
+        await createRefreshToken(jwtPayload.sub);
+
+        return undefined;
+      }
+
+      const jwtPayload = await jwt.verify(accessToken.value);
+      if (jwtPayload === false) {
+        accessToken.remove();
+        refreshToken.remove();
+        return error(401, 'failed to verify access token');
+      }
+
+      const userId = Number.parseInt(jwtPayload.sub!, 10);
+      if (Number.isNaN(userId)) {
+        accessToken.remove();
+        refreshToken.remove();
+        return error(401, 'failed to validate refresh token');
+      }
+
+      return undefined;
+    },
+  )
+  .resolve(async ({ cookie: { accessToken, refreshToken }, jwt, error }) => {
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
     const jwtPayload = await jwt.verify(accessToken.value);
     if (jwtPayload === false) {
       return error(401);
