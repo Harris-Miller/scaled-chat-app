@@ -65,9 +65,9 @@ services:
         - action: rebuild
           path: ./server/package.json
 
-  frontend:
+  client:
     build: ./frontend
-    container_name: frontend
+    container_name: client
     restart: on-failure:3
     depends_on:
       - server
@@ -82,3 +82,13 @@ services:
             - node_modules
         - action: rebuild
           path: ./frontend/package.json
+
+  httpd:
+    build: ./httpd
+    container_name: nginx
+    depends_on:
+      - server
+      - client
+    ports:
+      - 80:80
+    restart: on-failure:3

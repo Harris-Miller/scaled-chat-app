@@ -13,19 +13,18 @@ const connectionStatusMap = {
 } as const;
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
-  // const { sendMessage, lastMessage, readyState } = useWebSocket('ws/ping', {
-  //   onMessage: event => {
-  //     console.log('onMessage', event);
-  //     // lastMessage is still previous in this callback, gets updated after
-  //     console.log('lastMessage', lastMessage);
-  //   },
-  //   onOpen: event => {
-  //     console.log('onOpen', event);
-  //     sendMessage('i am message');
-  //   },
-  // });
+  const { sendMessage, lastMessage, readyState } = useWebSocket('ws/ping', {
+    onMessage: event => {
+      console.log('onMessage', event);
+      // lastMessage is still previous in this callback, gets updated after
+      console.log('lastMessage', lastMessage);
+    },
+    onOpen: event => {
+      console.log('onOpen', event);
+      sendMessage('i am message');
+    },
+  });
 
-  const readyState = ReadyState.UNINSTANTIATED;
   const connectionStatus = connectionStatusMap[readyState];
 
   return (
