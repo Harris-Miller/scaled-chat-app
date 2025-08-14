@@ -1,10 +1,11 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import harrisConfigBase from 'eslint-config-harris/base';
 import globals from 'globals';
 
 const eslintConfig = defineConfig([
   ...harrisConfigBase,
+  globalIgnores(['dist']),
   {
     languageOptions: {
       globals: {
@@ -14,6 +15,7 @@ const eslintConfig = defineConfig([
   },
   {
     rules: {
+      'func-names': 'off',
       'no-console': 'off',
       'no-param-reassign': 'off',
       'prefer-arrow/prefer-arrow-functions': 'off',

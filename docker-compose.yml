@@ -43,10 +43,11 @@ services:
     restart: on-failure:3
 
   server:
-    build: ./server
+    build: ./server2
     container_name: server
     depends_on:
       - postgres
+      - redis
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/dnd_encounters?sslmode=disable
       REDIS_URL: redis://redis:6379
@@ -58,12 +59,12 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./server
+          path: ./server2
           target: /usr/src/app
           ignore:
             - node_modules
         - action: rebuild
-          path: ./server/package.json
+          path: ./server2/package.json
 
   client:
     build: ./frontend
