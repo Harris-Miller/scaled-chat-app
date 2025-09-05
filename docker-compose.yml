@@ -43,7 +43,7 @@ services:
     restart: on-failure:3
 
   server:
-    build: ./server2
+    build: ./server
     container_name: server
     depends_on:
       - postgres
@@ -59,12 +59,12 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./server2
+          path: ./server
           target: /usr/src/app
           ignore:
             - node_modules
         - action: rebuild
-          path: ./server2/package.json
+          path: ./server/package.json
 
   client:
     build: ./frontend

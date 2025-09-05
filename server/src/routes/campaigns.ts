@@ -14,7 +14,7 @@ export const campaignsRoute = new Elysia({ prefix: '/campaigns' })
 
     return results;
   })
-  .get('/:id', async ({ error, user, params: { id } }) => {
+  .get('/:id', async ({ status, user, params: { id } }) => {
     console.log(`/api/campaign/${id}`);
 
     const result = await db.query.campaigns.findFirst({
@@ -22,7 +22,7 @@ export const campaignsRoute = new Elysia({ prefix: '/campaigns' })
     });
 
     if (result == null) {
-      return error(404, {
+      return status(404, {
         message: 'Not Found',
         success: false,
       });

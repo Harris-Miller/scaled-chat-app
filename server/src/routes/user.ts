@@ -15,13 +15,13 @@ export const userRoute = new Elysia({ prefix: '/user' })
   })
   .post(
     '/sign-up',
-    async ({ body: { email, password }, createAccessToken, createRefreshToken, error }) => {
+    async ({ body: { email, password }, createAccessToken, createRefreshToken, status }) => {
       console.log('user/sign-up');
       const user = await db.$count(users, eq(users.email, email));
 
       // bail if email already in use
       if (user !== 0)
-        return error(400, {
+        return status(400, {
           message: 'User already exists',
           success: false,
         });
@@ -53,13 +53,13 @@ export const userRoute = new Elysia({ prefix: '/user' })
   )
   .post(
     '/sign-in',
-    async ({ error, body: { email, password }, createAccessToken, createRefreshToken }) => {
+    async ({ status, body: { email, password }, createAccessToken, createRefreshToken }) => {
       console.log('user/sign-in');
 
       const user = await db.query.users.findFirst({ where: eq(users.email, email) });
 
       if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
-        return error(400, {
+        return status(400, {
           message: 'Invalid username or password',
           success: false,
         });

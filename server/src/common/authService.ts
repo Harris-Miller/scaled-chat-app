@@ -17,7 +17,7 @@ const getExpTimestamp = (seconds: number) => {
   return Math.floor(expirationTimeMs / 1000);
 };
 
-const createIat = () => Math.floor(Date.now() / 1000); // needs to be in seconds, not milliseconds
+// const createIat = () => Math.floor(Date.now() / 1000); // needs to be in seconds, not milliseconds
 
 export const authService = new Elysia({ name: 'auth/service' })
   .use(
@@ -29,9 +29,10 @@ export const authService = new Elysia({ name: 'auth/service' })
   .derive({ as: 'scoped' }, ({ jwt, cookie: { accessToken, refreshToken } }) => {
     return {
       createAccessToken: async (sub: string) => {
+        // @ts-expect-error
         const accessJWTToken = await jwt.sign({
           exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-          iat: createIat(),
+          iat: true,
           sub,
         });
 
@@ -48,9 +49,10 @@ export const authService = new Elysia({ name: 'auth/service' })
         return accessJWTToken;
       },
       createRefreshToken: async (sub: string) => {
+        // @ts-expect-error
         const refreshJWTToken = await jwt.sign({
           exp: getExpTimestamp(REFRESH_TOKEN_EXP),
-          iat: createIat(),
+          iat: true,
           sub,
         });
 
@@ -87,33 +89,33 @@ export const getUser = new Elysia()
     ),
   })
   .onBeforeHandle(
-    async ({ cookie: { accessToken, refreshToken }, error, jwt, createAccessToken, createRefreshToken }) => {
+    async ({ cookie: { accessToken, refreshToken }, status, jwt, createAccessToken, createRefreshToken }) => {
       if (accessToken.value == null) {
         if (refreshToken.value == null) {
           accessToken.remove();
           refreshToken.remove();
-          return error(401, 'no access or refresh token');
+          return status(401, 'no access or refresh token');
         }
 
         const jwtPayload = await jwt.verify(refreshToken.value);
         if (jwtPayload === false || jwtPayload.sub == null) {
           accessToken.remove();
           refreshToken.remove();
-          return error(401, 'failed to verify refresh token');
+          return status(401, 'failed to verify refresh token');
         }
 
         const userId = Number.parseInt(jwtPayload.sub, 10);
         if (Number.isNaN(userId)) {
           accessToken.remove();
           refreshToken.remove();
-          return error(401, 'failed to validate refresh token');
+          return status(401, 'failed to validate refresh token');
         }
 
         const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
         if (refreshToken.value !== storedRefreshToken) {
           accessToken.remove();
           refreshToken.remove();
-          return error(403, 'you dare! (tampered refresh token)');
+          return status(403, 'you dare! (tampered refresh token)');
         }
 
         await createAccessToken(jwtPayload.sub);
@@ -126,37 +128,37 @@ export const getUser = new Elysia()
       if (jwtPayload === false) {
         accessToken.remove();
         refreshToken.remove();
-        return error(401, 'failed to verify access token');
+        return status(401, 'failed to verify access token');
       }
 
       const userId = Number.parseInt(jwtPayload.sub!, 10);
       if (Number.isNaN(userId)) {
         accessToken.remove();
         refreshToken.remove();
-        return error(401, 'failed to validate refresh token');
+        return status(401, 'failed to validate refresh token');
       }
 
       return undefined;
     },
   )
-  .resolve(async ({ cookie: { accessToken, refreshToken }, jwt, error }) => {
+  .resolve(async ({ cookie: { accessToken, refreshToken }, jwt, status }) => {
     console.log('accessToken', accessToken);
     console.log('refreshToken', refreshToken);
     const jwtPayload = await jwt.verify(accessToken.value);
     if (jwtPayload === false) {
-      return error(401);
+      return status(401);
     }
 
     const userId = Number.parseInt(jwtPayload.sub!, 10);
     if (Number.isNaN(userId)) {
-      return error(401);
+      return status(401);
     }
 
     const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
     if (user == null) {
-      return error(403);
+      return status(403);
     }
 
     return { user };
   })
-  .as('plugin');
+  .as('global');
