@@ -56,7 +56,7 @@ export const Right: FC = () => {
             <Select
               fullWidth
               onChange={e => {
-                setCrRange([e.target.value as number, crHigh]);
+                setCrRange([e.target.value, crHigh]);
               }}
               value={crLow}
             >
@@ -74,7 +74,7 @@ export const Right: FC = () => {
             <Select
               fullWidth
               onChange={e => {
-                setCrRange([crLow, e.target.value as number]);
+                setCrRange([crLow, e.target.value]);
               }}
               value={crHigh}
             >

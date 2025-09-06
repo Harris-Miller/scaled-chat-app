@@ -33,6 +33,7 @@ const api = new Elysia({ prefix: '/api' })
   .use(charactersRoute)
   .use(campaignsRoute);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = new Elysia()
   .use(
     cors({

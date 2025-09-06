@@ -29,7 +29,6 @@ export const authService = new Elysia({ name: 'auth/service' })
   .derive({ as: 'scoped' }, ({ jwt, cookie: { accessToken, refreshToken } }) => {
     return {
       createAccessToken: async (sub: string) => {
-        // @ts-expect-error
         const accessJWTToken = await jwt.sign({
           exp: getExpTimestamp(ACCESS_TOKEN_EXP),
           iat: true,
@@ -49,7 +48,6 @@ export const authService = new Elysia({ name: 'auth/service' })
         return accessJWTToken;
       },
       createRefreshToken: async (sub: string) => {
-        // @ts-expect-error
         const refreshJWTToken = await jwt.sign({
           exp: getExpTimestamp(REFRESH_TOKEN_EXP),
           iat: true,
