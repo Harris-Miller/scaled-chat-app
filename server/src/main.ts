@@ -2,6 +2,8 @@ import { cors } from '@elysiajs/cors';
 import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
 import { swagger } from '@elysiajs/swagger';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { Elysia } from 'elysia';
 
 // import { seedDb } from './db';
@@ -41,7 +43,11 @@ const app = new Elysia()
     }),
   )
   .use(serverTiming())
-  .use(opentelemetry())
+  .use(
+    opentelemetry({
+      spanProcessors: [new BatchSpanProcessor(new OTLPTraceExporter())],
+    }),
+  )
   .use(swagger())
   .use(webSocket)
   .use(api)
