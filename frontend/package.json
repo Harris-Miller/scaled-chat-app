@@ -24,6 +24,7 @@
     "@tanstack/react-router": "^1.131.35",
     "@tanstack/router-devtools": "^1.131.35",
     "axios": "^1.11.0",
+    "dnd-data": "^1.0.0",
     "jotai": "^2.13.1",
     "nanoid": "^5.1.5",
     "neverthrow": "^8.2.0",
@@ -44,5 +45,5 @@
     "typescript": "^5.9.2",
     "vite": "^6.3.5"
   },
-  "packageManager": "pnpm@10.8.1"
+  "packageManager": "pnpm@10.15.1"
 }

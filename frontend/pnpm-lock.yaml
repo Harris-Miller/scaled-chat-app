@@ -35,6 +35,9 @@ importers:
       axios:
         specifier: ^1.11.0
         version: 1.11.0
+      dnd-data:
+        specifier: ^1.0.0
+        version: 1.0.0
       jotai:
         specifier: ^2.13.1
         version: 2.13.1(@babel/core@7.28.4)(@babel/template@7.27.2)(@types/react@19.1.12)(react@19.1.1)
@@ -1425,6 +1428,9 @@ packages:
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
+
+  dnd-data@1.0.0:
+    resolution: {integrity: sha512-owe7lzJ97TtfMo9KLZ2Z4LExvpO98Qt3oOIg54xOB3MjrN5ee0Ki6XwC1VSsRbapk0BSCh2ai8x6AXhcZc+4vw==}
 
   doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
@@ -3915,6 +3921,8 @@ snapshots:
   dir-glob@3.0.1:
     dependencies:
       path-type: 4.0.0
+
+  dnd-data@1.0.0: {}
 
   doctrine@2.1.0:
     dependencies:
