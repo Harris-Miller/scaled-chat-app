@@ -1,5 +1,5 @@
 {
-  "name": "encounter-backend",
+  "name": "chat-server",
   "private": true,
   "type": "module",
   "module": "src/main.ts",
