@@ -65,7 +65,7 @@ services:
     #       path: ./server/package.json
 
   client:
-    build: ./frontend
+    build: ./client
     container_name: client
     restart: on-failure:3
     depends_on:
