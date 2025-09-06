@@ -1,31 +1,38 @@
 import { Box, Container, Grid, Typography } from '@mui/material';
 import type { FC, PropsWithChildren } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { useEffect, useState } from 'react';
+
+import { socket } from '../socket';
 
 import { Header } from './Header';
 
-const connectionStatusMap = {
-  [ReadyState.CONNECTING]: 'Connecting',
-  [ReadyState.OPEN]: 'Open',
-  [ReadyState.CLOSING]: 'Closing',
-  [ReadyState.CLOSED]: 'Closed',
-  [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-} as const;
-
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
-  const { sendMessage, lastMessage, readyState } = useWebSocket('ws/ping', {
-    onMessage: event => {
-      console.log('onMessage', event);
-      // lastMessage is still previous in this callback, gets updated after
-      console.log('lastMessage', lastMessage);
-    },
-    onOpen: event => {
-      console.log('onOpen', event);
-      sendMessage('i am message');
-    },
-  });
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const connectionStatus = connectionStatusMap[readyState];
+  useEffect(() => {
+    const onConnect = () => {
+      setIsConnected(true);
+      socket.emit('ping');
+    };
+
+    const onDisconnect = () => {
+      setIsConnected(false);
+    };
+
+    const onPong = (msg: string) => {
+      console.log('pong received', msg);
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('pong', onPong);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('pong', onPong);
+    };
+  }, []);
 
   return (
     <>
@@ -43,7 +50,7 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
       >
         <Container maxWidth={false}>
           <Grid size={12}>
-            <Typography>The WebSocket is currently {connectionStatus}</Typography>
+            <Typography>The WebSocket is currently {isConnected ? 'connected' : 'disconnected'}</Typography>
           </Grid>
           <Grid size={12}>{children}</Grid>
         </Container>
