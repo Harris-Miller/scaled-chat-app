@@ -12,7 +12,6 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useNavigate } from '@tanstack/react-router';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 import { useAtom } from 'jotai';
@@ -23,6 +22,8 @@ import type { ApiError } from '../api/api.types';
 import { getProfile, signIn, signOut, signUp } from '../api/user';
 import type { User } from '../store/userData';
 import { userAtom } from '../store/userData';
+
+import { ButtonLink } from './ButtonLink';
 
 const handle =
   (fn: Dispatch<SetStateAction<string>>): ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =>
@@ -36,7 +37,6 @@ export const Header: FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [user, setUser] = useAtom(userAtom);
-  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -82,10 +82,6 @@ export const Header: FC = () => {
     });
   };
 
-  const handleNavigate = (path: string) => () => {
-    navigate({ to: `/${path}` });
-  };
-
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -128,12 +124,15 @@ export const Header: FC = () => {
               </IconButton>
             )}
             <Box sx={{ display: { md: 'flex', xs: 'none' }, flexGrow: 1 }}>
-              <Button onClick={handleNavigate('characters')} sx={{ color: 'white', display: 'block', my: 2 }}>
+              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/">
+                Home
+              </ButtonLink>
+              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/characters">
                 Characters
-              </Button>
-              <Button onClick={handleNavigate('campaigns')} sx={{ color: 'white', display: 'block', my: 2 }}>
+              </ButtonLink>
+              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/campaigns">
                 Campaigns
-              </Button>
+              </ButtonLink>
             </Box>
           </Toolbar>
         </AppBar>

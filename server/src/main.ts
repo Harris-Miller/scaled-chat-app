@@ -3,7 +3,6 @@ import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
 import { swagger } from '@elysiajs/swagger';
 import { Elysia } from 'elysia';
-import { createClient } from 'redis';
 
 // import { seedDb } from './db';
 import { createRedisInstance } from './redis/redisClient';
@@ -25,21 +24,6 @@ declare global {
 // await seedDb();
 
 await createRedisInstance();
-
-// TODO: get url/port from process.env
-const client = await createClient({
-  url: process.env.REDIS_URL,
-})
-  .on('connect', () => {
-    console.log('Redis Client connecting');
-  })
-  .on('ready', () => {
-    console.log('Redis Client ready');
-  })
-  .on('error', (err: unknown) => {
-    console.log('Redis Client Error', err);
-  })
-  .connect();
 
 const api = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')

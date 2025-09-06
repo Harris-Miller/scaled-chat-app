@@ -4,7 +4,6 @@ let instance: Awaited<ReturnType<typeof createClient>> | undefined;
 
 export const createRedisInstance = async () => {
   instance = await createClient({
-    // TODO: get url/port from process.env
     url: process.env.REDIS_URL,
   })
     .on('connect', () => {

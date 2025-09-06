@@ -1,5 +1,5 @@
 volumes:
-  db:
+  db-data:
 
 services:
   postgres:
@@ -11,9 +11,9 @@ services:
       POSTGRES_USER: postgres
     ports:
       - 5432:5432
-    restart: on-failure:3
+    restart: always
     volumes:
-      - db:/var/lib/postgres/data
+      - db-data:/var/lib/postgresql/data
 
   redis:
     image: redis/redis-stack:latest
@@ -21,7 +21,7 @@ services:
     ports:
       - 6379:6379
       - 8001:8001
-    restart: on-failure:3
+    restart: always
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -56,15 +56,13 @@ services:
       - 3101:3101 # port selected to no conflict with local dev port
     restart: on-failure:3
     # command: bun --watch run ./src/main.ts
-    develop:
-      watch:
-        - action: sync
-          path: ./server
-          target: /usr/src/app
-          ignore:
-            - node_modules
-        - action: rebuild
-          path: ./server/package.json
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./server
+    #       target: /usr/src/app
+    #     - action: rebuild
+    #       path: ./server/package.json
 
   client:
     build: ./frontend
@@ -74,15 +72,6 @@ services:
       - server
     ports:
       - 3100:3100 # port selected to no conflict with local dev port
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /app
-          ignore:
-            - node_modules
-        - action: rebuild
-          path: ./frontend/package.json
 
   httpd:
     build: ./httpd

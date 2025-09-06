@@ -81,9 +81,14 @@ const routeTree = rootRoute.addChildren([
   charactersRoute.addChildren([characterCreatorRoute]),
 ]);
 
-const router = createRouter({
+export const router = createRouter({
   defaultNotFoundComponent: () => <Typography>Not Found</Typography>,
   routeTree,
 });
 
-export { router };
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
