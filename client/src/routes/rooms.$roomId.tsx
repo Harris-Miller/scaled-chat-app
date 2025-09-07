@@ -10,8 +10,6 @@ export const RoomComponent: FC = () => {
 
   const query = useRoom(roomId);
 
-  console.log(query);
-
   return (
     <Box alignContent="center" display="flex" justifyContent="center">
       <Box>
