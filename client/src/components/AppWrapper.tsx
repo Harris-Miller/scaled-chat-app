@@ -1,22 +1,19 @@
-import { Box, Container, Grid, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import type { FC, PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { socket } from '../socket';
 
 import { Header } from './Header';
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-
   useEffect(() => {
     const onConnect = () => {
-      setIsConnected(true);
       socket.emit('ping');
     };
 
     const onDisconnect = () => {
-      setIsConnected(false);
+      // noop, for now
     };
 
     const onPong = (msg: string) => {
@@ -48,12 +45,7 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
           overflow: 'auto',
         }}
       >
-        <Container maxWidth={false}>
-          <Grid size={12}>
-            <Typography>The WebSocket is currently {isConnected ? 'connected' : 'disconnected'}</Typography>
-          </Grid>
-          <Grid size={12}>{children}</Grid>
-        </Container>
+        <Container maxWidth={false}>{children}</Container>
       </Box>
     </>
   );

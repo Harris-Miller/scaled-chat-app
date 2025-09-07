@@ -70,13 +70,7 @@ const app = new Elysia()
 const serverInstance = Bun.serve({
   fetch(req, server) {
     const url = new URL(req.url);
-
-    console.log(url.toString());
-
-    if (url.pathname === '/ws/') {
-      return engine.handleRequest(req, server);
-    }
-    return app.fetch(req);
+    return url.pathname === '/ws/' ? engine.handleRequest(req, server) : app.fetch(req);
   },
   port: process.env.PORT,
   websocket,
