@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
-import { DeadCenter } from '../DeadCenter';
-import { LoginDialog } from '../Login';
+import { DeadCenter } from '../components/DeadCenter';
+import { LoginDialog } from '../components/Login';
 
 export const LoginPage: FC = () => {
   return (

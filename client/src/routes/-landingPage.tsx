@@ -2,7 +2,7 @@ import { Button, Grid, Stack, TextField, Typography } from '@mui/material';
 import type { FC } from 'react';
 import { useState } from 'react';
 
-import { useCreateRoom } from '../../api/rooms';
+import { useCreateRoom } from '../api/rooms';
 import { handle } from '../utils';
 
 export const LandingPage: FC = () => {

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import type { ApiError } from '../../api/api.types';
 import { getProfile, signIn, signUp } from '../../api/user';
 import { useStore } from '../../store';
-import { handle } from '../utils';
+import { handle } from '../../utils';
 
 export const LoginDialog: FC<DialogProps> = props => {
   const [email, setEmail] = useState('');
