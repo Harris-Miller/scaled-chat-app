@@ -2,18 +2,13 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextF
 import type { DialogProps } from '@mui/material';
 import type { AxiosError } from 'axios';
 import { dissoc } from 'ramda';
-import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
+import type { FC } from 'react';
 import { useState } from 'react';
 
 import type { ApiError } from '../../api/api.types';
 import { getProfile, signIn, signUp } from '../../api/user';
 import { useStore } from '../../store';
-
-const handle =
-  (fn: Dispatch<SetStateAction<string>>): ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =>
-  e => {
-    fn(e.currentTarget.value);
-  };
+import { handle } from '../utils';
 
 export const LoginDialog: FC<DialogProps> = props => {
   const [email, setEmail] = useState('');
