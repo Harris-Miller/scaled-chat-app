@@ -92,7 +92,9 @@ export const userRoute = new Elysia({ prefix: '/user' })
     console.log('user/profile');
 
     return {
+      displayName: user.displayName,
       email: user.email,
+      id: user.id,
       success: true,
     };
   });
