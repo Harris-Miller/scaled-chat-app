@@ -3,7 +3,9 @@ import axios from 'axios';
 import type { SuccessMessage } from './api.types';
 
 export type Profile = {
+  displayName: string;
   email: string;
+  id: number;
   success: true;
 };
 

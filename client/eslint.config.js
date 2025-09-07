@@ -23,6 +23,7 @@ const eslintConfig = [
     files: ['src/**/*.ts'],
     rules: {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
       // remove once consume next eslint-config-harris
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
     },

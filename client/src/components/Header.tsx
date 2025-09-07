@@ -13,17 +13,13 @@ import {
   Typography,
 } from '@mui/material';
 import type { AxiosError } from 'axios';
-import axios from 'axios';
-import { useAtom } from 'jotai';
+import { dissoc } from 'ramda';
 import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
 
 import type { ApiError } from '../api/api.types';
 import { getProfile, signIn, signOut, signUp } from '../api/user';
-import type { User } from '../store/userData';
-import { userAtom } from '../store/userData';
-
-import { ButtonLink } from './ButtonLink';
+import { useStore } from '../store';
 
 const handle =
   (fn: Dispatch<SetStateAction<string>>): ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =>
@@ -36,14 +32,13 @@ export const Header: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [user, setUser] = useAtom(userAtom);
+  const { user, setUser } = useStore();
 
   useEffect(() => {
-    axios
-      .get<User>('/api/user/profile')
+    getProfile()
       .then(resp => {
         console.log(resp);
-        setUser(resp.data);
+        setUser(dissoc('success', resp.data));
       })
       .catch((resp: unknown) => {
         console.log(resp);
@@ -54,7 +49,7 @@ export const Header: FC = () => {
     try {
       const response = await signUp(email, password).then(getProfile);
       console.log(response.data);
-      setUser(response.data);
+      setUser(dissoc('success', response.data));
       setDialogOpen(false);
     } catch (err) {
       console.log(err);
@@ -123,17 +118,6 @@ export const Header: FC = () => {
                 <LoginIcon />
               </IconButton>
             )}
-            <Box sx={{ display: { md: 'flex', xs: 'none' }, flexGrow: 1 }}>
-              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/">
-                Home
-              </ButtonLink>
-              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/characters">
-                Characters
-              </ButtonLink>
-              <ButtonLink sx={{ color: 'white', display: 'block', my: 2 }} to="/campaigns">
-                Campaigns
-              </ButtonLink>
-            </Box>
           </Toolbar>
         </AppBar>
       </Box>
