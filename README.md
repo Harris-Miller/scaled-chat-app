@@ -1,10 +1,29 @@
-# dnd-encounter-runner
+# chat-app
 
-A remake of https://improvedinitiative.app/ (https://github.com/cynicaloptimist/improved-initiative) for the express purpose of learning how to deploy a frontend, backend, managed postgres/redis, etc, on _n_-number of Cloud providers
+Building a chat app for the express purpose of learning how to deploy a frontend, backend, managed postgres/redis, etc, on _n_-number of Cloud providers
 
-## TODO
+## Stage 1
+- auth is just simple username/password system (no email)
+  - cookie access/refresh tokens enabled (backed by redis), but no OAuth of any kind
+- landing page has simple "create or join" chat room names
+  - creating a room needs a name, is assigned a ulid, which can be used to join
+  - can list available rooms (virtualized, look in tanstack for this)
+- chat is done
+  - via websockets and broadcasting
+  - history kept in DB
+  - stretch: show chat history upon re-enter
+- docker-compose includes httpd project that simulates kubernetes nginx load balancer
 
-Make a more simple server2 that just uses ExpressJS. Elysia is good but is limiting and has poor docs and concepts.
-Building websockets that can correctly reconnect across horizontally scaled instances should be first explored with ExpressJS
-since I know more-less how to do that via SocketIO + redis plugin
+## Stage 2
+- socket.io redis adapter for scaling, use deploy option on docker-compose on server to test
+- allow users to post pictures, storing in `adobe/s3mock` container for docker-compose
+- show all rooms a user has joined, user can leave a room
+- user can add metadata and profile pic
+
+## Stage 3
+- Set up local Kubernetes through DockerDesktop
+- Helm Chart to manage deployment and orchestrations
+
+## Stage 4
+- ???
 

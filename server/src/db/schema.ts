@@ -1,5 +1,9 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+
+//
+// Tables
+//
 
 export const users = pgTable('users', {
   createdAt: timestamp().defaultNow().notNull(),
@@ -7,104 +11,95 @@ export const users = pgTable('users', {
   email: varchar({ length: 255 }).notNull().unique(),
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   passwordHash: varchar({ length: 255 }).notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
 
-export const campaigns = pgTable('campaigns', {
-  createdAt: timestamp().defaultNow().notNull(),
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
-  userId: integer()
+export const rooms = pgTable('rooms', {
+  adminId: integer()
     .notNull()
     .references(() => users.id),
-});
-
-export const characters = pgTable('characters', {
-  campaignId: integer().references(() => campaigns.id),
   createdAt: timestamp().defaultNow().notNull(),
+  description: text().notNull().default(''),
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
-  userId: integer()
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const chats = pgTable('chats', {
+  authorId: integer()
     .notNull()
     .references(() => users.id),
-});
-
-export const encounters = pgTable('encounters', {
-  campaignId: integer()
-    .notNull()
-    .references(() => campaigns.id),
   createdAt: timestamp().defaultNow().notNull(),
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
-});
-
-export const monsters = pgTable('monsters', {
-  createdAt: timestamp().defaultNow().notNull(),
-  encounterId: integer()
+  roomId: integer()
     .notNull()
-    .references(() => encounters.id),
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  updatedAt: timestamp().defaultNow().notNull(),
+    .references(() => rooms.id),
+  text: text().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
 
-//
-// Since Player characters and monster characters are their own tables
-// have separate condition tables for them, even though they share the same schema
-//
-
-const createConditionsTable = (name: string) =>
-  pgTable(name, {
-    createdAt: timestamp().defaultNow().notNull(),
-    encounterId: integer()
+export const usersToRooms = pgTable(
+  'users_to_rooms',
+  {
+    roomId: integer()
       .notNull()
-      .references(() => encounters.id),
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    updatedAt: timestamp().defaultNow().notNull(),
-  });
+      .references(() => rooms.id),
+    userId: integer()
+      .notNull()
+      .references(() => users.id),
+  },
+  t => [primaryKey({ columns: [t.userId, t.roomId] })],
+);
 
-export const characterConditions = createConditionsTable('character_conditions');
-
-export const monsterConditions = createConditionsTable('monster_conditions');
+export const usersToChats = pgTable(
+  'users_to_chats',
+  {
+    chatId: integer()
+      .notNull()
+      .references(() => chats.id),
+    userId: integer()
+      .notNull()
+      .references(() => users.id),
+  },
+  t => [primaryKey({ columns: [t.userId, t.chatId] })],
+);
 
 //
 // Relations
 //
 
-export const usersRelations = relations(users, ({ many }) => ({
-  campaigns: many(campaigns),
-  characters: many(characters),
+export const userRelations = relations(users, ({ many }) => ({
+  chats: many(chats),
+  usersToChats: many(usersToChats),
+  usersToRooms: many(usersToRooms),
 }));
 
-export const charactersRelations = relations(characters, ({ one }) => ({
-  campaign: one(campaigns, { fields: [characters.campaignId], references: [campaigns.id] }),
-  owner: one(users, { fields: [characters.userId], references: [users.id] }),
+export const chatRelations = relations(chats, ({ one, many }) => ({
+  author: one(users, { fields: [chats.authorId], references: [users.id] }),
+  room: one(rooms, { fields: [chats.roomId], references: [rooms.id] }),
+  usersToChats: many(usersToChats),
 }));
 
-export const campaignsRelations = relations(campaigns, ({ one, many }) => ({
-  characters: many(characters),
-  encounters: many(encounters),
-  owner: one(users, { fields: [campaigns.userId], references: [users.id] }),
+export const roomRelations = relations(rooms, ({ many }) => ({
+  chats: many(chats),
+  usersToRooms: many(usersToRooms),
 }));
 
-export const encountersRelations = relations(encounters, ({ many, one }) => ({
-  campaign: one(campaigns, { fields: [encounters.campaignId], references: [campaigns.id] }),
-  characterConditions: many(characterConditions),
-  monsterConditions: many(monsterConditions),
-  monsters: many(monsters),
+export const usersToRoomsRelations = relations(usersToRooms, ({ one }) => ({
+  room: one(rooms, { fields: [usersToRooms.roomId], references: [rooms.id] }),
+  user: one(users, { fields: [usersToRooms.userId], references: [users.id] }),
 }));
 
-export const monstersRelations = relations(monsters, ({ one }) => ({
-  encounters: one(encounters, { fields: [monsters.encounterId], references: [encounters.id] }),
-}));
-
-export const characterConditionsRelations = relations(characterConditions, ({ one }) => ({
-  encounters: one(encounters, { fields: [characterConditions.encounterId], references: [encounters.id] }),
-}));
-
-export const monsterConditionsRelations = relations(monsterConditions, ({ one }) => ({
-  encounters: one(encounters, { fields: [monsterConditions.encounterId], references: [encounters.id] }),
+export const usersToChatsRelations = relations(usersToChats, ({ one }) => ({
+  chat: one(chats, { fields: [usersToChats.chatId], references: [chats.id] }),
+  user: one(users, { fields: [usersToChats.userId], references: [users.id] }),
 }));
