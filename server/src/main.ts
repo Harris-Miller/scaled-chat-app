@@ -4,14 +4,13 @@ import { serverTiming } from '@elysiajs/server-timing';
 import { swagger } from '@elysiajs/swagger';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
-import { Server as SocketIoBunEngine } from '@socket.io/bun-engine';
 import { Elysia } from 'elysia';
-import { Server as SocketIoServer } from 'socket.io';
 
 // import { seedDb } from './db';
 import { createRedisInstance } from './redis/redisClient';
 import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
+import { engine, websocket } from './socket';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -26,23 +25,6 @@ declare global {
 // await seedDb();
 
 await createRedisInstance();
-
-const io = new SocketIoServer();
-const engine = new SocketIoBunEngine();
-
-io.bind(engine);
-
-// const handlePing = () => {}
-
-io.on('connection', socket => {
-  console.log('socket.io connected!');
-  socket.on('ping', () => {
-    console.log('received ping, responding...');
-    socket.emit('pong', 'hello from server!');
-  });
-});
-
-const { websocket } = engine.handler();
 
 const api = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')
