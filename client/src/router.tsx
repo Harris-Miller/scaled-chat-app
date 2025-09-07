@@ -11,6 +11,7 @@ import { AppWrapper } from './components/AppWrapper';
 // import { DbExplorer } from './components/dbExplorer/DbExplorer';
 // import { EncounterCreator } from './components/EncounterCreator';
 import { Home } from './components/Home';
+import { Room } from './components/Room';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -23,10 +24,16 @@ const rootRoute = createRootRoute({
   ),
 });
 
-const indexRoute = createRoute({
+export const indexRoute = createRoute({
   component: Home,
   getParentRoute: () => rootRoute,
   path: '/',
+});
+
+export const roomRoute = createRoute({
+  component: Room,
+  getParentRoute: () => rootRoute,
+  path: '/rooms/$roomId',  
 });
 
 // const campaignsRoute = createRoute({
@@ -73,6 +80,7 @@ const indexRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  roomRoute,
   // campaignsRoute,
   // campaignRoute,
   // encountersRoute,

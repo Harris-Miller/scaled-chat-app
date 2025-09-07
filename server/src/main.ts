@@ -10,8 +10,7 @@ import { Server as SocketIoServer } from 'socket.io';
 
 // import { seedDb } from './db';
 import { createRedisInstance } from './redis/redisClient';
-// import { campaignsRoute } from './routes/campaigns';
-// import { charactersRoute } from './routes/characters';
+import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
 
 declare global {
@@ -45,9 +44,10 @@ io.on('connection', socket => {
 
 const { websocket } = engine.handler();
 
-const api = new Elysia({ prefix: '/api' }).get('/', () => 'Hello Elysia').use(userRoute);
-// .use(charactersRoute)
-// .use(campaignsRoute);
+const api = new Elysia({ prefix: '/api' })
+  .get('/', () => 'Hello Elysia')
+  .use(userRoute)
+  .use(roomsRoute);
 
 const app = new Elysia()
   .use(

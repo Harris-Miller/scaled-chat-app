@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable */
 import { eq } from 'drizzle-orm';
 import { Elysia } from 'elysia';
 
