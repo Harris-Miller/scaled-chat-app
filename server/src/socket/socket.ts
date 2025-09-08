@@ -18,21 +18,18 @@ io.on('connection', socket => {
   socket.on('room:join', (args: { roomId: number }) => {
     console.log('room:join', args);
     socket.join(`room:${args.roomId}`);
-
-    globalThis.setTimeout(() => {
-      io.to(`room:${args.roomId}`).emit('chat', { text: 'first', timestamp: new Date(), userId: 0 });
-    }, 500);
-    globalThis.setTimeout(() => {
-      io.to(`room:${args.roomId}`).emit('chat', { text: 'second', timestamp: new Date(), userId: 0 });
-    }, 2000);
-    globalThis.setTimeout(() => {
-      io.to(`room:${args.roomId}`).emit('chat', { text: 'third', timestamp: new Date(), userId: 0 });
-    }, 5000);
   });
 
   socket.on('room:leave', (args: { roomId: number }) => {
     console.log('room:leave', args);
     socket.leave(`room:${args.roomId}`);
+  });
+
+  socket.on('chat:text', (args: { roomId: number; text: string; userId: number }) => {
+    console.log('chat:text', args);
+    socket.broadcast
+      .to(`room:${args.roomId}`)
+      .emit('chat', { text: args.text, timestamp: new Date(), userId: args.userId });
   });
 });
 

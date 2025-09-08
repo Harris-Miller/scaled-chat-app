@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { queryClient } from './client';
+import { queryClient } from './queryClient';
 
 export type Campaign = {
   createdAt: string;

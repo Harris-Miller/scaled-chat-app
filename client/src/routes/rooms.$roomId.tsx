@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRoom } from '../api/rooms';
 import type { Room } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
+import { handle } from '../utils';
 
 const SubComponent: FC<Room> = ({ description, id, name }) => {
   const user = useActiveUser();
+
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const callbackFn = (arg: unknown) => {
@@ -26,17 +29,37 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     };
   }, [id, user.id]);
 
+  const messageHandler = () => {
+    if (message.trim() === '') return;
+
+    socket.emit('chat:text', { roomId: id, text: message, userId: user.id });
+    setMessage('');
+  };
+
   return (
     <Box alignContent="center" display="flex" justifyContent="center">
-      <Box>
-        <Typography>Room: {id}</Typography>
-      </Box>
-      <Box>
-        <Typography>Name: {name}</Typography>
-      </Box>
-      <Box>
-        <Typography>Description: {description}</Typography>
-      </Box>
+      <Stack>
+        <Box>
+          <Typography>Room: {id}</Typography>
+        </Box>
+        <Box>
+          <Typography>Name: {name}</Typography>
+        </Box>
+        <Box>
+          <Typography>Description: {description}</Typography>
+        </Box>
+        <Box>
+          <TextField label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
+          <Button
+            onClick={() => {
+              messageHandler();
+            }}
+            variant="contained"
+          >
+            Submit
+          </Button>
+        </Box>
+      </Stack>
     </Box>
   );
 };
@@ -62,7 +85,7 @@ export const RoomComponent: FC = () => {
     );
   }
 
-  return <SubComponent {...query.data.data} />;
+  return <SubComponent {...query.data} />;
 };
 
 export const Route = createFileRoute('/rooms/$roomId')({

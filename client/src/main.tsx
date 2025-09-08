@@ -5,7 +5,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { queryClient } from './api/client';
+import { queryClient } from './api/queryClient';
 import { ThemeWrapper } from './components/ThemeWrapper';
 import { routeTree } from './routeTree.gen';
 

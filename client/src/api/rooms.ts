@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-import { queryClient } from './client';
+import { queryClient } from './queryClient';
 
 export interface Room {
   description: string;
@@ -27,6 +27,6 @@ export const useCreateRoom = () =>
 
 export const useRoom = (roomId: number) =>
   useQuery({
-    queryFn: () => getRoom(roomId),
+    queryFn: () => getRoom(roomId).then(({ data }) => data),
     queryKey: ['room', roomId],
   });
