@@ -1,6 +1,9 @@
 import { Server as SocketIoBunEngine } from '@socket.io/bun-engine';
 import { Server as SocketIoServer } from 'socket.io';
 
+import { db } from '../db';
+import { chats } from '../db/schema';
+
 const io = new SocketIoServer();
 const engine = new SocketIoBunEngine();
 
@@ -15,21 +18,24 @@ io.on('connection', socket => {
   });
 
   // TODO: abstract these into files
-  socket.on('room:join', (args: { roomId: number }) => {
+  socket.on('room:join', (args: { roomId: string }) => {
     console.log('room:join', args);
     socket.join(`room:${args.roomId}`);
   });
 
-  socket.on('room:leave', (args: { roomId: number }) => {
+  socket.on('room:leave', (args: { roomId: string }) => {
     console.log('room:leave', args);
     socket.leave(`room:${args.roomId}`);
   });
 
-  socket.on('chat:text', (args: { roomId: number; text: string; userId: number }) => {
+  socket.on('chat:text', async (args: { id: string; roomId: string; text: string; userId: string }) => {
     console.log('chat:text', args);
-    socket.broadcast
-      .to(`room:${args.roomId}`)
-      .emit('chat', { text: args.text, timestamp: new Date(), userId: args.userId });
+    const { id, roomId, userId: authorId, text } = args;
+
+    // TODO: try/catch
+    const [newChat] = await db.insert(chats).values({ authorId, id, roomId, text }).returning();
+
+    socket.broadcast.to(`room:${args.roomId}`).emit('chat', newChat!);
   });
 });
 

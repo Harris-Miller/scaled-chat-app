@@ -61,9 +61,7 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
     },
     {
       params: t.Object({
-        id: t.Integer({
-          error: 'Invalid roomId. Must be an integer',
-        }),
+        id: t.String(),
       }),
     },
   );

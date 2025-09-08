@@ -26,21 +26,8 @@ export const LandingPage: FC = () => {
       return;
     }
 
-    if (roomId.includes('.')) {
-      // TODO: error message
-      return;
-    }
-
-    const roomIdNum = Number.parseInt(roomId, 10);
-
-    if (Number.isNaN(roomIdNum)) {
-      // TODO: error message
-      return;
-    }
-
-    getRoom(roomIdNum)
+    getRoom(roomId)
       .then(({ data }) => {
-        console.log('getRoom', data);
         queryClient.setQueryData(['room', data.id], data);
         navigate({ params: { roomId: data.id }, to: '/rooms/$roomId' });
       })

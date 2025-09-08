@@ -102,14 +102,7 @@ export const getUser = new Elysia()
           return status(401, 'failed to verify refresh token');
         }
 
-        const userId = Number.parseInt(jwtPayload.sub, 10);
-        if (Number.isNaN(userId)) {
-          accessToken.remove();
-          refreshToken.remove();
-          return status(401, 'failed to validate refresh token');
-        }
-
-        const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${userId}`, 'refresh_token');
+        const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${jwtPayload.sub}`, 'refresh_token');
         if (refreshToken.value !== storedRefreshToken) {
           accessToken.remove();
           refreshToken.remove();
@@ -129,13 +122,6 @@ export const getUser = new Elysia()
         return status(401, 'failed to verify access token');
       }
 
-      const userId = Number.parseInt(jwtPayload.sub!, 10);
-      if (Number.isNaN(userId)) {
-        accessToken.remove();
-        refreshToken.remove();
-        return status(401, 'failed to validate refresh token');
-      }
-
       return undefined;
     },
   )
@@ -147,12 +133,11 @@ export const getUser = new Elysia()
       return status(401);
     }
 
-    const userId = Number.parseInt(jwtPayload.sub!, 10);
-    if (Number.isNaN(userId)) {
+    if (jwtPayload.sub == null) {
       return status(401);
     }
 
-    const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+    const user = await db.query.users.findFirst({ where: eq(users.id, jwtPayload.sub) });
     if (user == null) {
       return status(403);
     }

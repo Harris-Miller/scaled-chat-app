@@ -9,7 +9,7 @@ export interface Room {
   name: string;
 }
 
-export const getRoom = (roomId: number) => {
+export const getRoom = (roomId: string) => {
   return axios.get<Room>(`/api/rooms/${roomId}`);
 };
 
@@ -25,7 +25,7 @@ export const useCreateRoom = () =>
     },
   });
 
-export const useRoom = (roomId: number) =>
+export const useRoom = (roomId: string) =>
   useQuery({
     queryFn: () => getRoom(roomId).then(({ data }) => data),
     queryKey: ['room', roomId],

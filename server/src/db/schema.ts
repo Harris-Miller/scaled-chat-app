@@ -1,5 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { char, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { nanoid as genNanoid } from 'nanoid';
+
+const nanoid = () => char({ length: 21 });
 
 //
 // Tables
@@ -9,7 +12,9 @@ export const users = pgTable('users', {
   createdAt: timestamp().defaultNow().notNull(),
   displayName: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: nanoid()
+    .primaryKey()
+    .$defaultFn(() => genNanoid()),
   passwordHash: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp()
     .defaultNow()
@@ -18,12 +23,14 @@ export const users = pgTable('users', {
 });
 
 export const rooms = pgTable('rooms', {
-  adminId: integer()
+  adminId: nanoid()
     .notNull()
     .references(() => users.id),
   createdAt: timestamp().defaultNow().notNull(),
   description: text().notNull().default(''),
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: nanoid()
+    .primaryKey()
+    .$defaultFn(() => genNanoid()),
   name: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp()
     .defaultNow()
@@ -32,12 +39,14 @@ export const rooms = pgTable('rooms', {
 });
 
 export const chats = pgTable('chats', {
-  authorId: integer()
+  authorId: nanoid()
     .notNull()
     .references(() => users.id),
   createdAt: timestamp().defaultNow().notNull(),
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  roomId: integer()
+  id: nanoid()
+    .primaryKey()
+    .$defaultFn(() => genNanoid()),
+  roomId: nanoid()
     .notNull()
     .references(() => rooms.id),
   text: text().notNull(),
@@ -50,10 +59,10 @@ export const chats = pgTable('chats', {
 export const usersToRooms = pgTable(
   'users_to_rooms',
   {
-    roomId: integer()
+    roomId: nanoid()
       .notNull()
       .references(() => rooms.id),
-    userId: integer()
+    userId: nanoid()
       .notNull()
       .references(() => users.id),
   },
@@ -63,10 +72,10 @@ export const usersToRooms = pgTable(
 export const usersToChats = pgTable(
   'users_to_chats',
   {
-    chatId: integer()
+    chatId: nanoid()
       .notNull()
       .references(() => chats.id),
-    userId: integer()
+    userId: nanoid()
       .notNull()
       .references(() => users.id),
   },

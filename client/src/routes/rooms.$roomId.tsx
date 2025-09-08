@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
+import { nanoid } from 'nanoid';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -32,7 +33,8 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   const messageHandler = () => {
     if (message.trim() === '') return;
 
-    socket.emit('chat:text', { roomId: id, text: message, userId: user.id });
+    const chatId = nanoid();
+    socket.emit('chat:text', { id: chatId, roomId: id, text: message, userId: user.id });
     setMessage('');
   };
 
@@ -90,9 +92,4 @@ export const RoomComponent: FC = () => {
 
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomComponent,
-  params: {
-    parse: params => ({
-      roomId: Number.parseInt(params.roomId, 10),
-    }),
-  },
 });

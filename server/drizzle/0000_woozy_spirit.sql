@@ -1,17 +1,17 @@
 CREATE TABLE "chats" (
-	"author_id" integer NOT NULL,
+	"author_id" char(21) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "chats_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-	"room_id" integer NOT NULL,
+	"id" char(21) PRIMARY KEY NOT NULL,
+	"room_id" char(21) NOT NULL,
 	"text" text NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "rooms" (
-	"admin_id" integer NOT NULL,
+	"admin_id" char(21) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"description" text DEFAULT '' NOT NULL,
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "rooms_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" char(21) PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -20,21 +20,21 @@ CREATE TABLE "users" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"display_name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" char(21) PRIMARY KEY NOT NULL,
 	"password_hash" varchar(255) NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 CREATE TABLE "users_to_chats" (
-	"chat_id" integer NOT NULL,
-	"user_id" integer NOT NULL,
+	"chat_id" char(21) NOT NULL,
+	"user_id" char(21) NOT NULL,
 	CONSTRAINT "users_to_chats_user_id_chat_id_pk" PRIMARY KEY("user_id","chat_id")
 );
 --> statement-breakpoint
 CREATE TABLE "users_to_rooms" (
-	"room_id" integer NOT NULL,
-	"user_id" integer NOT NULL,
+	"room_id" char(21) NOT NULL,
+	"user_id" char(21) NOT NULL,
 	CONSTRAINT "users_to_rooms_user_id_room_id_pk" PRIMARY KEY("user_id","room_id")
 );
 --> statement-breakpoint

@@ -1,5 +1,5 @@
 {
-  "id": "ce6dfa25-d572-4bfc-a821-b18e6211b84a",
+  "id": "2eb2641a-7dfe-4b31-bf2e-36539f710b83",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,7 +10,7 @@
       "columns": {
         "author_id": {
           "name": "author_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         },
@@ -23,24 +23,13 @@
         },
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "chats_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
+          "notNull": true
         },
         "room_id": {
           "name": "room_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         },
@@ -99,7 +88,7 @@
       "columns": {
         "admin_id": {
           "name": "admin_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         },
@@ -119,20 +108,9 @@
         },
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "rooms_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -195,20 +173,9 @@
         },
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "users_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
+          "notNull": true
         },
         "password_hash": {
           "name": "password_hash",
@@ -246,13 +213,13 @@
       "columns": {
         "chat_id": {
           "name": "chat_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         }
@@ -306,13 +273,13 @@
       "columns": {
         "room_id": {
           "name": "room_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "char(21)",
           "primaryKey": false,
           "notNull": true
         }
