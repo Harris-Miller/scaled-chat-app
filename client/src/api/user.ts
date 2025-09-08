@@ -5,7 +5,7 @@ import type { SuccessMessage } from './api.types';
 export type Profile = {
   displayName: string;
   email: string;
-  id: number;
+  id: string;
   success: true;
 };
 

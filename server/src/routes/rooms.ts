@@ -7,6 +7,10 @@ import { rooms } from '../db/schema';
 
 export const roomsRoute = new Elysia({ prefix: '/rooms' })
   .use(getUser)
+  .get('/', async () => {
+    const results = await db.select().from(rooms);
+    return results;
+  })
   .post(
     '/',
     async ({ body: { name }, status, user }) => {

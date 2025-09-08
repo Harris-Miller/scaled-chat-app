@@ -4,10 +4,15 @@ import axios from 'axios';
 import { queryClient } from './queryClient';
 
 export interface Room {
+  authorId: string;
   description: string;
-  id: number;
+  id: string;
   name: string;
 }
+
+export const getRooms = () => {
+  return axios.get<Room[]>('/api/rooms/');
+};
 
 export const getRoom = (roomId: string) => {
   return axios.get<Room>(`/api/rooms/${roomId}`);

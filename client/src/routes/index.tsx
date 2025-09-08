@@ -10,11 +10,7 @@ import { LandingPage } from './-landingPage';
 const IndexComponent: FC = () => {
   const { user } = useStore();
 
-  return (
-    <Grid container>
-      <Grid size={12}>{user == null ? <LoginDialog open /> : <LandingPage />}</Grid>
-    </Grid>
-  );
+  return <Grid container>{user == null ? <LoginDialog open /> : <LandingPage />}</Grid>;
 };
 
 export const Route = createFileRoute('/')({
