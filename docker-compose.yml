@@ -4,81 +4,67 @@ volumes:
 services:
   postgres:
     image: postgres:17
-    container_name: postgres
     environment:
       POSTGRES_DB: scaled_chat_app
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
     ports:
-      - 5432:5432
+      - 5432:5432 # exposed for migrations from local
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
 
   redis:
     image: redis/redis-stack:latest
-    container_name: redis
     ports:
-      - 6379:6379
+      - 6379:6379 # exposed for redis' dashboard
       - 8001:8001
     restart: always
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: true
-    ports:
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 5778:5778
-      - 16686:16686
-      - 4317:4317
-      - 4318:4318
-      - 14250:14250
-      - 14268:14268
-      - 14269:14269
-      - 9411:9411
+    # ports:
+    #   - 6831:6831/udp
+    #   - 6832:6832/udp
+    #   - 5778:5778
+    #   - 16686:16686
+    #   - 4317:4317
+    #   - 4318:4318
+    #   - 14250:14250
+    #   - 14268:14268
+    #   - 14269:14269
+    #   - 9411:9411
     restart: on-failure:3
 
   server:
     build: ./server
-    container_name: server
     depends_on:
       - postgres
       - redis
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
       REDIS_URL: redis://redis:6379
-      PORT: 3101
-    ports:
-      - 3101:3101 # port selected to no conflict with local dev port
+      PORT: 3000
     restart: on-failure:3
-    # command: bun --watch run ./src/main.ts
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: ./server
-    #       target: /usr/src/app
-    #     - action: rebuild
-    #       path: ./server/package.json
+    deploy:
+      replicas: 4
 
   client:
     build: ./client
-    container_name: client
     restart: on-failure:3
     depends_on:
       - server
-    ports:
-      - 3100:3100 # port selected to no conflict with local dev port
 
   httpd:
     build: ./httpd
-    container_name: nginx
     depends_on:
       - server
       - client
+    environment:
+      SERVER_PORT: 3000
     ports:
       - 80:80
     restart: on-failure:3
