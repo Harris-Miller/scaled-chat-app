@@ -7,6 +7,7 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { Elysia } from 'elysia';
 
 // import { seedDb } from './db';
+import { kubeProbes } from './kubeProbes';
 import { createRedisInstance } from './redis/redisClient';
 import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
@@ -28,6 +29,7 @@ await createRedisInstance();
 
 const api = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')
+  .use(kubeProbes)
   .use(userRoute)
   .use(roomsRoute);
 
