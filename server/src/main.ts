@@ -13,16 +13,6 @@ import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
 import { engine, websocket } from './socket';
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface ProcessEnv {
-      PORT: string;
-      REDIS_URL: string;
-    }
-  }
-}
-
 // await seedDb();
 
 await createRedisInstance();
