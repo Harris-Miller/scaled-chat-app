@@ -8,14 +8,11 @@ import { Elysia } from 'elysia';
 
 // import { seedDb } from './db';
 import { kubeProbes } from './kubeProbes';
-import { createRedisInstance } from './redis/redisClient';
 import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
 import { engine, websocket } from './socket';
 
 // await seedDb();
-
-await createRedisInstance();
 
 const api = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')
@@ -35,7 +32,13 @@ const app = new Elysia()
   .use(serverTiming())
   .use(
     opentelemetry({
-      spanProcessors: [new BatchSpanProcessor(new OTLPTraceExporter())],
+      spanProcessors: [
+        new BatchSpanProcessor(
+          new OTLPTraceExporter({
+            url: process.env.OTLP_TRACES_URL,
+          }),
+        ),
+      ],
     }),
   )
   .use(swagger())

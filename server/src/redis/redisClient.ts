@@ -1,11 +1,12 @@
 import { createClient } from 'redis';
 
-let instance: Awaited<ReturnType<typeof createClient>> | undefined;
+let instance: ReturnType<typeof createClient> | undefined;
+let subClient: ReturnType<typeof createClient> | undefined;
 
 let status: 'connect' | 'end' | 'error' | 'ready' | 'reconnecting' | null = null;
 
 export const createRedisInstance = async () => {
-  instance = await createClient({
+  instance = createClient({
     url: process.env.REDIS_URL,
   })
     .on('connect', () => {
@@ -27,8 +28,11 @@ export const createRedisInstance = async () => {
     .on('reconnecting', () => {
       status = 'reconnecting';
       console.log('Redis Client ready');
-    })
-    .connect();
+    });
+
+  subClient = instance.duplicate();
+
+  await Promise.all([instance.connect(), subClient.connect()]);
 };
 
 /**
@@ -41,6 +45,15 @@ export const getRedisClient = () => {
     );
   }
   return instance;
+};
+
+export const getRedisSubClient = () => {
+  if (subClient == null) {
+    throw new Error(
+      'Redis subClient not yet instantiated. This means it is trying to be used because application bootstrapping has finished',
+    );
+  }
+  return subClient;
 };
 
 export const getRedisStatus = () => status;
