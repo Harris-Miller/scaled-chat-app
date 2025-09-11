@@ -2,11 +2,12 @@
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { nanoid } from 'nanoid';
+import { equals, sortBy } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
-import { useRoom } from '../api/rooms';
-import type { Room } from '../api/rooms';
+import { getChats, useRoom } from '../api/rooms';
+import type { Chat, Room } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
 import { handle } from '../utils';
@@ -15,6 +16,7 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   const user = useActiveUser();
 
   const [message, setMessage] = useState('');
+  const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
     const callbackFn = (arg: unknown) => {
@@ -30,6 +32,13 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     };
   }, [id, user.id]);
 
+  useEffect(() => {
+    getChats(id).then(({ data }) => {
+      console.log(data);
+      setChats(data);
+    });
+  }, [id]);
+
   const messageHandler = () => {
     if (message.trim() === '') return;
 
@@ -37,6 +46,11 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     socket.emit('chat:text', { id: chatId, roomId: id, text: message, userId: user.id });
     setMessage('');
   };
+
+  const isOrderedCorrectly = equals(
+    chats,
+    sortBy(chat => chat.createdAt, chats),
+  );
 
   return (
     <Box alignContent="center" display="flex" justifyContent="center">
@@ -60,6 +74,16 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
           >
             Submit
           </Button>
+        </Box>
+        <Box>Is ordered correctly? {isOrderedCorrectly ? 'yes' : 'no'}</Box>
+        <Box>
+          {chats.map(chat => (
+            <Box key={chat.id}>
+              <Typography>
+                createAt: {chat.createdAt} :: text: {chat.text}
+              </Typography>
+            </Box>
+          ))}
         </Box>
       </Stack>
     </Box>

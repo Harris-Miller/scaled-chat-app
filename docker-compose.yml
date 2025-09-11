@@ -1,5 +1,6 @@
 volumes:
   db-data:
+  redis-data:
 
 services:
   postgres:
@@ -22,6 +23,8 @@ services:
       - 6379:6379 # exposed for redis' dashboard
       - 8001:8001
     restart: always
+    volumes:
+      - redis-data:/data
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -53,8 +56,8 @@ services:
       PORT: 3000
       REDIS_URL: redis://redis:6379
     restart: on-failure:3
-    # deploy:
-    #   replicas: 4
+    deploy:
+      replicas: 4
 
   client:
     build: ./client

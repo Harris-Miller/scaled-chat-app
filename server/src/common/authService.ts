@@ -125,9 +125,7 @@ export const getUser = new Elysia()
       return undefined;
     },
   )
-  .resolve(async ({ cookie: { accessToken, refreshToken }, jwt, status }) => {
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
+  .resolve(async ({ cookie: { accessToken }, jwt, status }) => {
     const jwtPayload = await jwt.verify(accessToken.value);
     if (jwtPayload === false) {
       return status(401);

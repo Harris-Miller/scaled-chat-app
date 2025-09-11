@@ -30,5 +30,9 @@ export const kubeProbes = new Elysia()
     return status(500);
   })
   .get('/healthz', ({ status }) => {
+    // Note: don't check db/redis status here, that's not what this is for
+    // this is to see if _this_ app has crashed or not for k8s to know to relaunch it, etc
+    // that shouldn't happen if this app hasn't gone done but db/redis, or it's connections, has
+    // so we _do not_ check for that like we do for `ready` above
     return status(200);
   });

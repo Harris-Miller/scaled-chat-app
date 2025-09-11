@@ -1,9 +1,10 @@
 import { eq } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
+import { Result } from 'try';
 
 import { getUser } from '../common/authService';
 import { db } from '../db';
-import { rooms } from '../db/schema';
+import { chats, rooms } from '../db/schema';
 
 export const roomsRoute = new Elysia({ prefix: '/rooms' })
   .use(getUser)
@@ -68,4 +69,21 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
         id: t.String(),
       }),
     },
-  );
+  )
+  .get('/:id/chats', async ({ status, params: { id } }) => {
+    const [isRoomChatsOk, roomChatsErr, roomChats] = await Result.try(async () => {
+      const result = await db.select().from(chats).where(eq(chats.roomId, id));
+      return result;
+    });
+
+    if (!isRoomChatsOk) {
+      return status(500, {
+        error: (roomChatsErr as Error).message,
+        success: false,
+      });
+    }
+
+    console.log(roomChats);
+
+    return status(200, roomChats);
+  });

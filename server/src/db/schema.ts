@@ -69,33 +69,18 @@ export const usersToRooms = pgTable(
   t => [primaryKey({ columns: [t.userId, t.roomId] })],
 );
 
-export const usersToChats = pgTable(
-  'users_to_chats',
-  {
-    chatId: nanoid()
-      .notNull()
-      .references(() => chats.id),
-    userId: nanoid()
-      .notNull()
-      .references(() => users.id),
-  },
-  t => [primaryKey({ columns: [t.userId, t.chatId] })],
-);
-
 //
 // Relations
 //
 
 export const userRelations = relations(users, ({ many }) => ({
   chats: many(chats),
-  usersToChats: many(usersToChats),
   usersToRooms: many(usersToRooms),
 }));
 
-export const chatRelations = relations(chats, ({ one, many }) => ({
+export const chatRelations = relations(chats, ({ one }) => ({
   author: one(users, { fields: [chats.authorId], references: [users.id] }),
   room: one(rooms, { fields: [chats.roomId], references: [rooms.id] }),
-  usersToChats: many(usersToChats),
 }));
 
 export const roomRelations = relations(rooms, ({ many }) => ({
@@ -106,9 +91,4 @@ export const roomRelations = relations(rooms, ({ many }) => ({
 export const usersToRoomsRelations = relations(usersToRooms, ({ one }) => ({
   room: one(rooms, { fields: [usersToRooms.roomId], references: [rooms.id] }),
   user: one(users, { fields: [usersToRooms.userId], references: [users.id] }),
-}));
-
-export const usersToChatsRelations = relations(usersToChats, ({ one }) => ({
-  chat: one(chats, { fields: [usersToChats.chatId], references: [chats.id] }),
-  user: one(users, { fields: [usersToChats.userId], references: [users.id] }),
 }));

@@ -1,18 +1,22 @@
 import { Server as SocketIoBunEngine } from '@socket.io/bun-engine';
-// import { createAdapter } from '@socket.io/redis-adapter';
+import { createAdapter } from '@socket.io/redis-adapter';
 import { Server as SocketIoServer } from 'socket.io';
 
 import { db } from '../db';
 import { chats } from '../db/schema';
 import { createRedisInstance, getRedisClient, getRedisSubClient } from '../redis/redisClient';
 
+console.log('awaiting redisInstance');
 await createRedisInstance();
 const redisClient = getRedisClient();
-const subClient = getRedisSubClient();
+const redisSubClient = getRedisSubClient();
+console.log('redis instance retrieved');
 
+console.log('awaiting socketIO server with redis-streams-adapter');
 const io = new SocketIoServer({
-  // adapter: createAdapter(redisClient, subClient),
+  adapter: createAdapter(redisClient, redisSubClient),
 });
+console.log('socketIO server created');
 const engine = new SocketIoBunEngine();
 
 io.bind(engine);
