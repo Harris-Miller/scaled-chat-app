@@ -1,3 +1,3 @@
 #! /bin/sh
 
-docker compose up --build --detach postgres redis jaeger
+docker compose up --build --detach postgres redis jaeger localstack

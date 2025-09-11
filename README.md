@@ -16,7 +16,7 @@ Building a chat app for the express purpose of learning how to deploy a frontend
 
 ## Stage 2
 - socket.io redis adapter for scaling, use deploy option on docker-compose on server to test
-- allow users to post pictures, storing in `adobe/s3mock` container for docker-compose
+- allow users to post pictures, storing in a `localStack` container for docker-compose
 - show all rooms a user has joined, user can leave a room
 - user can add metadata and profile pic
 

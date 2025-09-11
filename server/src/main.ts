@@ -10,9 +10,13 @@ import { Elysia } from 'elysia';
 import { kubeProbes } from './kubeProbes';
 import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
+import { s3 } from './s3';
 import { engine, websocket } from './socket';
 
 // await seedDb();
+
+// Call an S3 API using the LocalStack endpoint
+console.log('s3 connection test (should display false)', await s3.exists('non-existent-file.jpg'));
 
 const api = new Elysia({ prefix: '/api' })
   .get('/', () => 'Hello Elysia')

@@ -1,6 +1,7 @@
 volumes:
   db-data:
   redis-data:
+  localstack-data:
 
 services:
   postgres:
@@ -25,6 +26,19 @@ services:
     restart: always
     volumes:
       - redis-data:/data
+
+  localstack:
+    container_name: localstack-main
+    image: localstack/localstack
+    ports:
+      - 127.0.0.1:4566:4566 # LocalStack Gateway
+      - 127.0.0.1:4510-4559:4510-4559 # external services port range
+    # environment:
+    #   # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+    #   - DEBUG=${DEBUG:-0}
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock # ???
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -55,6 +69,7 @@ services:
       OTLP_TRACES_URL: http://jaeger:4318/v1/traces
       PORT: 3000
       REDIS_URL: redis://redis:6379
+      S3_URL: http://localstack-main:4566
     restart: on-failure:3
     deploy:
       replicas: 4
