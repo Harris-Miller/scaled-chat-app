@@ -40,17 +40,17 @@ io.on('connection', socket => {
     socket.leave(`room:${args.roomId}`);
   });
 
-  socket.on('chat:text', async (args: { id: string; roomId: string; text: string; userId: string }) => {
+  socket.on('chat:text', async (args: { roomId: string; text: string; userId: string }) => {
     console.log('chat:text', args);
-    const { id, roomId, userId: authorId, text } = args;
+    const { roomId, userId: authorId, text } = args;
 
     // TODO: try/catch
-    const [newChat] = await db.insert(chats).values({ authorId, id, roomId, text }).returning();
+    const [newChat] = await db.insert(chats).values({ authorId, roomId, text }).returning();
 
-    socket.broadcast.to(`room:${args.roomId}`).emit('chat', newChat!);
+    io.to(`room:${args.roomId}`).emit('chat', newChat!);
   });
 });
 
 const { websocket } = engine.handler();
 
-export { engine, websocket };
+export { engine, websocket, io };

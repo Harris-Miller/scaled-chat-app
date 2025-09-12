@@ -5,6 +5,7 @@ import { Result } from 'try';
 import { getUser } from '../common/authService';
 import { db } from '../db';
 import { chats, rooms } from '../db/schema';
+import { io } from '../socket';
 
 export const roomsRoute = new Elysia({ prefix: '/rooms' })
   .use(getUser)
@@ -108,6 +109,15 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
         })
         .returning()
         .then(d => d[0]);
+
+      if (newChat == null) {
+        return status(422, {
+          message: 'unknown error during chat creation process',
+          success: false,
+        });
+      }
+
+      io.to(`room:${id}`).emit('chat', newChat);
 
       return status(201, newChat);
     },

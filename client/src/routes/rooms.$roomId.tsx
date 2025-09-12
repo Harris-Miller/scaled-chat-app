@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
-import { nanoid } from 'nanoid';
 import { equals, sortBy } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
@@ -19,8 +18,9 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
-    const callbackFn = (arg: unknown) => {
-      console.log(arg);
+    const callbackFn = (newChat: Chat) => {
+      // console.log(newChat);
+      setChats(current => [...current, newChat]);
     };
 
     socket.emit('room:join', { roomId: id, userId: user.id });
@@ -42,8 +42,7 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   const messageHandler = () => {
     if (message.trim() === '') return;
 
-    const chatId = nanoid();
-    socket.emit('chat:text', { id: chatId, roomId: id, text: message, userId: user.id });
+    socket.emit('chat:text', { roomId: id, text: message, userId: user.id });
     setMessage('');
   };
 
