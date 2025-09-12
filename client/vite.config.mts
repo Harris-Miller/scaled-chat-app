@@ -6,16 +6,20 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [tanstackRouter({ autoCodeSplitting: true, target: 'react' }), react()],
   server: {
+    /* eslint-disable sort-keys-fix/sort-keys-fix */
     proxy: {
-      '/api': {
-        changeOrigin: true,
-        target: 'http://localhost:3000/',
-      },
-      '/ws': {
+      '/api/ws': {
         // rewriteWsOrigin: true,
         target: 'ws://localhost:3000/',
         ws: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+      '/api': {
+        changeOrigin: true,
+        target: 'http://localhost:3000/',
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
+    /* eslint-enable sort-keys-fix/sort-keys-fix */
   },
 });
