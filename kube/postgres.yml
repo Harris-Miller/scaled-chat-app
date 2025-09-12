@@ -73,5 +73,6 @@ spec:
   selector:
     app: chat-postgres
   ports:
-    - port: 5432
+    - name: entry
+      port: 5432
       targetPort: 5432

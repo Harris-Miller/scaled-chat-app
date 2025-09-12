@@ -18,7 +18,7 @@ spec:
         - name: testserver
           image: testserver:latest
           imagePullPolicy: Always
-          If the client serves an HTTP port, expose it here:
+          # If the client serves an HTTP port, expose it here:
           ports:
             - containerPort: 3000
           readinessProbe:

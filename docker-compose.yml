@@ -47,10 +47,6 @@ services:
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: true
-      SPAN_STORAGE_TYPE: badger
-      BADGER_EPHEMERAL: false
-      BADGER_DIRECTORY: /badger
-      # BADGER_SPAN_STORE_TTL: 72h
     ports:
       - 6831:6831/udp
       - 6832:6832/udp
@@ -63,8 +59,6 @@ services:
       - 14269:14269
       - 9411:9411
     restart: on-failure:3
-    volumes:
-      - jaeger-data:/badger
 
   server:
     build: ./server
@@ -94,8 +88,6 @@ services:
     depends_on:
       - server
       - client
-    environment:
-      SERVER_PORT: 3000
     ports:
       - 80:80
     restart: on-failure:3

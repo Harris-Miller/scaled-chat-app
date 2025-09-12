@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 
 const socket = io({
   autoConnect: true,
-  path: '/ws/',
+  path: '/api/ws/',
 });
 
 socket.on('connect', () => {

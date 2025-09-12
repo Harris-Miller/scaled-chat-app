@@ -17,8 +17,8 @@ const checkDbConnection = async () => {
   }
 };
 
-export const kubeProbes = new Elysia()
-  .get('/readyz', async ({ status }) => {
+export const kubeProbes = new Elysia({ prefix: '/health' })
+  .get('/ready', async ({ status }) => {
     const isRedisReady = getRedisStatus() === 'ready';
     // Add your readiness logic here. For example, check if the database is connected.
     const isDatabaseReady = await checkDbConnection();
@@ -29,7 +29,7 @@ export const kubeProbes = new Elysia()
 
     return status(500);
   })
-  .get('/healthz', ({ status }) => {
+  .get('/live', ({ status }) => {
     // Note: don't check db/redis status here, that's not what this is for
     // this is to see if _this_ app has crashed or not for k8s to know to relaunch it, etc
     // that shouldn't happen if this app hasn't gone done but db/redis, or it's connections, has

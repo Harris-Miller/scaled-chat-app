@@ -51,5 +51,6 @@ spec:
   selector:
     app: chat-redis
   ports:
-    - port: 6379
+    - name: entry
+      port: 6379
       targetPort: 6379
