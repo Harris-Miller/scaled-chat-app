@@ -30,7 +30,7 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
           adminId: user.id,
           name,
         })
-        .returning({ description: rooms.description, id: rooms.id, name: rooms.name })
+        .returning()
         .then(r => r[0]);
 
       if (newRoom == null) {
@@ -70,17 +70,6 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
       }),
     },
   )
-  .post(
-    '/:id/chats',
-    ({ status, query: { backdoor } }) => {
-      status(200, { backdoor, test: 'ok' });
-    },
-    {
-      query: t.Object({
-        backdoor: t.Optional(t.String()),
-      }),
-    },
-  )
   .get('/:id/chats', async ({ status, params: { id } }) => {
     const [isRoomChatsOk, roomChatsErr, roomChats] = await Result.try(async () => {
       const result = await db.select().from(chats).where(eq(chats.roomId, id));
@@ -97,4 +86,34 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
     console.log(roomChats);
 
     return status(200, roomChats);
-  });
+  })
+  .post(
+    '/:id/chats',
+    async ({ status, body: { text }, params: { id }, user }) => {
+      const doesRoomExist = (await db.$count(rooms, eq(rooms.id, id))) === 1;
+
+      if (!doesRoomExist) {
+        return status(400, {
+          error: `Room "${id}" does not exist`,
+          success: false,
+        });
+      }
+
+      const newChat = await db
+        .insert(chats)
+        .values({
+          authorId: user.id,
+          roomId: id,
+          text,
+        })
+        .returning()
+        .then(d => d[0]);
+
+      return status(201, newChat);
+    },
+    {
+      body: t.Object({
+        text: t.String(),
+      }),
+    },
+  );
