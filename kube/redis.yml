@@ -38,23 +38,6 @@ spec:
           persistentVolumeClaim:
             claimName: chat-pvc-redis
 
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: chat-svc-redis
-  labels:
-    app: chat-redis
-spec:
-  type: NodePort
-  selector:
-    app: chat-redis
-  ports:
-    - port: 6379
-      targetPort: 6379
-
 ---
 
 apiVersion: v1
