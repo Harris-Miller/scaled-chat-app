@@ -23,7 +23,7 @@ export const authService = new Elysia({ name: 'auth/service' })
   .use(
     jwtConstructor({
       name: 'jwt',
-      secret: 'beyond',
+      secret: 'chat about what?',
     }),
   )
   .derive({ as: 'scoped' }, ({ jwt, cookie: { accessToken, refreshToken } }) => {
@@ -81,13 +81,32 @@ export const getUser = new Elysia()
       },
       {
         httpOnly: true,
-        secrets: 'beyond',
+        secrets: 'chat about what?',
         secure: true,
       },
     ),
   })
   .onBeforeHandle(
-    async ({ cookie: { accessToken, refreshToken }, status, jwt, createAccessToken, createRefreshToken }) => {
+    async ({
+      cookie: { accessToken, refreshToken },
+      headers: { authorization },
+      status,
+      jwt,
+      createAccessToken,
+      createRefreshToken,
+    }) => {
+      // first check for Authorization header
+      // WARNING: this is hack for backdoor access for automation
+      // The Bearer tokens here are just the userId. Don't do this in an actual application
+      if (authorization != null) {
+        if (!authorization.startsWith('Bearer ')) {
+          return status(401, 'Received malformed Authorization header');
+        }
+
+        return undefined;
+      }
+
+      // next, check cookies
       if (accessToken.value == null) {
         if (refreshToken.value == null) {
           accessToken.remove();
@@ -125,7 +144,22 @@ export const getUser = new Elysia()
       return undefined;
     },
   )
-  .resolve(async ({ cookie: { accessToken }, jwt, status }) => {
+  .resolve(async ({ cookie: { accessToken }, headers: { authorization }, jwt, status }) => {
+    // if bearer token was passed
+    if (authorization != null) {
+      // 'Bearer '.length === 7
+      const token = authorization.slice(7);
+
+      // Note: token is just userId for this app, as it makes for an easy backdoor for purpose of demo automation
+      const user = await db.query.users.findFirst({ where: eq(users.id, token) });
+      if (user == null) {
+        return status(403);
+      }
+
+      return { user };
+    }
+
+    // else, validate cookie accessToken
     const jwtPayload = await jwt.verify(accessToken.value);
     if (jwtPayload === false) {
       return status(401);

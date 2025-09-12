@@ -70,6 +70,17 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
       }),
     },
   )
+  .post(
+    '/:id/chats',
+    ({ status, query: { backdoor } }) => {
+      status(200, { backdoor, test: 'ok' });
+    },
+    {
+      query: t.Object({
+        backdoor: t.Optional(t.String()),
+      }),
+    },
+  )
   .get('/:id/chats', async ({ status, params: { id } }) => {
     const [isRoomChatsOk, roomChatsErr, roomChats] = await Result.try(async () => {
       const result = await db.select().from(chats).where(eq(chats.roomId, id));

@@ -51,7 +51,6 @@ const app = new Elysia()
 const serverInstance = Bun.serve({
   fetch(req, server) {
     const url = new URL(req.url);
-    console.log('incoming request:', url);
     if (url.pathname === '/ws/') {
       return engine.handleRequest(req, server);
     }

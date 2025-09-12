@@ -1,11 +1,12 @@
 import { Button, Grid, List, ListItem, Stack, TextField, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import type { FC } from 'react';
 import { useState } from 'react';
 
 import { queryClient } from '../api/queryClient';
 import { getRoom, getRooms, useCreateRoom } from '../api/rooms';
+import { CustomLink } from '../components/CustomLink';
 import { handle } from '../utils';
 
 export const LandingPage: FC = () => {
@@ -84,9 +85,9 @@ export const LandingPage: FC = () => {
             <List>
               {(roomsQuery.data ?? []).map(r => (
                 <ListItem key={r.id}>
-                  <Link params={{ roomId: r.id }} to="/rooms/$roomId">
+                  <CustomLink params={{ roomId: r.id }} to="/rooms/$roomId">
                     {r.name}
-                  </Link>
+                  </CustomLink>
                 </ListItem>
               ))}
             </List>
