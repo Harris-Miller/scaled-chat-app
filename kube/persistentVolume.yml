@@ -1,0 +1,36 @@
+# minikube's default VolumeControler will create the underlying PersistentVolume's automatically ??
+# TODO: verify this works and retains data correctly on cluster stop/start
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-pvc-redis
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-pvc-postgres
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-pvc-jaeger
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi

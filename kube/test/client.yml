@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deploy-client
+  labels:
+    app: test-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-client
+  template:
+    metadata:
+      labels:
+        app: test-client
+    spec:
+      containers:
+        - name: testclient
+          image: testclient:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-svc-client
+  labels:
+    app: test-client
+spec:
+  type: ClusterIP
+  selector:
+    app: test-client
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

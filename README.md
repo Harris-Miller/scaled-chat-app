@@ -19,6 +19,7 @@ Building a chat app for the express purpose of learning how to deploy a frontend
 - allow users to post pictures, storing in a `localStack` container for docker-compose
 - show all rooms a user has joined, user can leave a room
 - user can add metadata and profile pic
+  - use npm package `sharp` to create thumbnails of the profile pics
 
 ## Stage 3
 - Set up local Kubernetes through DockerDesktop

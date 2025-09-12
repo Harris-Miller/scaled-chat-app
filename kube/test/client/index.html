@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test App</title>
+</head>
+
+<body>
+  <button id="a">GET text</button>
+  <button id="b">GET json</button>
+  <button id="c">POST json</button>
+
+  <script>
+    const buttonA = document.getElementById('a');
+    buttonA.addEventListener('click', () => {
+      fetch('/api/text')
+      .then(resp => resp.text())
+      .then(text => {
+        console.log(text);
+      })
+      .catch((err) =>{
+        console.log('GET text failed');
+        console.log(err);
+      });
+    });
+
+    const buttonB = document.getElementById('b');
+    buttonB.addEventListener('click', () => {
+      fetch('/api/json')
+      .then(resp => resp.json())
+      .then(json => {
+        console.log(json);
+      })
+      .catch((err) => {
+        console.log('GET json failed');
+        console.log(err);
+      });
+    });
+
+    const buttonC = document.getElementById('c');
+    buttonC.addEventListener('click', () => {
+      fetch('/api/json', {
+        method: 'POST',
+        body: JSON.stringify({ foo: 'bar', abc: 123 })
+      })
+      .then(resp => resp.json())
+      .then(json => {
+          console.log(json);
+      })
+      .catch((err) => {
+        console.log('POST json failed');
+        console.log(err);
+      });
+    });
+  </script>
+
+</body>
+
+</html>
