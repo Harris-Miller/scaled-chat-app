@@ -1012,23 +1012,30 @@ console.log('fetching user data');
 const userIds = await db
   .select({ id: users.id })
   .from(users)
-  .then(us => us.map(u => u.id));
+  .then(us => {
+    console.log(us);
+    return us.map(u => u.id);
+  });
 
 const numUsers = userIds.length;
+const numPhrases = randomChatGptGeneratedPhrases.length;
 
 console.log(`${numUsers} users found`);
 
-console.log('Sending chats every 2 seconds...');
+console.log(`Sending chats every 2 seconds to http://localhost:3000/rooms/${coloradoRoomId}/chats...`);
 
 setInterval(async () => {
-  const randomIndex = Math.floor(Math.random() * 1000);
-  const randomUserId = Math.floor(Math.random() * numUsers);
+  const randomIndex = Math.floor(Math.random() * numPhrases);
+  const phrase = randomChatGptGeneratedPhrases[randomIndex];
+  const randomUserIdIndex = Math.floor(Math.random() * numUsers);
+  const userId = userIds[randomUserIdIndex];
 
+  console.log(`posting for user "${userId}" the phrase "${phrase}"`);
   // why is this failing?
   try {
     const response = await fetch(`http://localhost:3000/rooms/${coloradoRoomId}/chats`, {
-      body: JSON.stringify({ text: randomChatGptGeneratedPhrases[randomIndex] }, null, 2),
-      headers: { Accept: '*/*', Authorization: `Bearer ${randomUserId}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: randomChatGptGeneratedPhrases[randomIndex] }),
+      headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',
     }).then(r => r.json());
     console.log('chat sent.', response);
