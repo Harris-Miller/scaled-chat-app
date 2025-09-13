@@ -1,5 +1,5 @@
 import { db } from './src/db';
-import { users } from './src/db/schema';
+import { rooms, users } from './src/db/schema';
 
 const randomChatGptGeneratedPhrases = [
   'moment adventure path rain glow magic river',
@@ -1004,42 +1004,40 @@ const randomChatGptGeneratedPhrases = [
   'journey spark forest smile',
 ];
 
-const coloradoRoomId = '9Q5yMi8VkkZZCoZeevEQZ';
-
 console.log('running simulation');
 console.log('fetching user data');
 
 const userIds = await db
   .select({ id: users.id })
   .from(users)
-  .then(us => {
-    console.log(us);
-    return us.map(u => u.id);
-  });
+  .then(us => us.map(u => u.id));
+const roomIds = await db
+  .select({ id: rooms.id })
+  .from(rooms)
+  .then(rs => rs.map(r => r.id));
 
-const numUsers = userIds.length;
 const numPhrases = randomChatGptGeneratedPhrases.length;
+const numUsers = userIds.length;
+const numRooms = roomIds.length;
 
-console.log(`${numUsers} users found`);
+const delayBetweenPosts = 100;
 
-console.log(`Sending chats every 2 seconds to http://localhost:3000/rooms/${coloradoRoomId}/chats...`);
+console.log(`${numUsers} users found. ${numRooms} rooms found.`);
+console.log(`Sending every ${delayBetweenPosts}ms...`);
 
 setInterval(async () => {
-  const randomIndex = Math.floor(Math.random() * numPhrases);
-  const phrase = randomChatGptGeneratedPhrases[randomIndex];
-  const randomUserIdIndex = Math.floor(Math.random() * numUsers);
-  const userId = userIds[randomUserIdIndex];
+  const text = randomChatGptGeneratedPhrases[Math.floor(Math.random() * numPhrases)];
+  const userId = userIds[Math.floor(Math.random() * numUsers)];
+  const roomId = roomIds[Math.floor(Math.random() * numRooms)];
 
-  console.log(`posting for user "${userId}" the phrase "${phrase}"`);
-  // why is this failing?
   try {
-    const response = await fetch(`http://localhost:3000/rooms/${coloradoRoomId}/chats`, {
-      body: JSON.stringify({ text: randomChatGptGeneratedPhrases[randomIndex] }),
+    await fetch(`http://localhost/rooms/${roomId}/chats`, {
+      body: JSON.stringify({ text }),
       headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',
-    }).then(r => r.json());
-    console.log('chat sent.', response);
+    });
+    console.log('chat sent.');
   } catch (e) {
     console.log('chat failed.', (e as Error).message);
   }
-}, 2000);
+}, delayBetweenPosts);

@@ -1,10 +1,11 @@
 import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
-// import { opentelemetry } from '@elysiajs/opentelemetry';
+import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
-// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-// import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { Elysia } from 'elysia';
+import prometheusPlugin from 'elysia-prometheus';
 
 // import { seedDb } from './db';
 import { kubeProbes } from './kubeProbes';
@@ -34,17 +35,25 @@ const app = new Elysia()
     }),
   )
   .use(serverTiming())
-  // .use(
-  //   opentelemetry({
-  //     spanProcessors: [
-  //       new BatchSpanProcessor(
-  //         new OTLPTraceExporter({
-  //           url: process.env.OTLP_TRACES_URL,
-  //         }),
-  //       ),
-  //     ],
-  //   }),
-  // )
+  .use(
+    prometheusPlugin({
+      dynamicLabels: {
+        userAgent: ctx => ctx.request.headers.get('user-agent') ?? 'unknown',
+      },
+      staticLabels: { service: 'chat-server' },
+    }),
+  )
+  .use(
+    opentelemetry({
+      spanProcessors: [
+        new BatchSpanProcessor(
+          new OTLPTraceExporter({
+            url: process.env.OTLP_TRACES_URL,
+          }),
+        ),
+      ],
+    }),
+  )
   .use(openapi())
   .use(api);
 
