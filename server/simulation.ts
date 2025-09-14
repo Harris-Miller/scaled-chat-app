@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { db } from './src/db';
 import { rooms, users } from './src/db/schema';
 
@@ -1020,7 +1021,7 @@ const numPhrases = randomChatGptGeneratedPhrases.length;
 const numUsers = userIds.length;
 const numRooms = roomIds.length;
 
-const delayBetweenPosts = 100;
+const delayBetweenPosts = 1000;
 
 console.log(`${numUsers} users found. ${numRooms} rooms found.`);
 console.log(`Sending every ${delayBetweenPosts}ms...`);
@@ -1035,7 +1036,8 @@ setInterval(async () => {
       body: JSON.stringify({ text }),
       headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',
-    });
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+    }).then(r => (r.ok ? r : Promise.reject(r)));
     console.log('chat sent.');
   } catch (e) {
     console.log('chat failed.', (e as Error).message);

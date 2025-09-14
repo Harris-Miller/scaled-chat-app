@@ -5,17 +5,18 @@ import { Result } from 'try';
 import { getUser } from '../common/authService';
 import { db } from '../db';
 import { chats, rooms } from '../db/schema';
+import { logger } from '../logger';
 import { io } from '../socket';
 
 export const roomsRoute = new Elysia({ prefix: '/rooms' })
   .use(getUser)
-  .get('/', async () => {
+  .get('/', async function roomsRouteGetIndex() {
     const results = await db.select().from(rooms);
     return results;
   })
   .post(
     '/',
-    async ({ body: { name }, status, user }) => {
+    async function roomsRoutePostIndex({ body: { name }, status, user }) {
       const roomWithNameExists = (await db.$count(rooms, eq(rooms.name, name))) !== 0;
       if (roomWithNameExists) {
         return status(409, {
@@ -51,7 +52,7 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
   )
   .get(
     '/:id',
-    async ({ status, params: { id } }) => {
+    async function roomsRouteGetId({ status, params: { id } }) {
       const results = await db.select().from(rooms).where(eq(rooms.id, id)).limit(1);
 
       const [room] = results;
@@ -71,7 +72,7 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
       }),
     },
   )
-  .get('/:id/chats', async ({ status, params: { id } }) => {
+  .get('/:id/chats', async function roomsRouteGetIdChats({ status, params: { id } }) {
     const [isRoomChatsOk, roomChatsErr, roomChats] = await Result.try(async () => {
       const result = await db.select().from(chats).where(eq(chats.roomId, id));
       return result;
@@ -84,13 +85,11 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
       });
     }
 
-    console.log(roomChats);
-
     return status(200, roomChats);
   })
   .post(
     '/:id/chats',
-    async ({ status, body: { text }, params: { id }, user }) => {
+    async function roomsRoutePostIdChats({ status, body: { text }, params: { id }, user }) {
       const doesRoomExist = (await db.$count(rooms, eq(rooms.id, id))) === 1;
 
       if (!doesRoomExist) {
@@ -116,6 +115,8 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
           success: false,
         });
       }
+
+      logger.silly(`New chat created: ${JSON.stringify(newChat)}`);
 
       io.to(`room:${id}`).emit('chat', newChat);
 

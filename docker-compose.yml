@@ -3,9 +3,9 @@ volumes:
   redis-data:
   jaeger-data:
   localstack-data:
-  prom-data:
   prometheus-data:
   grafana-data:
+  loki-data:
 
 services:
   postgres:
@@ -30,6 +30,19 @@ services:
     restart: always
     volumes:
       - redis-data:/data
+
+  # localstack:
+  #   container_name: localstack-main
+  #   image: localstack/localstack
+  #   ports:
+  #     - 127.0.0.1:4566:4566 # LocalStack Gateway
+  #     - 127.0.0.1:4510-4559:4510-4559 # external services port range
+  #   # environment:
+  #   #   # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+  #   #   - DEBUG=${DEBUG:-0}
+  #   volumes:
+  #     - localstack-data:/var/lib/localstack
+  #     - /var/run/docker.sock:/var/run/docker.sock # ???
 
   prometheus:
     image: prom/prometheus:latest
@@ -57,18 +70,13 @@ services:
       - GF_SECURITY_ADMIN_USER=admin # Default admin username
       - GF_SECURITY_ADMIN_PASSWORD=admin # Default admin password (change in production)
 
-  localstack:
-    container_name: localstack-main
-    image: localstack/localstack
-    ports:
-      - 127.0.0.1:4566:4566 # LocalStack Gateway
-      - 127.0.0.1:4510-4559:4510-4559 # external services port range
-    # environment:
-    #   # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
-    #   - DEBUG=${DEBUG:-0}
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    # command: -config.file=/etc/loki/config.yaml
     volumes:
-      - localstack-data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock # ???
+      # - ./loki-config.yaml:/etc/loki/config.yaml
+      - loki-data:/loki
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -94,8 +102,11 @@ services:
     depends_on:
       - postgres
       - redis
+      - loki
+      - grafana
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
+      LOKI_URL: http://loki:3100
       OTLP_TRACES_URL: http://jaeger:4318/v1/traces
       PORT: 3000
       REDIS_URL: redis://redis:6379

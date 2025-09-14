@@ -6,7 +6,6 @@ export type Profile = {
   displayName: string;
   email: string;
   id: string;
-  success: true;
 };
 
 export const getProfile = () => {

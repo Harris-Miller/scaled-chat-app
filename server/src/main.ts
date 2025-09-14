@@ -4,11 +4,13 @@ import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+// import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
 import { Elysia } from 'elysia';
 import prometheusPlugin from 'elysia-prometheus';
 
 // import { seedDb } from './db';
 import { kubeProbes } from './kubeProbes';
+import { logger } from './logger';
 import { roomsRoute } from './routes/rooms';
 import { userRoute } from './routes/user';
 // import { s3 } from './s3';
@@ -43,6 +45,12 @@ const app = new Elysia()
       staticLabels: { service: 'chat-server' },
     }),
   )
+  // .use(
+  //   elysiaLogging(logger, {
+  //     format: 'json',
+  //     level: 'http',
+  //   }),
+  // )
   .use(
     opentelemetry({
       spanProcessors: [
@@ -69,4 +77,4 @@ const serverInstance = Bun.serve({
   websocket,
 });
 
-console.log(`🦊 Elysia is running at at ${serverInstance.hostname}:${serverInstance.port}`);
+logger.info(`🦊 Elysia is running at at ${serverInstance.hostname}:${serverInstance.port}`);

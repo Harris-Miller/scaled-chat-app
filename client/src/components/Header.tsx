@@ -13,7 +13,6 @@ import {
   Typography,
 } from '@mui/material';
 import type { AxiosError } from 'axios';
-import { dissoc } from 'ramda';
 import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
 
@@ -38,7 +37,7 @@ export const Header: FC = () => {
     getProfile()
       .then(resp => {
         console.log(resp);
-        setUser(dissoc('success', resp.data));
+        setUser(resp.data);
       })
       .catch((resp: unknown) => {
         console.log(resp);
@@ -49,7 +48,7 @@ export const Header: FC = () => {
     try {
       const response = await signUp(email, password).then(getProfile);
       console.log(response.data);
-      setUser(dissoc('success', response.data));
+      setUser(response.data);
       setDialogOpen(false);
     } catch (err) {
       console.log(err);

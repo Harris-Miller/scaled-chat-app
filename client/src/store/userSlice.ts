@@ -3,7 +3,7 @@ import type { StateCreator } from 'zustand';
 export interface User {
   displayName: string;
   email: string;
-  id: number;
+  id: string;
 }
 
 export interface UserSlice {

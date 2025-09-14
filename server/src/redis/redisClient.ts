@@ -1,5 +1,7 @@
 import { createClient } from 'redis';
 
+import { logger } from '../logger';
+
 let instance: ReturnType<typeof createClient> | undefined;
 let subClient: ReturnType<typeof createClient> | undefined;
 
@@ -11,23 +13,23 @@ export const createRedisInstance = async () => {
   })
     .on('connect', () => {
       status = 'connect';
-      console.log('Redis Client connecting');
+      logger.info('Redis Client connecting');
     })
     .on('ready', () => {
       status = 'ready';
-      console.log('Redis Client ready');
+      logger.info('Redis Client ready');
     })
     .on('end', () => {
       status = 'end';
-      console.log('Redis Client ready');
+      logger.info('Redis Client ready');
     })
     .on('error', (err: unknown) => {
       status = 'error';
-      console.log('Redis Client Error', err);
+      logger.error('Redis Client Error', err);
     })
     .on('reconnecting', () => {
       status = 'reconnecting';
-      console.log('Redis Client ready');
+      logger.warn('Redis Client ready');
     });
 
   subClient = instance.duplicate();

@@ -5,7 +5,7 @@ import { equals, sortBy } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
-import { getChats, useRoom } from '../api/rooms';
+import { getChats, postChat, useRoom } from '../api/rooms';
 import type { Chat, Room } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
@@ -42,7 +42,8 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   const messageHandler = () => {
     if (message.trim() === '') return;
 
-    socket.emit('chat:text', { roomId: id, text: message, userId: user.id });
+    // socket.emit('chat:text', { roomId: id, text: message, userId: user.id });
+    postChat(id, message);
     setMessage('');
   };
 

@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material';
 import type { DialogProps } from '@mui/material';
 import type { AxiosError } from 'axios';
-import { dissoc } from 'ramda';
 import type { FC } from 'react';
 import { useState } from 'react';
 
@@ -22,7 +21,7 @@ export const LoginDialog: FC<DialogProps> = props => {
     try {
       const response = await signUp(email, password).then(getProfile);
       console.log(response.data);
-      setUser(dissoc('success', response.data));
+      setUser(response.data);
       // setDialogOpen(false);
     } catch (err) {
       console.log(err);

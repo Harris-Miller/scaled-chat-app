@@ -4,6 +4,7 @@ import { Elysia, t } from 'elysia';
 
 import { db } from '../db';
 import { users } from '../db/schema';
+import { logger } from '../logger';
 import { getRedisClient } from '../redis/redisClient';
 
 export const ACCESS_TOKEN_EXP = 60 * 24; // 1 day in seconds
@@ -26,7 +27,7 @@ export const authService = new Elysia({ name: 'auth/service' })
       secret: 'chat about what?',
     }),
   )
-  .derive({ as: 'scoped' }, ({ jwt, cookie: { accessToken, refreshToken } }) => {
+  .derive({ as: 'scoped' }, function authServiceDerive({ jwt, cookie: { accessToken, refreshToken } }) {
     return {
       createAccessToken: async (sub: string) => {
         const accessJWTToken = await jwt.sign({
@@ -86,94 +87,109 @@ export const getUser = new Elysia()
       },
     ),
   })
-  .onBeforeHandle(
-    async ({
-      cookie: { accessToken, refreshToken },
-      headers: { authorization },
-      status,
-      jwt,
-      createAccessToken,
-      createRefreshToken,
-    }) => {
-      // first check for Authorization header
-      // WARNING: this is hack for backdoor access for automation
-      // The Bearer tokens here are just the userId. Don't do this in an actual application
-      if (authorization != null) {
-        if (!authorization.startsWith('Bearer ')) {
-          return status(401, 'Received malformed Authorization header');
-        }
-
-        return undefined;
-      }
-
-      // next, check cookies
-      if (accessToken.value == null) {
-        if (refreshToken.value == null) {
-          accessToken.remove();
-          refreshToken.remove();
-          return status(401, 'no access or refresh token');
-        }
-
-        const jwtPayload = await jwt.verify(refreshToken.value);
-        if (jwtPayload === false || jwtPayload.sub == null) {
-          accessToken.remove();
-          refreshToken.remove();
-          return status(401, 'failed to verify refresh token');
-        }
-
-        const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${jwtPayload.sub}`, 'refresh_token');
-        if (refreshToken.value !== storedRefreshToken) {
-          accessToken.remove();
-          refreshToken.remove();
-          return status(403, 'you dare! (tampered refresh token)');
-        }
-
-        await createAccessToken(jwtPayload.sub);
-        await createRefreshToken(jwtPayload.sub);
-
-        return undefined;
-      }
-
-      const jwtPayload = await jwt.verify(accessToken.value);
-      if (jwtPayload === false) {
-        accessToken.remove();
-        refreshToken.remove();
-        return status(401, 'failed to verify access token');
+  .onBeforeHandle(async function getUserOnBeforeHandle({
+    cookie: { accessToken, refreshToken },
+    headers: { authorization },
+    status,
+    jwt,
+    createAccessToken,
+    createRefreshToken,
+  }) {
+    // first check for Authorization header
+    // WARNING: this is hack for backdoor access for automation
+    // The Bearer tokens here are just the userId. Don't do this in an actual application
+    if (authorization != null) {
+      logger.silly('authorization header found');
+      if (!authorization.startsWith('Bearer ')) {
+        logger.silly(`authorization header malformed: "${authorization}"`);
+        return status(401, 'Received malformed Authorization header');
       }
 
       return undefined;
-    },
-  )
-  .resolve(async ({ cookie: { accessToken }, headers: { authorization }, jwt, status }) => {
+    }
+
+    // next, check cookies
+    if (accessToken.value == null) {
+      logger.silly('accessToken null, checking refreshToken');
+      if (refreshToken.value == null) {
+        logger.silly('Both accessToken and refreshTokens have null values');
+        accessToken.remove();
+        refreshToken.remove();
+        return status(401, 'no access or refresh token');
+      }
+
+      const jwtPayload = await jwt.verify(refreshToken.value);
+      if (jwtPayload === false || jwtPayload.sub == null) {
+        logger.silly('refreshToken is invalid');
+        accessToken.remove();
+        refreshToken.remove();
+        return status(401, 'failed to verify refresh token');
+      }
+
+      const storedRefreshToken = await getRedisClient().hGet(`user:jwt:${jwtPayload.sub}`, 'refresh_token');
+      if (refreshToken.value !== storedRefreshToken) {
+        logger.silly('refreshToken does not match any currently stored value');
+        accessToken.remove();
+        refreshToken.remove();
+        return status(403, 'you dare! (tampered refresh token)');
+      }
+
+      logger.silly('refreshToken valid, updating both access and refresh tokens');
+
+      await createAccessToken(jwtPayload.sub);
+      await createRefreshToken(jwtPayload.sub);
+
+      return undefined;
+    }
+
+    const jwtPayload = await jwt.verify(accessToken.value);
+    if (jwtPayload === false) {
+      logger.silly('accessToken invalid. removing both accessToken and refreshToken');
+      accessToken.remove();
+      refreshToken.remove();
+      return status(401, 'failed to verify access token');
+    }
+
+    logger.silly('accessToken verified');
+    return undefined;
+  })
+  .resolve(async function getUserResolve({ cookie: { accessToken }, headers: { authorization }, jwt, status }) {
     // if bearer token was passed
     if (authorization != null) {
+      logger.silly('Validating Bearer Token');
       // 'Bearer '.length === 7
       const token = authorization.slice(7);
 
       // Note: token is just userId for this app, as it makes for an easy backdoor for purpose of demo automation
       const user = await db.query.users.findFirst({ where: eq(users.id, token) });
       if (user == null) {
+        logger.silly('Bearer Token Invalid');
         return status(403);
       }
 
+      logger.silly('Bearer Token Valid');
       return { user };
     }
 
     // else, validate cookie accessToken
     const jwtPayload = await jwt.verify(accessToken.value);
     if (jwtPayload === false) {
+      logger.silly('AccessToken Invalid');
       return status(401);
     }
 
     if (jwtPayload.sub == null) {
+      logger.silly('AccessToken Invalid');
       return status(401);
     }
 
     const user = await db.query.users.findFirst({ where: eq(users.id, jwtPayload.sub) });
     if (user == null) {
+      logger.silly('AccessToken valid, but for user that has been deactivated');
       return status(403);
     }
 
+    logger.silly('AccessToken Valid');
     return { user };
   })
   .as('global');

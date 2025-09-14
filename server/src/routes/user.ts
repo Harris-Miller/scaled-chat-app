@@ -15,8 +15,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   })
   .post(
     '/sign-up',
-    async ({ body: { email, password }, createAccessToken, createRefreshToken, status }) => {
-      console.log('user/sign-up');
+    async function userRoutePostSignUp({ body: { email, password }, createAccessToken, createRefreshToken, status }) {
       const user = await db.$count(users, eq(users.email, email));
 
       // bail if email already in use
@@ -53,9 +52,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
   )
   .post(
     '/sign-in',
-    async ({ status, body: { email, password }, createAccessToken, createRefreshToken }) => {
-      console.log('user/sign-in');
-
+    async function userRoutePostSignIn({ status, body: { email, password }, createAccessToken, createRefreshToken }) {
       const user = await db.query.users.findFirst({ where: eq(users.email, email) });
 
       if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
@@ -77,8 +74,7 @@ export const userRoute = new Elysia({ prefix: '/user' })
       body: 'signIn',
     },
   )
-  .get('/sign-out', ({ cookie: { accessToken, refreshToken } }) => {
-    console.log('user/sign-out');
+  .get('/sign-out', function userRouteGetSignOut({ cookie: { accessToken, refreshToken } }) {
     accessToken?.remove();
     refreshToken?.remove();
 
@@ -88,13 +84,10 @@ export const userRoute = new Elysia({ prefix: '/user' })
     };
   })
   .use(getUser)
-  .get('/profile', ({ user }) => {
-    console.log('user/profile');
-
+  .get('/profile', function userRouteGetProfile({ user }) {
     return {
       displayName: user.displayName,
       email: user.email,
       id: user.id,
-      success: true,
     };
   });

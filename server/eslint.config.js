@@ -15,7 +15,6 @@ const eslintConfig = [
   },
   {
     rules: {
-      'no-console': 'off',
       'no-param-reassign': 'off',
       'prefer-arrow/prefer-arrow-functions': 'off',
       // 'func-names': ['error', 'as-needed'], // I think this is weird with generators, need to double check
