@@ -7,8 +7,16 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090'] # Prometheus scrapes itself
 
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']
+  - job_name: 'tempo-usage-metrics'
+    metrics_path: '/usage_metrics'
+    static_configs:
+      - targets: ['tempo:3200']
+
   - job_name: 'chat-server'
-    scrape_interval: 10s # Override global scrape interval for this job
+    # scrape_interval: 10s # Override global scrape interval for this job
     static_configs:
       - targets: ['server:3000']
 

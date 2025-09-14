@@ -1032,7 +1032,7 @@ setInterval(async () => {
   const roomId = roomIds[Math.floor(Math.random() * numRooms)];
 
   try {
-    await fetch(`http://localhost/rooms/${roomId}/chats`, {
+    await fetch(`http://localhost/api/rooms/${roomId}/chats`, {
       body: JSON.stringify({ text }),
       headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',

@@ -6,6 +6,7 @@ volumes:
   prometheus-data:
   grafana-data:
   loki-data:
+  tempo-data:
 
 services:
   postgres:
@@ -50,11 +51,15 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Mount the config file
+      - type: bind
+        source: ./config/prometheus.yaml
+        target: /etc/prometheus/prometheus.yaml
       - prometheus-data:/prometheus # Persistent storage for metrics
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
     restart: unless-stopped
 
   grafana:
@@ -64,38 +69,43 @@ services:
     ports:
       - 3001:3000
     volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - type: bind
+        source: ./config/datasources.yaml
+        target: /etc/grafana/provisioning/datasources/datasources.yaml
     environment:
-      - GF_SECURITY_ADMIN_USER=admin # Default admin username
-      - GF_SECURITY_ADMIN_PASSWORD=admin # Default admin password (change in production)
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor metricsSummary
+      - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
 
   loki:
     image: grafana/loki:latest
     container_name: loki
     # command: -config.file=/etc/loki/config.yaml
     volumes:
-      # - ./loki-config.yaml:/etc/loki/config.yaml
+      # - type: bind
+      #   source: ./config/loki-config.yaml
+      #   target: /etc/loki/config.yaml
       - loki-data:/loki
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: jaeger
-    environment:
-      COLLECTOR_ZIPKIN_HOST_PORT: 9411
-      COLLECTOR_OTLP_ENABLED: true
     ports:
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 5778:5778
-      - 16686:16686
-      - 4317:4317
-      - 4318:4318
-      - 14250:14250
-      - 14268:14268
-      - 14269:14269
-      - 9411:9411
-    restart: on-failure:3
+      - 3100:3100
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: -config.file=/etc/tempo.yaml
+    ports:
+      - 3200:3200 # tempo
+      - 9095:9095 # tempo grpc
+      - 4317:4317 # otlp grpc
+      - 4318:4318 # otlp http
+      - 9411:9411 # zipkin
+    volumes:
+      - type: bind
+        source: ./config/tempo-config.yaml
+        target: /etc/tempo.yaml
+      - tempo-data:/tmp/tempo
 
   server:
     build: ./server
@@ -107,7 +117,7 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
       LOKI_URL: http://loki:3100
-      OTLP_TRACES_URL: http://jaeger:4318/v1/traces
+      OTLP_TRACES_URL: http://tempo:4318/v1/traces
       PORT: 3000
       REDIS_URL: redis://redis:6379
       S3_URL: http://localstack-main:4566
