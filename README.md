@@ -12,7 +12,7 @@ Building a chat app for the express purpose of learning how to deploy a frontend
   - via websockets and broadcasting
   - history kept in DB
   - stretch: show chat history upon re-enter
-- docker-compose includes httpd project that simulates kubernetes nginx load balancer
+- docker-compose includes nginx project that simulates kubernetes nginx load balancer
 
 ## Stage 2
 - socket.io redis adapter for scaling, use deploy option on docker-compose on server to test

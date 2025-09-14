@@ -67,8 +67,17 @@ const app = new Elysia()
 
 const serverInstance = Bun.serve({
   fetch(req, server) {
+    const ip = server.requestIP(req);
     const url = new URL(req.url);
+    // eslint-disable-next-line no-console
+    console.log(`URL: ${url.toString()}`);
+    // eslint-disable-next-line no-console
+    console.log(`Request IP: ${JSON.stringify(ip)}`);
+    // eslint-disable-next-line no-console
+    console.log(`X-Forwarded-For`, req.headers.get('x-forwarded-for'));
+
     if (url.pathname === '/ws/') {
+      // TODO: place websocket behind auth barriers
       return engine.handleRequest(req, server);
     }
     return app.fetch(req);

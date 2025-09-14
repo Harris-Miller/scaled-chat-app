@@ -1,3 +1,7 @@
+networks:
+  testnet:
+    driver: bridge
+
 volumes:
   db-data:
   redis-data:
@@ -21,6 +25,8 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - testnet
 
   redis:
     image: redis/redis-stack:latest
@@ -31,6 +37,8 @@ services:
     restart: always
     volumes:
       - redis-data:/data
+    networks:
+      - testnet
 
   # localstack:
   #   container_name: localstack-main
@@ -44,6 +52,8 @@ services:
   #   volumes:
   #     - localstack-data:/var/lib/localstack
   #     - /var/run/docker.sock:/var/run/docker.sock # ???
+  #   networks:
+  #     - testnet
 
   prometheus:
     image: prom/prometheus:latest
@@ -61,6 +71,8 @@ services:
       - --enable-feature=exemplar-storage
       - --enable-feature=native-histograms
     restart: unless-stopped
+    networks:
+      - testnet
 
   grafana:
     image: grafana/grafana:latest
@@ -78,6 +90,8 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor metricsSummary
       - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip;grafana-traces-app
+    networks:
+      - testnet
 
   loki:
     image: grafana/loki:latest
@@ -90,6 +104,8 @@ services:
       - loki-data:/loki
     ports:
       - 3100:3100
+    networks:
+      - testnet
 
   tempo:
     image: grafana/tempo:latest
@@ -106,6 +122,8 @@ services:
         source: ./config/tempo-config.yaml
         target: /etc/tempo.yaml
       - tempo-data:/tmp/tempo
+    networks:
+      - testnet
 
   server:
     build: ./server
@@ -122,8 +140,10 @@ services:
       REDIS_URL: redis://redis:6379
       S3_URL: http://localstack-main:4566
     restart: on-failure:3
-    # deploy:
-    #   replicas: 4
+    deploy:
+      replicas: 4
+    networks:
+      - testnet
 
   client:
     build: ./client
@@ -131,13 +151,30 @@ services:
     restart: on-failure:3
     depends_on:
       - server
+    networks:
+      - testnet
 
-  httpd:
-    build: ./httpd
-    container_name: httpd
+  nginx:
+    build: ./nginx
+    container_name: nginx
     depends_on:
       - server
       - client
     ports:
       - 80:80
     restart: on-failure:3
+    networks:
+      - testnet
+
+  socket-test:
+    build:
+      context: server
+      dockerfile: Dockerfile.simulate
+    depends_on:
+      - nginx
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
+    deploy:
+      replicas: 10
+    networks:
+      - testnet

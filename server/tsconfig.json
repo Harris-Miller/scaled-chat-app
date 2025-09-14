@@ -4,6 +4,9 @@
     "lib": [
       "ESNext"
     ],
+    "types": [
+      "bun"
+    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
@@ -23,5 +26,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
