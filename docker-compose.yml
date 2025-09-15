@@ -166,15 +166,16 @@ services:
     networks:
       - testnet
 
-  socket-test:
-    build:
-      context: server
-      dockerfile: Dockerfile.simulate
-    depends_on:
-      - nginx
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
-    deploy:
-      replicas: 10
-    networks:
-      - testnet
+  ## uncomment to test nginx as a load balancer for websockets across the 4 server replicas
+  # socket-test:
+  #   build:
+  #     context: server
+  #     dockerfile: Dockerfile.simulate
+  #   depends_on:
+  #     - nginx
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
+  #   deploy:
+  #     replicas: 10
+  #   networks:
+  #     - testnet

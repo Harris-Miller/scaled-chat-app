@@ -18,7 +18,7 @@ datasources:
 
   - name: Tempo
     type: tempo
-    url: http://temp:3100
+    url: http://tempo:3100
     access: proxy
     version: 1
     editable: true

@@ -1067,23 +1067,24 @@ const createSocket = (i: number) => {
   return socket;
 };
 
-const sockets = Array(1)
-  .fill(undefined)
-  .map((_, i) => {
-    const socket = createSocket(i);
-    socket.connect();
-    return socket;
-  });
+// const sockets = Array(1)
+//   .fill(undefined)
+//   .map((_, i) => {
+//     const socket = createSocket(i);
+//     socket.connect();
+//     return socket;
+//   });
 
 const postChat = async () => {
   const text = randomChatGptGeneratedPhrases[Math.floor(Math.random() * numPhrases)];
   const userId = userIds[Math.floor(Math.random() * numUsers)];
-  const roomId = roomIds[Math.floor(Math.random() * numRooms)];
+  const roomId = '9Q5yMi8VkkZZCoZeevEQZ'; // colorado
+  // const roomId = roomIds[Math.floor(Math.random() * numRooms)];
 
   const ipSuffix = Math.floor(Math.random() * 9);
 
   try {
-    await Bun.fetch(`http://nginx/api/rooms/${roomId}/chats`, {
+    await Bun.fetch(`http://localhost/api/rooms/${roomId}/chats`, {
       body: JSON.stringify({ text }),
       headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',
@@ -1097,5 +1098,5 @@ const postChat = async () => {
 
 // postChat();
 
-// console.log(`Sending every ${delayBetweenPosts}ms...`);
-// setInterval(postChat, delayBetweenPosts);
+console.log(`Sending every ${delayBetweenPosts}ms...`);
+setInterval(postChat, delayBetweenPosts);

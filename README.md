@@ -2,29 +2,52 @@
 
 Building a chat app for the express purpose of learning how to deploy a frontend, backend, managed postgres/redis, etc, on _n_-number of Cloud providers
 
-## Stage 1
-- auth is just simple username/password system (no email)
-  - cookie access/refresh tokens enabled (backed by redis), but no OAuth of any kind
-- landing page has simple "create or join" chat room names
-  - creating a room needs a name, is assigned a ulid, which can be used to join
-  - can list available rooms (virtualized, look in tanstack for this)
-- chat is done
-  - via websockets and broadcasting
-  - history kept in DB
-  - stretch: show chat history upon re-enter
-- docker-compose includes nginx project that simulates kubernetes nginx load balancer
+# CLI Snippets
 
-## Stage 2
-- socket.io redis adapter for scaling, use deploy option on docker-compose on server to test
-- allow users to post pictures, storing in a `localStack` container for docker-compose
-- show all rooms a user has joined, user can leave a room
-- user can add metadata and profile pic
-  - use npm package `sharp` to create thumbnails of the profile pics
+# Preinstall
 
-## Stage 3
-- Set up local Kubernetes through DockerDesktop
-- Helm Chart to manage deployment and orchestrations
+## Ingress controller
 
-## Stage 4
-- ???
+You need to add this manually to correctly expose `localhost:80` via Ingress objects
+- `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.2/deploy/static/provider/cloud/deploy.yaml`
+
+## Dashboard
+
+Run in order:
+- `kubectl apply -f ./kube/dashboard.yml`
+- `helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard`
+- `kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443`
+
+Dashboard will then display on `localhost:8443`
+
+### Installing dashboard and generating API Key
+
+TODO
+
+## Kubeview
+
+```bash
+helm repo add kv2 https://code.benco.io/kubeview/deploy/helm
+helm repo update
+helm install kubeview kv2/kubeview --create-namespace --namespace=kubeview
+```
+
+This is an helm "application" and you do not need to port-forward. Available at `localhost:8000`
+
+## Grafana + friends
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install tempo grafana/tempo -n monitoring --create-namespace
+helm install loki grafana/loki -n monitoring
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
+helm install grafana grafana/grafana -n monitoring
+```
+
+## Services
+
+- `kubectl port-forward svc/chat-svc-postgres 5432:5432`
+- `kubectl port-forward svc/chat-svc-redis 6379:6379`
 
