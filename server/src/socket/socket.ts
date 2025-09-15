@@ -45,6 +45,12 @@ io.on('connection', socket => {
     // TODO: try/catch
     const [newChat] = await db.insert(chats).values({ authorId, roomId, text }).returning();
 
+    if (newChat != null) {
+      // uncomment to test redis load
+      // fire and forget
+      // getRedisClient().set(`room:${roomId}:chat:${newChat.id}`, JSON.stringify(newChat));
+    }
+
     io.to(`room:${args.roomId}`).emit('chat', newChat!);
   });
 });

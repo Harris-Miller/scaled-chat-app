@@ -6,12 +6,13 @@ import { serverTiming } from '@elysiajs/server-timing';
 // import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 // import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
 import { Elysia } from 'elysia';
-// import prometheusPlugin from 'elysia-prometheus';
+import prometheusPlugin from 'elysia-prometheus';
 
 // import { seedDb } from './db';
 import { kubeProbes } from './kubeProbes';
 import { logger } from './logger';
 import { roomsRoute } from './routes/rooms';
+import { testsRoute } from './routes/tests';
 import { userRoute } from './routes/user';
 // import { s3 } from './s3';
 import { engine, websocket } from './socket';
@@ -24,6 +25,7 @@ import { engine, websocket } from './socket';
 const api = new Elysia()
   .get('/', () => 'Hello Elysia')
   .use(kubeProbes)
+  .use(testsRoute)
   .use(userRoute)
   .use(roomsRoute);
 
@@ -37,14 +39,14 @@ const app = new Elysia()
     }),
   )
   .use(serverTiming())
-  // .use(
-  //   prometheusPlugin({
-  //     dynamicLabels: {
-  //       userAgent: ctx => ctx.request.headers.get('user-agent') ?? 'unknown',
-  //     },
-  //     staticLabels: { service: 'chat-server' },
-  //   }),
-  // )
+  .use(
+    prometheusPlugin({
+      dynamicLabels: {
+        userAgent: ctx => ctx.request.headers.get('user-agent') ?? 'unknown',
+      },
+      staticLabels: { service: 'chat-server' },
+    }),
+  )
   // .use(
   //   elysiaLogging(logger, {
   //     format: 'json',
@@ -67,19 +69,13 @@ const app = new Elysia()
 
 const serverInstance = Bun.serve({
   fetch(req, server) {
-    const ip = server.requestIP(req);
+    // Any request on the `/ws/` path, let the socket-io engine handle
     const url = new URL(req.url);
-    // eslint-disable-next-line no-console
-    console.log(`URL: ${url.toString()}`);
-    // eslint-disable-next-line no-console
-    console.log(`Request IP: ${JSON.stringify(ip)}`);
-    // eslint-disable-next-line no-console
-    console.log(`X-Forwarded-For`, req.headers.get('x-forwarded-for'));
-
     if (url.pathname === '/ws/') {
       // TODO: place websocket behind auth barriers
       return engine.handleRequest(req, server);
     }
+    // else, send to Elysia to handle
     return app.fetch(req);
   },
   port: process.env.PORT,

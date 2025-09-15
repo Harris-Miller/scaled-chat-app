@@ -51,3 +51,11 @@ helm install grafana grafana/grafana -n monitoring
 - `kubectl port-forward svc/chat-svc-postgres 5432:5432`
 - `kubectl port-forward svc/chat-svc-redis 6379:6379`
 
+# Setting up Grafana
+
+## Dashboard
+
+TODO: figure out how to config file this so I don't have to re-add manually each time
+- postgres id: 9628
+- redis id: 12776
+- nodejs id (for bun server app): 11159

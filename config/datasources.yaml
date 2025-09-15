@@ -22,3 +22,10 @@ datasources:
     access: proxy
     version: 1
     editable: true
+
+  - name: Redis
+    type: redis
+    url: redis://redis:6379
+    access: proxy
+    version: 1
+    editable: true

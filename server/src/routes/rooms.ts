@@ -6,6 +6,7 @@ import { getUser } from '../common/authService';
 import { db } from '../db';
 import { chats, rooms } from '../db/schema';
 import { logger } from '../logger';
+import { getRedisClient } from '../redis/redisClient';
 import { io } from '../socket';
 
 export const roomsRoute = new Elysia({ prefix: '/rooms' })
@@ -115,6 +116,10 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
           success: false,
         });
       }
+
+      // uncomment to test redis load
+      // fire and forget
+      // getRedisClient().set(`room:${id}:chat:${newChat.id}`, JSON.stringify(newChat));
 
       logger.silly(`New chat created: ${JSON.stringify(newChat)}`);
 

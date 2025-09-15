@@ -3,27 +3,45 @@ global:
   evaluation_interval: 15s # Evaluate rules every 15 seconds by default
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: prometheus
     static_configs:
-      - targets: ['localhost:9090'] # Prometheus scrapes itself
+      - targets:
+        - localhost:9090 # Prometheus scrapes itself
 
-  - job_name: 'tempo'
+  - job_name: tempo
     static_configs:
-      - targets: ['tempo:3200']
-  - job_name: 'tempo-usage-metrics'
-    metrics_path: '/usage_metrics'
+      - targets:
+        - tempo:3200
+  - job_name: tempo-usage-metrics
+    metrics_path: /usage_metrics
     static_configs:
-      - targets: ['tempo:3200']
+      - targets:
+        - tempo:3200
 
-  - job_name: 'chat-server'
+  - job_name: chat-server
     # scrape_interval: 10s # Override global scrape interval for this job
     static_configs:
-      - targets: ['server:3000']
+      - targets:
+        - scaled-chat-app-server-1:3000
+        - scaled-chat-app-server-2:3000
+        - scaled-chat-app-server-3:3000
+        - scaled-chat-app-server-4:3000
 
-# alerting:
-#   alertmanagers:
-#     - static_configs:
-#         - targets: ['localhost:9093'] # Send alerts to an Alertmanager on port 9093
+  - job_name: postgres
+    static_configs:
+      - targets:
+        - pg-exporter:9187
+  
+  - job_name: redis
+    static_configs:
+      - targets:
+        - redis-exporter:9121
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - localhost:9093 # Send alerts to an Alertmanager on port 9093
 
 # rule_files:
-#   - 'alert.rules' # Path to a file containing alerting rules
+#   - alert.rules # Path to a file containing alerting rules

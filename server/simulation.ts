@@ -1024,8 +1024,6 @@ const numPhrases = randomChatGptGeneratedPhrases.length;
 const numUsers = userIds.length;
 const numRooms = roomIds.length;
 
-const delayBetweenPosts = 1000;
-
 console.log(`${numUsers} users found. ${numRooms} rooms found.`);
 
 const coloradoRoomId = '9Q5yMi8VkkZZCoZeevEQZ';
@@ -1078,8 +1076,8 @@ const createSocket = (i: number) => {
 const postChat = async () => {
   const text = randomChatGptGeneratedPhrases[Math.floor(Math.random() * numPhrases)];
   const userId = userIds[Math.floor(Math.random() * numUsers)];
-  const roomId = '9Q5yMi8VkkZZCoZeevEQZ'; // colorado
-  // const roomId = roomIds[Math.floor(Math.random() * numRooms)];
+  // const roomId = '9Q5yMi8VkkZZCoZeevEQZ'; // colorado
+  const roomId = roomIds[Math.floor(Math.random() * numRooms)];
 
   const ipSuffix = Math.floor(Math.random() * 9);
 
@@ -1098,5 +1096,6 @@ const postChat = async () => {
 
 // postChat();
 
+const delayBetweenPosts = 200;
 console.log(`Sending every ${delayBetweenPosts}ms...`);
 setInterval(postChat, delayBetweenPosts);
