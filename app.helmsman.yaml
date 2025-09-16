@@ -1,0 +1,30 @@
+namespaces:
+  ingress-nginx:
+  kubernetes-dashboard:
+  kubeview:
+
+helmRepos:
+  kv2: https://code.benco.io/kubeview/deploy/helm
+  nginx: https://kubernetes.github.io/ingress-nginx
+
+apps:
+  ingress-nginx:
+    chart: nginx/ingress-nginx
+    namespace: ingress-nginx
+    version: 4.13.2
+    enabled: true
+
+  kubernetes-dashboard:
+    chart: ./helm/dashboard
+    namespace: kubernetes-dashboard
+    version: 1.0.0
+    enabled: true
+    helmFlags:
+      - "--dependency-update"
+
+  kubeview:
+    chart: kv2/kubeview
+    namespace: kubeview
+    version: 2.0.5
+    enabled: true
+  

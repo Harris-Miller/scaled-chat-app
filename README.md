@@ -6,23 +6,56 @@ Building a chat app for the express purpose of learning how to deploy a frontend
 
 # Preinstall
 
+## Docker Desktop
+- Settings > General
+  - Check "Use containerd for pulling and storing images" if not already
+    - WARNING: This will switch the image registry that docker uses under the hood, you will lose all active images and containers
+    - If you have any containers that your launched from the command line, now is the time to figure out how to re-produce them!
+
+Click "Apply", then...
+
+- Settings > Kubernetes
+  - Check "Enable Kubernetes"
+  - Under Cluster settings
+    - check "kind"
+    - kubernetes version dropdown choose latest
+    - set Nodes to "2"
+    - check "Show system containers (advanced)"
+
+Click "Apply" again.
+
+Not that unchecking "Enable Kubernetes" _destroys_ the cluster, and does not just stop it! This is very annoying because you'll lose everything you've deployed to it.
+
+You can still stop/start it though. you simply need to select and stop the 4 containers you see in the Containers page
+- Just check them all and Click The Stop/Play buttons at the top right to do them all at once
+
+I have no idea why DockerDesktop doesn't make this easier. Hopefully in the future.
+
+
 ## Ingress controller
 
-You need to add this manually to correctly expose `localhost:80` via Ingress objects
-- `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.2/deploy/static/provider/cloud/deploy.yaml`
+Add this so ports `80` and `433` for http/https are exposed out
+
+```
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace 
+```
 
 ## Dashboard
 
-Run in order:
-- `kubectl apply -f ./kube/dashboard.yml`
-- `helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard`
-- `kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443`
+Note: you _must_ use the namespace kubernetes-dashboard for this to work
+```bash
+# install everything with helm
+helm upgrade dashboard ./helm/dashboard --create-namespace --namespace kubernetes-dashboard --install --dependency-update
+# create a long-lived token
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+# activate the proxy -- this needs to stay running to access the dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
 
-Dashboard will then display on `localhost:8443`
+Nav to `localhost:8443` and past in the token
 
-### Installing dashboard and generating API Key
-
-TODO
 
 ## Kubeview
 
@@ -32,7 +65,7 @@ helm repo update
 helm install kubeview kv2/kubeview --create-namespace --namespace=kubeview
 ```
 
-This is an helm "application" and you do not need to port-forward. Available at `localhost:8000`
+Kubeview uses a LoadBalancer to `localhost:8000` so it's immediately accessable
 
 ## Grafana + friends
 
@@ -54,6 +87,11 @@ helm install grafana grafana/grafana -n monitoring
 # Setting up Grafana
 
 ## Dashboard
+
+Long live token:
+```
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+```
 
 TODO: figure out how to config file this so I don't have to re-add manually each time
 - postgres id: 9628

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deploy-server
+  namespace: test-app
+  labels:
+    app: test-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-server
+  template:
+    metadata:
+      labels:
+        app: test-server
+    spec:
+      containers:
+        - name: testserver
+          image: testserver:latest
+          imagePullPolicy: Always
+          # If the client serves an HTTP port, expose it here:
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-svc-server
+  labels:
+    app: test-server
+spec:
+  type: ClusterIP
+  selector:
+    app: test-server
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
