@@ -11,21 +11,22 @@ datasources:
 
   - name: Loki
     type: loki
-    url: http://loki:3200
+    url: http://loki:3100
     access: proxy
     version: 1
     editable: true
 
   - name: Tempo
     type: tempo
-    url: http://tempo:3100
+    url: http://tempo:3200
     access: proxy
     version: 1
     editable: true
 
-  - name: Redis
-    type: redis
-    url: redis://redis:6379
-    access: proxy
-    version: 1
-    editable: true
+  ## why doesn't this work after clearing volume?
+  # - name: Redis
+  #   type: redis
+  #   url: redis://redis:6379
+  #   access: proxy
+  #   version: 1
+  #   editable: true

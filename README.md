@@ -101,6 +101,25 @@ TODO: figure out how to config file this so I don't have to re-add manually each
 
 # TODO and Ideas
 
-- Connected/Disconnected icons
-- DMs
-- Friends list?
+- add metrics to s3 and other services
+- figure out how to add `userId`, `sessionId`, etc, to all API calls and socket messages for traces/spans
+  - figure out how to send those across micro-services to correctly report them
+
+- Joined roomed (to show versus all rooms)
+- Friends list? (to show versus all users)
+- Reimplement room admin
+
+- ClientSide
+  - pull and persist other user info
+    - thinking just do _all_ users for first time
+    - on subsequent sessions, query on `updatedAt` from last check
+    - should subscribe to a "user update" channel that on receive an update, will update user's `lastCheckedAt`
+  - on application first load, no chat history is persisted (for now)
+  - on room enter
+    - subscribe from incoming updates
+    - for first time, grab latest chats
+    - on subsequent enter after leave, query for chats since most-recent
+  - on channel leave
+    - unsubscribe from incoming updates
+  - Display active / inactive icons for users
+    - keep it simple for starters: just show when other users are connected via the websocket
