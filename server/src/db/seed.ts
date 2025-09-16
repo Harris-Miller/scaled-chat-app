@@ -226,6 +226,9 @@ export const seedDb = async () => {
       chats: {
         count: 0,
       },
+      profilePics: {
+        count: 0,
+      },
       rooms: {
         columns: {
           id: funcs.valuesFromArray({ isUnique: true, values: roomIdSeeds }),

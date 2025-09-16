@@ -2,14 +2,17 @@ import axios from 'axios';
 
 import type { SuccessMessage } from './api.types';
 
-export type Profile = {
+export interface User {
+  createdAt: string;
   displayName: string;
   email: string;
   id: string;
-};
+  profilePicId?: string;
+  updatedAt: string;
+}
 
 export const getProfile = () => {
-  return axios.get<Profile>('/api/user/profile');
+  return axios.get<User>('/api/user/profile');
 };
 
 export const signIn = (email: string, password: string) => {
@@ -27,5 +30,5 @@ export const signUp = (email: string, password: string) => {
 };
 
 export const signOut = () => {
-  return axios.get<Profile>('/api/user/sign-out');
+  return axios.get<User>('/api/user/sign-out');
 };

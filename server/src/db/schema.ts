@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { char, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, char, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { nanoid as genNanoid } from 'nanoid';
 
 const nanoid = () => char({ length: 21 });
@@ -20,6 +20,24 @@ export const users = pgTable('users', {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
+});
+
+export const profilePics = pgTable('profile_pics', {
+  contentType: varchar('20').notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+  id: nanoid()
+    .primaryKey()
+    .$defaultFn(() => genNanoid()),
+  // must do to avoid circular reference with drizzle
+  selected: boolean().notNull(),
+  success: boolean().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+  userId: nanoid()
+    .notNull()
+    .references(() => users.id),
 });
 
 export const rooms = pgTable('rooms', {
@@ -75,7 +93,12 @@ export const usersToRooms = pgTable(
 
 export const userRelations = relations(users, ({ many }) => ({
   chats: many(chats),
+  profilePics: many(profilePics),
   usersToRooms: many(usersToRooms),
+}));
+
+export const profilePicRelations = relations(profilePics, ({ one }) => ({
+  user: one(users, { fields: [profilePics.userId], references: [users.id] }),
 }));
 
 export const chatRelations = relations(chats, ({ one }) => ({

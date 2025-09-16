@@ -7,14 +7,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
+  ListSubheader,
+  Menu,
+  MenuItem,
   TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
 import type { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
-import type { ChangeEventHandler, Dispatch, FC, SetStateAction } from 'react';
+import type { ChangeEventHandler, Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import type { ApiError } from '../api/api.types';
 import { getProfile, signIn, signOut, signUp } from '../api/user';
@@ -27,6 +31,7 @@ const handle =
   };
 
 export const Header: FC = () => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,7 +41,7 @@ export const Header: FC = () => {
   useEffect(() => {
     getProfile()
       .then(resp => {
-        console.log(resp);
+        console.log(resp.data);
         setUser(resp.data);
       })
       .catch((resp: unknown) => {
@@ -47,7 +52,6 @@ export const Header: FC = () => {
   const signUpHandler = async () => {
     try {
       const response = await signUp(email, password).then(getProfile);
-      console.log(response.data);
       setUser(response.data);
       setDialogOpen(false);
     } catch (err) {
@@ -60,7 +64,6 @@ export const Header: FC = () => {
     try {
       const response = await signIn(email, password).then(getProfile);
 
-      console.log(response);
       setUser(response.data);
       setDialogOpen(false);
     } catch (err) {
@@ -76,6 +79,14 @@ export const Header: FC = () => {
     });
   };
 
+  const handleMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -84,24 +95,35 @@ export const Header: FC = () => {
             <IconButton aria-label="menu" color="inherit" edge="start" size="large" sx={{ mr: 2 }}>
               <MenuIcon />
             </IconButton>
+            <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
+              Scaled Chat App
+            </Typography>
             {user != null ? (
               <>
                 <IconButton
                   aria-label="menu"
                   color="inherit"
                   edge="start"
-                  onClick={() => {
-                    // TODO
-                  }}
+                  onClick={handleMenu}
                   size="large"
                   sx={{ mr: 2 }}
                 >
                   <PersonIcon />
                 </IconButton>
-                <Typography>{user.email}</Typography>
-                <Button onClick={logoutHandler} variant="outlined">
-                  Logout
-                </Button>
+                <Menu
+                  anchorEl={anchorEl}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  id="menu-appbar"
+                  onClose={handleClose}
+                  open={Boolean(anchorEl)}
+                >
+                  <ListSubheader>
+                    {user.displayName} ({user.email})
+                  </ListSubheader>
+                  <Divider />
+                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+                </Menu>
               </>
             ) : (
               <IconButton

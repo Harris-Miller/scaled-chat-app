@@ -1,10 +1,6 @@
 import type { StateCreator } from 'zustand';
 
-export interface User {
-  displayName: string;
-  email: string;
-  id: string;
-}
+import type { User } from '../api/user';
 
 export interface UserSlice {
   setUser: (user: User | null) => void;

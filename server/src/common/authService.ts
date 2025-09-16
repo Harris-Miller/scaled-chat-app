@@ -183,7 +183,11 @@ export const getUser = new Elysia()
       return status(401);
     }
 
-    const user = await db.query.users.findFirst({ where: eq(users.id, jwtPayload.sub) });
+    const user = await db.query.users.findFirst({
+      columns: { passwordHash: false },
+      where: eq(users.id, jwtPayload.sub),
+    });
+
     if (user == null) {
       logger.silly('AccessToken valid, but for user that has been deactivated');
       return status(403);
