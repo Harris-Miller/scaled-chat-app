@@ -1,6 +1,7 @@
 import { Login as LoginIcon, Menu as MenuIcon, Person as PersonIcon } from '@mui/icons-material';
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
   Dialog,
@@ -16,6 +17,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useNavigate } from '@tanstack/react-router';
 import type { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import type { ChangeEventHandler, Dispatch, FC, MouseEvent, SetStateAction } from 'react';
@@ -37,6 +39,7 @@ export const Header: FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { user, setUser } = useStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getProfile()
@@ -79,6 +82,10 @@ export const Header: FC = () => {
     });
   };
 
+  const profileHandler = () => {
+    navigate({ to: '/profile' });
+  };
+
   const handleMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -108,7 +115,11 @@ export const Header: FC = () => {
                   size="large"
                   sx={{ mr: 2 }}
                 >
-                  <PersonIcon />
+                  {user.profilePicId != null ? (
+                    <Avatar alt="Profile" src={`/api/user/profile/pic/${user.profilePicId}/thumb`} />
+                  ) : (
+                    <PersonIcon />
+                  )}
                 </IconButton>
                 <Menu
                   anchorEl={anchorEl}
@@ -121,7 +132,7 @@ export const Header: FC = () => {
                     {user.displayName} ({user.email})
                   </ListSubheader>
                   <Divider />
-                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={profileHandler}>Profile</MenuItem>
                   <MenuItem onClick={logoutHandler}>Logout</MenuItem>
                 </Menu>
               </>

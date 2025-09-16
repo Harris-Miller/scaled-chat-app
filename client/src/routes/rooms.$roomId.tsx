@@ -91,6 +91,8 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
 };
 
 export const RoomComponent: FC = () => {
+  // TODO: redirect to `/` if not authed
+
   const { roomId } = Route.useParams();
 
   const query = useRoom(roomId);

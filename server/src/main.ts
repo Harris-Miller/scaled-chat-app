@@ -21,6 +21,12 @@ import { engine, websocket } from './socket';
 console.log('s3 connection test (should display false)', await s3.exists('non-existent-file.jpg'));
 
 const api = new Elysia()
+  .onError(({ error }) => {
+    // eslint-disable-next-line no-console
+    console.log(error);
+    logger.error(error);
+    return error;
+  })
   .get('/', () => 'Hello Elysia')
   .use(kubeProbes)
   .use(testsRoute)

@@ -7,5 +7,6 @@ declare module 'bun' {
     PORT: string;
     REDIS_URL: string;
     S3_URL: string;
+    THUMBNAIL_URL: string;
   }
 }

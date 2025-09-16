@@ -205,6 +205,7 @@ services:
       PORT: 3000
       REDIS_URL: redis://redis:6379
       S3_URL: http://minio:9000
+      THUMBNAIL_URL: http://thumbnail-micro:3008
     restart: on-failure:3
     deploy:
       replicas: 4
