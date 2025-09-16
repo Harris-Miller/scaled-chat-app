@@ -97,3 +97,10 @@ TODO: figure out how to config file this so I don't have to re-add manually each
 - postgres id: 9628
 - redis id: 12776
 - nodejs id (for bun server app): 11159
+
+
+# TODO and Ideas
+
+- Connected/Disconnected icons
+- DMs
+- Friends list?

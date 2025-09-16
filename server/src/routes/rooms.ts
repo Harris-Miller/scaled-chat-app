@@ -16,7 +16,7 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
   })
   .post(
     '/',
-    async function roomsRoutePostIndex({ body: { name }, status, user }) {
+    async function roomsRoutePostIndex({ body: { name }, status }) {
       const roomWithNameExists = (await db.$count(rooms, eq(rooms.name, name))) !== 0;
       if (roomWithNameExists) {
         return status(409, {
@@ -29,7 +29,6 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
       const newRoom = await db
         .insert(rooms)
         .values({
-          adminId: user.id,
           name,
         })
         .returning()

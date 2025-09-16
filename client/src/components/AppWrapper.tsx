@@ -1,10 +1,11 @@
-import { Box, Container } from '@mui/material';
+import { Box, Container, Toolbar } from '@mui/material';
 import type { FC, PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
 import { socket } from '../socket';
 
 import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
@@ -32,8 +33,10 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   return (
-    <>
+    <Box sx={{ display: 'flex' }}>
       <Header />
+
+      <Sidebar />
 
       <Box
         component="main"
@@ -45,8 +48,9 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
           overflow: 'auto',
         }}
       >
+        <Toolbar />
         <Container maxWidth={false}>{children}</Container>
       </Box>
-    </>
+    </Box>
   );
 };

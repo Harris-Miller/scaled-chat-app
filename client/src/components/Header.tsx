@@ -2,7 +2,6 @@ import { Login as LoginIcon, Menu as MenuIcon, Person as PersonIcon } from '@mui
 import {
   AppBar,
   Avatar,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -96,63 +95,61 @@ export const Header: FC = () => {
 
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton aria-label="menu" color="inherit" edge="start" size="large" sx={{ mr: 2 }}>
-              <MenuIcon />
-            </IconButton>
-            <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
-              Scaled Chat App
-            </Typography>
-            {user != null ? (
-              <>
-                <IconButton
-                  aria-label="menu"
-                  color="inherit"
-                  edge="start"
-                  onClick={handleMenu}
-                  size="large"
-                  sx={{ mr: 2 }}
-                >
-                  {user.profilePicId != null ? (
-                    <Avatar alt="Profile" src={`/api/user/profile/pic/${user.profilePicId}/thumb`} />
-                  ) : (
-                    <PersonIcon />
-                  )}
-                </IconButton>
-                <Menu
-                  anchorEl={anchorEl}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  id="menu-appbar"
-                  onClose={handleClose}
-                  open={Boolean(anchorEl)}
-                >
-                  <ListSubheader>
-                    {user.displayName} ({user.email})
-                  </ListSubheader>
-                  <Divider />
-                  <MenuItem onClick={profileHandler}>Profile</MenuItem>
-                  <MenuItem onClick={logoutHandler}>Logout</MenuItem>
-                </Menu>
-              </>
-            ) : (
+      <AppBar position="fixed" sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}>
+        <Toolbar>
+          <IconButton aria-label="menu" color="inherit" edge="start" size="large" sx={{ mr: 2 }}>
+            <MenuIcon />
+          </IconButton>
+          <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
+            Scaled Chat App
+          </Typography>
+          {user != null ? (
+            <>
               <IconButton
                 aria-label="menu"
                 color="inherit"
                 edge="start"
-                onClick={() => {
-                  setDialogOpen(true);
-                }}
+                onClick={handleMenu}
                 size="large"
                 sx={{ mr: 2 }}
               >
-                <LoginIcon />
+                {user.profilePicId != null ? (
+                  <Avatar alt="Profile" src={`/api/user/profile/pic/${user.profilePicId}/thumb`} />
+                ) : (
+                  <PersonIcon />
+                )}
               </IconButton>
-            )}
-          </Toolbar>
-        </AppBar>
-      </Box>
+              <Menu
+                anchorEl={anchorEl}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                id="menu-appbar"
+                onClose={handleClose}
+                open={Boolean(anchorEl)}
+              >
+                <ListSubheader>
+                  {user.displayName} ({user.email})
+                </ListSubheader>
+                <Divider />
+                <MenuItem onClick={profileHandler}>Profile</MenuItem>
+                <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <IconButton
+              aria-label="menu"
+              color="inherit"
+              edge="start"
+              onClick={() => {
+                setDialogOpen(true);
+              }}
+              size="large"
+              sx={{ mr: 2 }}
+            >
+              <LoginIcon />
+            </IconButton>
+          )}
+        </Toolbar>
+      </AppBar>
       <Dialog open={dialogOpen}>
         <DialogTitle>Auth</DialogTitle>
         <DialogContent>

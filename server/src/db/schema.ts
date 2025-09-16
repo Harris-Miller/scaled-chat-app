@@ -41,9 +41,9 @@ export const profilePics = pgTable('profile_pics', {
 });
 
 export const rooms = pgTable('rooms', {
-  adminId: nanoid()
-    .notNull()
-    .references(() => users.id),
+  // adminId: nanoid()
+  //   .notNull()
+  //   .references(() => users.id),
   createdAt: timestamp().defaultNow().notNull(),
   description: text().notNull().default(''),
   id: nanoid()
@@ -74,17 +74,44 @@ export const chats = pgTable('chats', {
     .$onUpdate(() => new Date()),
 });
 
-export const usersToRooms = pgTable(
-  'users_to_rooms',
+export const directMessages = pgTable('direct_messages', {
+  createdAt: timestamp().defaultNow().notNull(),
+
+  id: nanoid()
+    .primaryKey()
+    .$defaultFn(() => genNanoid()),
+  text: text().notNull(),
+
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+// export const usersToRooms = pgTable(
+//   'users_to_rooms',
+//   {
+//     roomId: nanoid()
+//       .notNull()
+//       .references(() => rooms.id),
+//     userId: nanoid()
+//       .notNull()
+//       .references(() => users.id),
+//   },
+//   t => [primaryKey({ columns: [t.userId, t.roomId] })],
+// );
+
+export const usersToDirectMessages = pgTable(
+  'users_to_direct_messages',
   {
-    roomId: nanoid()
+    fromId: nanoid()
       .notNull()
-      .references(() => rooms.id),
-    userId: nanoid()
+      .references(() => users.id),
+    toId: nanoid()
       .notNull()
       .references(() => users.id),
   },
-  t => [primaryKey({ columns: [t.userId, t.roomId] })],
+  t => [primaryKey({ columns: [t.fromId, t.toId] })],
 );
 
 //
@@ -94,7 +121,7 @@ export const usersToRooms = pgTable(
 export const userRelations = relations(users, ({ many }) => ({
   chats: many(chats),
   profilePics: many(profilePics),
-  usersToRooms: many(usersToRooms),
+  // usersToRooms: many(usersToRooms),
 }));
 
 export const profilePicRelations = relations(profilePics, ({ one }) => ({
@@ -108,10 +135,21 @@ export const chatRelations = relations(chats, ({ one }) => ({
 
 export const roomRelations = relations(rooms, ({ many }) => ({
   chats: many(chats),
-  usersToRooms: many(usersToRooms),
+  // usersToRooms: many(usersToRooms),
 }));
 
-export const usersToRoomsRelations = relations(usersToRooms, ({ one }) => ({
-  room: one(rooms, { fields: [usersToRooms.roomId], references: [rooms.id] }),
-  user: one(users, { fields: [usersToRooms.userId], references: [users.id] }),
+// export const usersToRoomsRelations = relations(usersToRooms, ({ one }) => ({
+//   room: one(rooms, { fields: [usersToRooms.roomId], references: [rooms.id] }),
+//   user: one(users, { fields: [usersToRooms.userId], references: [users.id] }),
+// }));
+
+export const usersToDirectMessagesRelations = relations(usersToDirectMessages, ({ one }) => ({
+  from: one(users, {
+    fields: [usersToDirectMessages.fromId],
+    references: [users.id],
+  }),
+  to: one(users, {
+    fields: [usersToDirectMessages.toId],
+    references: [users.id],
+  }),
 }));

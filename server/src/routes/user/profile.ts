@@ -2,10 +2,10 @@ import { and, eq } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
 import { Result } from 'try';
 
-import { authService, getUser } from '../common/authService';
-import { db } from '../db';
-import { profilePics, users } from '../db/schema';
-import { s3 } from '../s3';
+import { getUser } from '../../common/authService';
+import { db } from '../../db';
+import { profilePics } from '../../db/schema';
+import { s3 } from '../../s3';
 
 // string | null because checking for `null` key is a use-case
 const supportedProfilePicContentType = new Set<string | null>(['image/png', 'image/jpg', 'image/jpeg']);
@@ -18,84 +18,7 @@ const contentTypeToExt = {
 
 type ContentType = keyof typeof contentTypeToExt;
 
-export const userRoute = new Elysia({ prefix: '/user' })
-  .use(authService)
-  .model({
-    signIn: t.Object({
-      email: t.String({ minLength: 5 }),
-      password: t.String({ minLength: 8 }),
-    }),
-  })
-  .post(
-    '/sign-up',
-    async function userRoutePostSignUp({ body: { email, password }, createAccessToken, createRefreshToken, status }) {
-      const user = await db.$count(users, eq(users.email, email));
-
-      // bail if email already in use
-      if (user !== 0)
-        return status(400, {
-          message: 'User already exists',
-          success: false,
-        });
-
-      const passwordHash = await Bun.password.hash(password);
-
-      const { userId } = await db
-        .insert(users)
-        .values({
-          displayName: '',
-          email,
-          passwordHash,
-        })
-        .returning({ userId: users.id })
-        .then(r => r[0]!); // TODO: is there a better way?
-
-      const idAsString = userId.toString();
-      await createAccessToken(idAsString);
-      await createRefreshToken(idAsString);
-
-      return {
-        message: `User created. Signed in as ${email}`,
-        success: true,
-      };
-    },
-    {
-      body: 'signIn',
-    },
-  )
-  .post(
-    '/sign-in',
-    async function userRoutePostSignIn({ status, body: { email, password }, createAccessToken, createRefreshToken }) {
-      const user = await db.query.users.findFirst({ where: eq(users.email, email) });
-
-      if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
-        return status(400, {
-          message: 'Invalid username or password',
-          success: false,
-        });
-
-      const idAsString = user.id.toString();
-      await createAccessToken(idAsString);
-      await createRefreshToken(idAsString);
-
-      return {
-        message: `Signed in as ${email}`,
-        success: true,
-      };
-    },
-    {
-      body: 'signIn',
-    },
-  )
-  .get('/sign-out', function userRouteGetSignOut({ cookie: { accessToken, refreshToken } }) {
-    accessToken?.remove();
-    refreshToken?.remove();
-
-    return {
-      message: 'Signed out',
-      success: true,
-    };
-  })
+export const profileRoutes = new Elysia()
   .use(getUser)
   .get('/profile', async function userRouteGetProfile({ user }) {
     const [profilePic] = await db

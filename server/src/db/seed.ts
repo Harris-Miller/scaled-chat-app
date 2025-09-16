@@ -4,6 +4,8 @@ import { reset, seed } from 'drizzle-seed';
 import { db } from './db';
 import * as schema from './schema';
 
+const harrisId = 'X2jsoEJMJt65CV6I472gZ';
+
 const userIdSeeds = [
   'jMjDsHBbPQO4UaXFzQPNS',
   'oCPdPutVGH5fAJ32qXHRt',
@@ -105,7 +107,6 @@ const userIdSeeds = [
   'MFkoaLnv8S7ro0aCPzWnw',
   'ee69e9R2y0-VsEFRIBhN6',
   'kCfHGGgPailGQPXSDMYj9',
-  'ebe1nVGmXyOhrFQVVLErx',
 ];
 
 const roomIdSeeds = [
@@ -117,102 +118,9 @@ const roomIdSeeds = [
   '9bCy8qluSyRAJA2pqX373',
   'PVQlCqrMPAM60Hd7YucJF',
   'Y0mdHs5rIxEnsqOTVhkZ1',
-  'X2jsoEJMJt65CV6I472gZ',
-  'KJW0cuYrhdAEt5CegGxtX',
-  'rt5jbbmUnw-RtjXtktioT',
-  'sAjZeSRu_006OdL9sQC-_',
-  'rZKePBvu4_HGCnNKY44bq',
-  'sauDqIlQQahxc-ILxdKD2',
-  '9Q5yMi8VkkZZCoZeevEQZ',
-  'buVGid-Y7L5a0_HGAQQG1',
-  'Qlj3qmAN-s084kTv0bL_l',
-  '-x2OmOcfBzgLwOqrquHWt',
-  'sdYJ-tZ9sa3mdZozvchjt',
-  'lppbWAyqkMcFzNvkbb0kV',
-  'sBtuBYr0LF09Ywy_Bqk4h',
-  'sXKAIt3q3_izd-DOdAAqH',
-  'XgqWA9UGuBSfH_3HGBEko',
-  'K9eggWcut3pb1M5ST1usD',
-  'HXp2YrChLQaOo4y1oN59R',
-  'yOah7hDEhjcuOmUnOWHvx',
-  'wvRKA7VpfF-RZk_TIdWEA',
-  'xGjVfsB7VxA4IOfdPX959',
-  'QU9Uu81J2f6TcmefxhS13',
-  'J6uxA0d0rZxva9_Pi68aY',
-  'wM4NmuByNjO9JB6CwRrhF',
-  'H3-zsIMtP57iGDJmDYwee',
-  'NvYV49SAK6SV5V4J184BP',
-  'VNyqculRe55W6zYC_ofah',
-  '5TpA7TatvaRWms5RZi7Ie',
-  'spEqJMEJu0-tE6-T7afiv',
-  'SSmjghEtRGrwTA7i-4wFR',
-  'uRPVphS-G8wbuLPIiiNow',
-  '0gJ-YMtw7mctO80aGQKa3',
-  'YaV-7sduKv3752AqlAhhi',
-  'tqHTAuotQo1z-pvg5ZGRC',
-  'XfSgOmAudSjUcsm-Umcex',
-  'pSqxYxlXK1UtVKuwt6osp',
-  'ZEsI7CCclODidCdLQoI9w',
-  'L8fNyyKsy73aEtrMHEDJ8',
-  'ekesCZTIAleW-XosUwz4R',
-  'cKJ4w9IfCXEDDE-_ZCM2F',
-  '6wo7L37g040tn1w27-Mfy',
-  'GGQnYNZIwjOfp5KlU5sWI',
-  'JOydMpNZl0Lg4SCkSNxIg',
 ];
 
-const stateNames = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming',
-];
+const roomNames = ['Mercery', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
 
 export const seedDb = async () => {
   // seed
@@ -221,9 +129,16 @@ export const seedDb = async () => {
 
   const passwordHash = await Bun.password.hash('password123');
 
+  await db
+    .insert(schema.users)
+    .values({ displayName: 'Harris', email: 'harris@email.com', id: harrisId, passwordHash });
+
   await seed(db, schema).refine(funcs => {
     return {
       chats: {
+        count: 0,
+      },
+      directMessages: {
         count: 0,
       },
       profilePics: {
@@ -231,10 +146,11 @@ export const seedDb = async () => {
       },
       rooms: {
         columns: {
+          // adminId: funcs.valuesFromArray({ values: [harrisId] }),
           id: funcs.valuesFromArray({ isUnique: true, values: roomIdSeeds }),
-          name: funcs.valuesFromArray({ isUnique: true, values: stateNames }),
+          name: funcs.valuesFromArray({ isUnique: true, values: roomNames }),
         },
-        count: 50,
+        count: 8,
       },
       users: {
         columns: {
@@ -244,15 +160,9 @@ export const seedDb = async () => {
           passwordHash: funcs.default({ defaultValue: passwordHash }),
         },
         count: 50,
-        with: {
-          rooms: 1,
-        },
       },
     };
   });
-
-  await db.insert(schema.users).values({ displayName: 'Harris', email: 'harris@email.com', passwordHash });
-  await db.insert(schema.users).values({ displayName: 'Other', email: 'other@email.com', passwordHash });
 
   console.log('db seeded!');
 };
