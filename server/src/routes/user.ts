@@ -91,3 +91,24 @@ export const userRoute = new Elysia({ prefix: '/user' })
       id: user.id,
     };
   });
+// .post(
+//   '/profile/pic',
+//   async function userRoutePostProfilePic({ status, body }) {
+//     const buffer = body.stream();
+//     const response = await Bun.fetch('http://thumbnail-micro/thumbnail', {
+//       body: buffer,
+//       method: 'POST',
+//     });
+
+//     if (!response.ok) {
+//       return status(500, 'Failed to process thumbnail.');
+//     }
+
+//     const thumbnailBlob = await response.blob();
+
+//     return status(200, thumbnailBlob);
+//   },
+//   {
+//     body: t.File(),
+//   },
+// );

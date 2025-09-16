@@ -1,26 +1,24 @@
 import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
-// import { opentelemetry } from '@elysiajs/opentelemetry';
+import { opentelemetry } from '@elysiajs/opentelemetry';
 import { serverTiming } from '@elysiajs/server-timing';
-// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-// import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 // import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
 import { Elysia } from 'elysia';
 import prometheusPlugin from 'elysia-prometheus';
 
-// import { seedDb } from './db';
 import { kubeProbes } from './kubeProbes';
 import { logger } from './logger';
 import { roomsRoute } from './routes/rooms';
 import { testsRoute } from './routes/tests';
 import { userRoute } from './routes/user';
-// import { s3 } from './s3';
+import { s3 } from './s3';
 import { engine, websocket } from './socket';
 
-// await seedDb();
-
 // Call an S3 API using the LocalStack endpoint
-// console.log('s3 connection test (should display false)', await s3.exists('non-existent-file.jpg'));
+// eslint-disable-next-line no-console
+console.log('s3 connection test (should display false)', await s3.exists('non-existent-file.jpg'));
 
 const api = new Elysia()
   .get('/', () => 'Hello Elysia')
@@ -53,17 +51,17 @@ const app = new Elysia()
   //     level: 'http',
   //   }),
   // )
-  // .use(
-  //   opentelemetry({
-  //     spanProcessors: [
-  //       new BatchSpanProcessor(
-  //         new OTLPTraceExporter({
-  //           url: process.env.OTLP_TRACES_URL,
-  //         }),
-  //       ),
-  //     ],
-  //   }),
-  // )
+  .use(
+    opentelemetry({
+      spanProcessors: [
+        new BatchSpanProcessor(
+          new OTLPTraceExporter({
+            url: process.env.OTLP_TRACES_URL,
+          }),
+        ),
+      ],
+    }),
+  )
   .use(openapi())
   .use(api);
 

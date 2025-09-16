@@ -11,6 +11,7 @@ volumes:
   grafana-data:
   loki-data:
   tempo-data:
+  minio-data:
 
 services:
   postgres:
@@ -38,6 +39,21 @@ services:
     restart: always
     volumes:
       - redis-data:/data
+    networks:
+      - testnet
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000 # API port
+      - 9001:9001 # Console port
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
     networks:
       - testnet
 
@@ -164,6 +180,15 @@ services:
     networks:
       - testnet
 
+  thumbnail-micro:
+    build: ./thumbnail-micro
+    container_name: thumbail-micro
+    restart: on-failure:3
+    ports:
+      - 3008:3000
+    networks:
+      - testnet
+
   server:
     build: ./server
     depends_on:
@@ -171,13 +196,15 @@ services:
       - redis
       - grafana
       - fakeapis
+      - thumbnail-micro
+      - minio
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/scaled_chat_app?sslmode=disable
       LOKI_URL: http://loki:3100
       OTLP_TRACES_URL: http://tempo:4318/v1/traces
       PORT: 3000
       REDIS_URL: redis://redis:6379
-      S3_URL: http://localstack-main:4566
+      S3_URL: http://minio:9000
     restart: on-failure:3
     deploy:
       replicas: 4
