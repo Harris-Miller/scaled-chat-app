@@ -104,4 +104,17 @@ export const chatRoutes = new Elysia()
         text: t.String(),
       }),
     },
-  );
+  )
+  .get('/:id/chats/count', async function roomsRoutePostIdChatsCount({ status, params: { id } }) {
+    const doesRoomExist = (await db.$count(rooms, eq(rooms.id, id))) === 1;
+
+    if (!doesRoomExist) {
+      return status(400, {
+        error: `Room "${id}" does not exist`,
+        success: false,
+      });
+    }
+
+    const rowCount = await db.$count(chats, eq(chats.roomId, id));
+    return status(200, rowCount);
+  });

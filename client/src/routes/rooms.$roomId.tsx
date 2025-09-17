@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { equals, sortBy } from 'ramda';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import axios from 'axios';
+import { equals, last, sortBy } from 'ramda';
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getChats, postChat, useRoom } from '../api/rooms';
 import type { Chat, Room } from '../api/rooms';
@@ -12,32 +15,64 @@ import { useActiveUser } from '../store/user.selectors';
 import { handle } from '../utils';
 
 const SubComponent: FC<Room> = ({ description, id, name }) => {
-  const user = useActiveUser();
-
+  const scrollableBoxRef = useRef(null);
   const [message, setMessage] = useState('');
-  const [chats, setChats] = useState<Chat[]>([]);
+
+  const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    getNextPageParam: (lastPage: Chat[]) => {
+      return last(lastPage)?.createdAt;
+    },
+    initialPageParam: new Date().toISOString(),
+    queryFn: async ({ pageParam }) => {
+      const resp = await axios.get<Chat[]>(`/api/rooms/${id}/chats/?before=${pageParam}`);
+      return resp.data;
+    },
+    queryKey: ['chats', id],
+  });
+
+  const allChats = data?.pages.flat() ?? [];
+
+  const rowVirtualizer = useVirtualizer({
+    count: hasNextPage ? allChats.length + 1 : allChats.length,
+    estimateSize: () => 100,
+    getScrollElement: () => scrollableBoxRef.current,
+    overscan: 5, // ?? what do here?
+  });
 
   useEffect(() => {
-    const callbackFn = (newChat: Chat) => {
-      // console.log(newChat);
-      setChats(current => [...current, newChat]);
-    };
+    const [lastItem] = rowVirtualizer.getVirtualItems().toReversed();
 
-    socket.emit('room:join', { roomId: id, userId: user.id });
-    socket.on('chat', callbackFn);
+    // false positive
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (lastItem == null) return;
 
-    return () => {
-      socket.off('chat', callbackFn);
-      socket.emit('room:leave', { roomId: id, userId: user.id });
-    };
-  }, [id, user.id]);
+    if (lastItem.index >= allChats.length - 1 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasNextPage, fetchNextPage, allChats.length, isFetchingNextPage, rowVirtualizer.getVirtualItems()]);
 
-  useEffect(() => {
-    getChats(id).then(({ data }) => {
-      console.log(data);
-      setChats(data);
-    });
-  }, [id]);
+  // useEffect(() => {
+  //   const callbackFn = (newChat: Chat) => {
+  //     // console.log(newChat);
+  //     setChats(current => [...current, newChat]);
+  //   };
+
+  //   socket.emit('room:join', { roomId: id, userId: user.id });
+  //   socket.on('chat', callbackFn);
+
+  //   return () => {
+  //     socket.off('chat', callbackFn);
+  //     socket.emit('room:leave', { roomId: id, userId: user.id });
+  //   };
+  // }, [id, user.id]);
+
+  // useEffect(() => {
+  //   getChats(id).then(({ data }) => {
+  //     console.log(data);
+  //     setChats(data);
+  //   });
+  // }, [id]);
 
   const messageHandler = () => {
     if (message.trim() === '') return;
@@ -48,12 +83,12 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   };
 
   const isOrderedCorrectly = equals(
-    chats,
-    sortBy(chat => chat.createdAt, chats),
+    allChats,
+    sortBy(chat => chat.createdAt, allChats),
   );
 
   return (
-    <Box alignContent="center" display="flex" justifyContent="center">
+    <Box alignContent="center" display="flex" height="100vh" justifyContent="center">
       <Stack>
         <Box>
           <Typography>Room: {id}</Typography>
@@ -76,14 +111,17 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
           </Button>
         </Box>
         <Box>Is ordered correctly? {isOrderedCorrectly ? 'yes' : 'no'}</Box>
-        <Box>
-          {chats.map(chat => (
-            <Box key={chat.id}>
-              <Typography>
-                createAt: {chat.createdAt} :: text: {chat.text}
-              </Typography>
-            </Box>
-          ))}
+        <Box ref={scrollableBoxRef} sx={{ flexGrow: 1, overflow: 'auto' }}>
+          {rowVirtualizer.getVirtualItems().map(virtualItem => {
+            const chat = allChats[virtualItem.index];
+            return (
+              <Box key={chat.id}>
+                <Typography>
+                  createAt: {chat.createdAt} :: text: {chat.text}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
       </Stack>
     </Box>

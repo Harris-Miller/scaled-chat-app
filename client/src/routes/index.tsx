@@ -1,4 +1,3 @@
-import { Grid } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import type { FC } from 'react';
 
@@ -10,7 +9,7 @@ import { LandingPage } from './-landingPage';
 const IndexComponent: FC = () => {
   const { user } = useStore();
 
-  return <Grid container>{user == null ? <LoginDialog open /> : <LandingPage />}</Grid>;
+  return user == null ? <LoginDialog open /> : <LandingPage />;
 };
 
 export const Route = createFileRoute('/')({
