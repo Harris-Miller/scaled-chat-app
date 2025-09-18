@@ -18,7 +18,6 @@
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-query-devtools": "^5.89.0",
     "@tanstack/react-router": "^1.131.44",
-    "@tanstack/react-virtual": "^3.13.12",
     "@tanstack/router-devtools": "^1.131.44",
     "@tanstack/router-plugin": "^1.131.44",
     "axios": "^1.12.2",

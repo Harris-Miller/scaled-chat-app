@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, lt } from 'drizzle-orm';
+import { and, desc, eq, lt } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
 import { Result } from 'try';
 

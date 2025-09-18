@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import axios from 'axios';
-import { head, isNotEmpty, nth, uniqBy } from 'ramda';
-import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { head } from 'ramda';
+import type { FC, RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Chat } from '../api/chats';
 import { postChat } from '../api/chats';
@@ -18,6 +18,7 @@ import { handle } from '../utils';
 
 const SubComponent: FC<Room> = ({ description, id, name }) => {
   const scrollableBoxRef = useRef<HTMLElement>(null);
+  const innerBoxRef = useRef<HTMLElement>(null);
   const [message, setMessage] = useState('');
 
   const { data, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } = useInfiniteQuery({
@@ -34,24 +35,40 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     queryKey: ['chats', id],
   });
 
+  // TODO: add virtualization scrolling
   const allChats = data?.pages.flat() ?? [];
 
-  const virtualizer = useVirtualizer({
-    count: hasPreviousPage ? allChats.length + 1 : allChats.length,
-    estimateSize: () => 24, // This is the size of the "element" rendered, not total length of data
-    getScrollElement: () => scrollableBoxRef.current,
-    overscan: 5, // ?? what do here?
-  });
-
-  const virtualItems = virtualizer.getVirtualItems();
-
   useEffect(() => {
-    const firstItem = head(virtualItems);
+    if (scrollableBoxRef.current == null) return;
+    if (innerBoxRef.current == null) return;
+    if (isFetchingPreviousPage) return;
 
-    if (firstItem?.index === 0 && hasPreviousPage && !isFetchingPreviousPage) {
+    if (scrollableBoxRef.current.clientHeight >= innerBoxRef.current.clientHeight) {
       fetchPreviousPage();
     }
-  }, [hasPreviousPage, fetchPreviousPage, isFetchingPreviousPage, virtualItems]);
+  }, [
+    scrollableBoxRef.current?.clientHeight,
+    innerBoxRef.current?.clientHeight,
+    isFetchingPreviousPage,
+    fetchPreviousPage,
+  ]);
+
+  // const scrollHandler = useCallback(() => {
+  //   const div = innerBoxRef.current;
+  //   if (!isFetchingPreviousPage && (div?.scrollTop ?? Infinity) < 20) {
+  //     fetchPreviousPage();
+  //   }
+  // }, [fetchPreviousPage, isFetchingPreviousPage]);
+
+  // useEffect(() => {
+  //   const div = scrollableBoxRef.current;
+
+  //   div?.addEventListener('scroll', scrollHandler);
+
+  //   return () => {
+  //     div?.removeEventListener('scroll', scrollHandler);
+  //   };
+  // }, [scrollHandler]);
 
   // useEffect(() => {
   //   const callbackFn = (newChat: Chat) => {
@@ -111,55 +128,40 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
             Submit
           </Button>
         </Box>
-        <Box>
-          <Button
-            onClick={() => {
-              fetchPreviousPage();
-            }}
-          >
-            Load More
-          </Button>
-        </Box>
       </Stack>
-      {/* This structure is required by @tanstack/react-virtual */}
       {/* Outer, scrollable element  */}
-      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ height: '500px', overflow: 'auto' }}>
-        {/* Inner element to container the virtual items  */}
-        <Box data-id="inner" sx={{ position: 'relative' }}>
-          {/* The virtual items themselves */}
-          {virtualizer.getVirtualItems().map((virtualItem, _i, _arr) => {
-            const inner = (() => {
-              if (virtualItem.index === 0) {
-                if (!hasPreviousPage) return null;
-                return (
-                  <Box sx={{ padding: '10px', textAlign: 'center' }}>
-                    <Typography>Loading...</Typography>
-                  </Box>
-                );
-              }
-
-              const chat = nth(virtualItem.index - 1, allChats);
-
-              if (chat == null) {
-                console.log('The virtualItem.index has exceeded allChats. This should never happen');
-                return null;
-              }
-
-              return (
-                <Box>
-                  <Typography>
-                    id: {chat.id} :: text: {chat.text}
-                  </Typography>
-                </Box>
-              );
-            })();
-
-            return (
-              <Box data-index={virtualItem.index} key={virtualItem.key} ref={virtualizer.measureElement}>
-                {inner}
-              </Box>
-            );
-          })}
+      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ height: '500px', overflow: 'scroll' }}>
+        {/* Inner element to container the items to scroll through  */}
+        <Box data-id="inner" ref={innerBoxRef} sx={{ position: 'relative' }}>
+          {isFetchingPreviousPage ? (
+            <Box sx={{ padding: '10px', textAlign: 'center' }}>
+              <RefreshIcon fontSize="small" />
+            </Box>
+          ) : null}
+          {!isFetchingPreviousPage && !hasPreviousPage && (
+            <Box sx={{ padding: '10px', textAlign: 'center' }}>
+              <Typography variant="body2">You&apos;re at the top!</Typography>
+            </Box>
+          )}
+          {!isFetchingPreviousPage && hasPreviousPage ? (
+            <Box sx={{ padding: '10px', textAlign: 'center' }}>
+              <Button
+                onClick={() => {
+                  fetchPreviousPage();
+                }}
+                size="small"
+              >
+                Load More
+              </Button>
+            </Box>
+          ) : null}
+          {allChats.map(chat => (
+            <Box key={chat.id}>
+              <Typography>
+                id: {chat.id} :: text: {chat.text}
+              </Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
     </Box>
