@@ -5,18 +5,41 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import { head } from 'ramda';
-import type { FC, RefObject } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Chat } from '../api/chats';
 import { postChat } from '../api/chats';
+import { queryClient } from '../api/queryClient';
 import { useRoom } from '../api/rooms';
 import type { Room } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
 import { handle } from '../utils';
 
+const addChatToBottom = (roomId: string, chat: Chat) => {
+  queryClient.setQueryData<{ pageParams: string[]; pages: Chat[][] }>(['chats', roomId], oldData => {
+    // oldData will be the existing cached data for your infinite query,
+    // which has a 'pages' array and 'pageParams' array.
+
+    if (oldData == null) {
+      // Handle the case where no data is yet cached for this query
+      return {
+        // Start with your new page
+        pageParams: [chat.id],
+        pages: [[chat]], // Add the corresponding page param
+      };
+    }
+
+    return {
+      pageParams: [...oldData.pageParams, chat.id],
+      pages: [...oldData.pages, [chat]],
+    };
+  });
+};
+
 const SubComponent: FC<Room> = ({ description, id, name }) => {
+  const user = useActiveUser();
   const scrollableBoxRef = useRef<HTMLElement>(null);
   const innerBoxRef = useRef<HTMLElement>(null);
   const [message, setMessage] = useState('');
@@ -53,44 +76,19 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     fetchPreviousPage,
   ]);
 
-  // const scrollHandler = useCallback(() => {
-  //   const div = innerBoxRef.current;
-  //   if (!isFetchingPreviousPage && (div?.scrollTop ?? Infinity) < 20) {
-  //     fetchPreviousPage();
-  //   }
-  // }, [fetchPreviousPage, isFetchingPreviousPage]);
+  useEffect(() => {
+    const callbackFn = (newChat: Chat) => {
+      addChatToBottom(id, newChat);
+    };
 
-  // useEffect(() => {
-  //   const div = scrollableBoxRef.current;
+    socket.emit('room:join', { roomId: id, userId: user.id });
+    socket.on('chat', callbackFn);
 
-  //   div?.addEventListener('scroll', scrollHandler);
-
-  //   return () => {
-  //     div?.removeEventListener('scroll', scrollHandler);
-  //   };
-  // }, [scrollHandler]);
-
-  // useEffect(() => {
-  //   const callbackFn = (newChat: Chat) => {
-  //     // console.log(newChat);
-  //     setChats(current => [...current, newChat]);
-  //   };
-
-  //   socket.emit('room:join', { roomId: id, userId: user.id });
-  //   socket.on('chat', callbackFn);
-
-  //   return () => {
-  //     socket.off('chat', callbackFn);
-  //     socket.emit('room:leave', { roomId: id, userId: user.id });
-  //   };
-  // }, [id, user.id]);
-
-  // useEffect(() => {
-  //   getChats(id).then(({ data }) => {
-  //     console.log(data);
-  //     setChats(data);
-  //   });
-  // }, [id]);
+    return () => {
+      socket.off('chat', callbackFn);
+      socket.emit('room:leave', { roomId: id, userId: user.id });
+    };
+  }, [id, user.id]);
 
   const messageHandler = () => {
     if (message.trim() === '') return;
