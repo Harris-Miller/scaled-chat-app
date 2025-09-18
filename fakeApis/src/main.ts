@@ -13,33 +13,31 @@ const fileTypeOptions = new Set(Object.keys(mimeMap));
 const isAvailableType = (type: string): type is MimeType =>
   fileTypeOptions.has(type);
 
-function generateFile(type: MimeType, sizeMB: number) {
-  const size = sizeMB * 1024;
+async function* generateFile(sizeMB: number) {
+  const size = sizeMB * 1024 * 1024; // _n_ MB
 
   const chunkSize = 1024 * 1024; // 1 MB
   const chunks = Math.ceil(size / chunkSize);
   const chunk = new Uint8Array(chunkSize).fill(48); // '0'
-  const blobParts: Bun.BlobPart[] = [];
 
   let i = 0;
 
   while (i < chunks) {
     const remaining = size - i * chunkSize;
-    blobParts.push(remaining >= chunkSize ? chunk : chunk.slice(0, remaining));
+    if (remaining >= chunkSize) {
+      yield chunk;
+    } else {
+      yield  chunk.slice(0, remaining);
+    }
     i++;
   }
-
-  const contentType = mimeMap[type];
-  const blob = new Blob(blobParts, { type: contentType || 'application/octet-stream' });
-  const filename = `dummy.${type}`;
-
-  return { blob, contentType, filename }
 }
 
 function processFileRequest(type: MimeType, parsedSize: number) {
-  const { blob, contentType, filename } = generateFile(type, parsedSize);
+  const contentType = mimeMap[type];
+  const filename = `dummy.${type}`;
 
-  return new Response(blob, {
+  return new Response(generateFile(parsedSize), {
     headers: {
       'Content-Disposition': `attachment' filename="${filename}"`,
       'Content-Type': contentType,
