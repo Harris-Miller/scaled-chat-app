@@ -4,58 +4,54 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import axios from 'axios';
-import { equals, sortBy } from 'ramda';
+import { head, isNotEmpty, nth, uniqBy } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { getChats, postChat, useRoom } from '../api/rooms';
-import type { Chat, Room } from '../api/rooms';
+import type { Chat } from '../api/chats';
+import { postChat } from '../api/chats';
+import { useRoom } from '../api/rooms';
+import type { Room } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
 import { handle } from '../utils';
 
 const SubComponent: FC<Room> = ({ description, id, name }) => {
-  const scrollableBoxRef = useRef(null);
+  const scrollableBoxRef = useRef<HTMLElement>(null);
   const [message, setMessage] = useState('');
 
-  const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-    getNextPageParam: (lastPage: Chat[]) => {
-      return lastPage[0]?.id;
+  const { data, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } = useInfiniteQuery({
+    getNextPageParam: () => null,
+    getPreviousPageParam: (firstPage: Chat[]) => {
+      return head(firstPage)?.id;
     },
     initialPageParam: null,
     queryFn: async ({ pageParam }) => {
-      const url = pageParam == null ? `/api/rooms/${id}/chats` : `/api/rooms/${id}/chats?before=${pageParam}`;
+      const url = pageParam == null ? `/api/rooms/${id}/chats` : `/api/rooms/${id}/chats?cursor=${pageParam}`;
       const resp = await axios.get<Chat[]>(url);
       return resp.data.reverse();
     },
     queryKey: ['chats', id],
-    select: ({ pages, pageParams }) => ({
-      pageParams: pageParams.toReversed(),
-      pages: pages.toReversed(),
-    }),
   });
 
   const allChats = data?.pages.flat() ?? [];
 
-  const rowVirtualizer = useVirtualizer({
-    count: hasNextPage ? allChats.length + 1 : allChats.length,
-    estimateSize: () => 100,
+  const virtualizer = useVirtualizer({
+    count: hasPreviousPage ? allChats.length + 1 : allChats.length,
+    estimateSize: () => 24, // This is the size of the "element" rendered, not total length of data
     getScrollElement: () => scrollableBoxRef.current,
     overscan: 5, // ?? what do here?
   });
 
+  const virtualItems = virtualizer.getVirtualItems();
+
   useEffect(() => {
-    const [lastItem] = rowVirtualizer.getVirtualItems().toReversed();
+    const firstItem = head(virtualItems);
 
-    // false positive
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (lastItem == null) return;
-
-    if (lastItem.index >= allChats.length - 1 && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    if (firstItem?.index === 0 && hasPreviousPage && !isFetchingPreviousPage) {
+      fetchPreviousPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasNextPage, fetchNextPage, allChats.length, isFetchingNextPage, rowVirtualizer.getVirtualItems()]);
+  }, [hasPreviousPage, fetchPreviousPage, isFetchingPreviousPage, virtualItems]);
 
   // useEffect(() => {
   //   const callbackFn = (newChat: Chat) => {
@@ -88,8 +84,13 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   };
 
   return (
-    <Box alignContent="center" display="flex" height="100vh" justifyContent="center">
-      <Stack>
+    <Box
+      data-id="SubComponent"
+      display="flex"
+      flexDirection="column"
+      sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden' }}
+    >
+      <Stack data-id="Stack">
         <Box>
           <Typography>Room: {id}</Typography>
         </Box>
@@ -113,35 +114,54 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
         <Box>
           <Button
             onClick={() => {
-              fetchNextPage();
+              fetchPreviousPage();
             }}
           >
             Load More
           </Button>
         </Box>
-        {/* This structure is required by @tanstack/react-virtual */}
-        {/* Outer, scrollable element  */}
-        <Box ref={scrollableBoxRef} sx={{ flexGrow: 1, overflow: 'auto' }}>
-          {/* Inner element to container the virtual items  */}
-          <Box>
-            {/* The virtual items themselves */}
-            {/* {rowVirtualizer.getVirtualItems().map(virtualItem => { */}
-            {allChats.map(chat => {
-              // const chat = allChats[virtualItem.index];
+      </Stack>
+      {/* This structure is required by @tanstack/react-virtual */}
+      {/* Outer, scrollable element  */}
+      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ height: '500px', overflow: 'auto' }}>
+        {/* Inner element to container the virtual items  */}
+        <Box data-id="inner" sx={{ position: 'relative' }}>
+          {/* The virtual items themselves */}
+          {virtualizer.getVirtualItems().map((virtualItem, _i, _arr) => {
+            const inner = (() => {
+              if (virtualItem.index === 0) {
+                if (!hasPreviousPage) return null;
+                return (
+                  <Box sx={{ padding: '10px', textAlign: 'center' }}>
+                    <Typography>Loading...</Typography>
+                  </Box>
+                );
+              }
+
+              const chat = nth(virtualItem.index - 1, allChats);
+
+              if (chat == null) {
+                console.log('The virtualItem.index has exceeded allChats. This should never happen');
+                return null;
+              }
+
               return (
-                <Box key={chat.id}>
-                  {/* <Typography>
-                    createAt: {chat.createdAt} :: text: {chat.text}
-                  </Typography> */}
+                <Box>
                   <Typography>
                     id: {chat.id} :: text: {chat.text}
                   </Typography>
                 </Box>
               );
-            })}
-          </Box>
+            })();
+
+            return (
+              <Box data-index={virtualItem.index} key={virtualItem.key} ref={virtualizer.measureElement}>
+                {inner}
+              </Box>
+            );
+          })}
         </Box>
-      </Stack>
+      </Box>
     </Box>
   );
 };
@@ -156,14 +176,14 @@ export const RoomComponent: FC = () => {
   if (query.isPending) {
     return (
       <Box alignContent="center" display="flex" justifyContent="center">
-        <Typography>Loading...</Typography>
+        <Typography>Loading Room...</Typography>
       </Box>
     );
   }
 
   if (!query.isSuccess) {
     return (
-      <Box alignContent="center" display="flex" justifyContent="center">
+      <Box alignContent="center" display="flex" justifyContent="center" overflow="hidden">
         <Typography>There was an error loading the room</Typography>
       </Box>
     );

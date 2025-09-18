@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 import { reset, seed } from 'drizzle-seed';
-import { nanoid } from 'nanoid';
+import { monotonicFactory } from 'ulid';
 
 import { db } from './db';
 import * as schema from './schema';
 import { randomChatGptGeneratedPhrases, roomIdSeeds, userIdSeeds } from './seedData';
+
+const ulid = monotonicFactory();
 
 const harrisId = '01K5D89QE73Q6H11QP051DP01E';
 
@@ -38,7 +40,7 @@ export const seedDb = async () => {
             isUnique: true,
             values: Array(1200)
               .fill(undefined)
-              .map(() => nanoid()),
+              .map(() => ulid()),
           }),
           text: funcs.valuesFromArray({ values: randomChatGptGeneratedPhrases }),
           // @ts-expect-error - false positive

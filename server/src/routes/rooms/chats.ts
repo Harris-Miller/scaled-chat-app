@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
 import { Result } from 'try';
 
@@ -12,7 +12,7 @@ export const chatRoutes = new Elysia()
   .use(getUser)
   .get(
     '/:id/chats',
-    async function roomsRouteGetIdChats({ status, params: { id }, query: { after, before, limit } }) {
+    async function roomsRouteGetIdChats({ status, params: { id }, query: { cursor, limit } }) {
       // for querying... limit always applies, defaults to 20
       // query accepts _either_ `after` or `before`, which are the `id` of a chat
       // 400 error is returned if that `id` is not found
@@ -21,34 +21,16 @@ export const chatRoutes = new Elysia()
       // all returned arrays are returned in order latest to earliest
       // default limit is 20, passing 0 will give you
 
-      if (before != null) {
+      if (cursor != null) {
         const doesExist =
-          (await db.query.chats.findFirst({ columns: { id: true }, where: eq(chats.id, before) })) != null;
+          (await db.query.chats.findFirst({ columns: { id: true }, where: eq(chats.id, cursor) })) != null;
         if (!doesExist) {
           return status(400, 'Chat query from "before" id does not exist.');
         }
-      } else if (after != null) {
-        const doesExist =
-          (await db.query.chats.findFirst({ columns: { id: true }, where: eq(chats.id, after) })) != null;
-        if (!doesExist) {
-          return status(400, 'Chat query from "after" id does not exist.');
-        }
       }
 
-      const positionClause = (() => {
-        if (before != null) {
-          // check if exists
-          return lt(chats.id, before);
-        }
-        if (after != null) {
-          return gt(chats.id, after);
-        }
-
-        return null;
-      })();
-
+      const positionClause = cursor != null ? lt(chats.id, cursor) : null;
       const eqClause = eq(chats.roomId, id);
-
       const whereClause = positionClause != null ? and(eqClause, positionClause) : eqClause;
 
       // `findMany()` is "promise-like", so we have to wrap it in an async function like this for it work properly with Result.try
@@ -73,10 +55,8 @@ export const chatRoutes = new Elysia()
     {
       query: t.Object({
         // TODO: make these discriminating unions
-        after: t.Optional(t.String()),
-        before: t.Optional(t.String()),
+        cursor: t.Optional(t.String()),
         limit: t.Optional(t.Integer({ minimum: 0 })),
-        offset: t.Optional(t.Integer({ minimum: 0 })),
       }),
     },
   )
