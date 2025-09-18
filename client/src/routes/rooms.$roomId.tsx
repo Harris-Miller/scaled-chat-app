@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import axios from 'axios';
-import { equals, last, sortBy } from 'ramda';
+import { equals, sortBy } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,14 +20,19 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
 
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
     getNextPageParam: (lastPage: Chat[]) => {
-      return last(lastPage)?.createdAt;
+      return lastPage[0]?.id;
     },
-    initialPageParam: new Date().toISOString(),
+    initialPageParam: null,
     queryFn: async ({ pageParam }) => {
-      const resp = await axios.get<Chat[]>(`/api/rooms/${id}/chats/?before=${pageParam}`);
-      return resp.data;
+      const url = pageParam == null ? `/api/rooms/${id}/chats` : `/api/rooms/${id}/chats?before=${pageParam}`;
+      const resp = await axios.get<Chat[]>(url);
+      return resp.data.reverse();
     },
     queryKey: ['chats', id],
+    select: ({ pages, pageParams }) => ({
+      pageParams: pageParams.toReversed(),
+      pages: pages.toReversed(),
+    }),
   });
 
   const allChats = data?.pages.flat() ?? [];
@@ -82,11 +87,6 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
     setMessage('');
   };
 
-  const isOrderedCorrectly = equals(
-    allChats,
-    sortBy(chat => chat.createdAt, allChats),
-  );
-
   return (
     <Box alignContent="center" display="flex" height="100vh" justifyContent="center">
       <Stack>
@@ -110,19 +110,31 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
             Submit
           </Button>
         </Box>
-        <Box>Is ordered correctly? {isOrderedCorrectly ? 'yes' : 'no'}</Box>
+        <Box>
+          <Button
+            onClick={() => {
+              fetchNextPage();
+            }}
+          >
+            Load More
+          </Button>
+        </Box>
         {/* This structure is required by @tanstack/react-virtual */}
         {/* Outer, scrollable element  */}
         <Box ref={scrollableBoxRef} sx={{ flexGrow: 1, overflow: 'auto' }}>
           {/* Inner element to container the virtual items  */}
           <Box>
             {/* The virtual items themselves */}
-            {rowVirtualizer.getVirtualItems().map(virtualItem => {
-              const chat = allChats[virtualItem.index];
+            {/* {rowVirtualizer.getVirtualItems().map(virtualItem => { */}
+            {allChats.map(chat => {
+              // const chat = allChats[virtualItem.index];
               return (
                 <Box key={chat.id}>
-                  <Typography>
+                  {/* <Typography>
                     createAt: {chat.createdAt} :: text: {chat.text}
+                  </Typography> */}
+                  <Typography>
+                    id: {chat.id} :: text: {chat.text}
                   </Typography>
                 </Box>
               );
