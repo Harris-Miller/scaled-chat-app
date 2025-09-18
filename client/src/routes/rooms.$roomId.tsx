@@ -111,17 +111,23 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
           </Button>
         </Box>
         <Box>Is ordered correctly? {isOrderedCorrectly ? 'yes' : 'no'}</Box>
+        {/* This structure is required by @tanstack/react-virtual */}
+        {/* Outer, scrollable element  */}
         <Box ref={scrollableBoxRef} sx={{ flexGrow: 1, overflow: 'auto' }}>
-          {rowVirtualizer.getVirtualItems().map(virtualItem => {
-            const chat = allChats[virtualItem.index];
-            return (
-              <Box key={chat.id}>
-                <Typography>
-                  createAt: {chat.createdAt} :: text: {chat.text}
-                </Typography>
-              </Box>
-            );
-          })}
+          {/* Inner element to container the virtual items  */}
+          <Box>
+            {/* The virtual items themselves */}
+            {rowVirtualizer.getVirtualItems().map(virtualItem => {
+              const chat = allChats[virtualItem.index];
+              return (
+                <Box key={chat.id}>
+                  <Typography>
+                    createAt: {chat.createdAt} :: text: {chat.text}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       </Stack>
     </Box>

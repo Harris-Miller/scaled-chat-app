@@ -1,8 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { boolean, char, pgTable, primaryKey, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { nanoid as genNanoid } from 'nanoid';
+import { ulid as getUlid } from 'ulid';
 
-const nanoid = () => char({ length: 21 });
+const ulid = () => char({ length: 26 });
 
 //
 // Tables
@@ -12,9 +12,9 @@ export const users = pgTable('users', {
   createdAt: timestamp().defaultNow().notNull(),
   displayName: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
-  id: nanoid()
+  id: ulid()
     .primaryKey()
-    .$defaultFn(() => genNanoid()),
+    .$defaultFn(() => getUlid()),
   passwordHash: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp()
     .defaultNow()
@@ -25,9 +25,9 @@ export const users = pgTable('users', {
 export const profilePics = pgTable('profile_pics', {
   contentType: varchar('20').notNull(),
   createdAt: timestamp().defaultNow().notNull(),
-  id: nanoid()
+  id: ulid()
     .primaryKey()
-    .$defaultFn(() => genNanoid()),
+    .$defaultFn(() => getUlid()),
   // must do to avoid circular reference with drizzle
   selected: boolean().notNull(),
   success: boolean().notNull(),
@@ -35,20 +35,20 @@ export const profilePics = pgTable('profile_pics', {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-  userId: nanoid()
+  userId: ulid()
     .notNull()
     .references(() => users.id),
 });
 
 export const rooms = pgTable('rooms', {
-  // adminId: nanoid()
+  // adminId: ulid()
   //   .notNull()
   //   .references(() => users.id),
   createdAt: timestamp().defaultNow().notNull(),
   description: text().notNull().default(''),
-  id: nanoid()
+  id: ulid()
     .primaryKey()
-    .$defaultFn(() => genNanoid()),
+    .$defaultFn(() => getUlid()),
   name: varchar({ length: 255 }).notNull(),
   updatedAt: timestamp()
     .defaultNow()
@@ -57,14 +57,14 @@ export const rooms = pgTable('rooms', {
 });
 
 export const chats = pgTable('chats', {
-  authorId: nanoid()
+  authorId: ulid()
     .notNull()
     .references(() => users.id),
   createdAt: timestamp().defaultNow().notNull(),
-  id: nanoid()
+  id: ulid()
     .primaryKey()
-    .$defaultFn(() => genNanoid()),
-  roomId: nanoid()
+    .$defaultFn(() => getUlid()),
+  roomId: ulid()
     .notNull()
     .references(() => rooms.id),
   text: text().notNull(),
@@ -77,9 +77,9 @@ export const chats = pgTable('chats', {
 export const directMessages = pgTable('direct_messages', {
   createdAt: timestamp().defaultNow().notNull(),
 
-  id: nanoid()
+  id: ulid()
     .primaryKey()
-    .$defaultFn(() => genNanoid()),
+    .$defaultFn(() => getUlid()),
   text: text().notNull(),
 
   updatedAt: timestamp()
@@ -91,10 +91,10 @@ export const directMessages = pgTable('direct_messages', {
 // export const usersToRooms = pgTable(
 //   'users_to_rooms',
 //   {
-//     roomId: nanoid()
+//     roomId: ulid()
 //       .notNull()
 //       .references(() => rooms.id),
-//     userId: nanoid()
+//     userId: ulid()
 //       .notNull()
 //       .references(() => users.id),
 //   },
@@ -104,10 +104,10 @@ export const directMessages = pgTable('direct_messages', {
 export const usersToDirectMessages = pgTable(
   'users_to_direct_messages',
   {
-    fromId: nanoid()
+    fromId: ulid()
       .notNull()
       .references(() => users.id),
-    toId: nanoid()
+    toId: ulid()
       .notNull()
       .references(() => users.id),
   },

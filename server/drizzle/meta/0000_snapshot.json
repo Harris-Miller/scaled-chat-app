@@ -1,5 +1,5 @@
 {
-  "id": "2eb2641a-7dfe-4b31-bf2e-36539f710b83",
+  "id": "755b7986-0cfa-4c6f-8804-2078505ede1e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,7 +10,7 @@
       "columns": {
         "author_id": {
           "name": "author_id",
-          "type": "char(21)",
+          "type": "char(26)",
           "primaryKey": false,
           "notNull": true
         },
@@ -23,13 +23,13 @@
         },
         "id": {
           "name": "id",
-          "type": "char(21)",
+          "type": "char(26)",
           "primaryKey": true,
           "notNull": true
         },
         "room_id": {
           "name": "room_id",
-          "type": "char(21)",
+          "type": "char(26)",
           "primaryKey": false,
           "notNull": true
         },
@@ -82,16 +82,120 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.direct_messages": {
+      "name": "direct_messages",
+      "schema": "",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "id": {
+          "name": "id",
+          "type": "char(26)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.profile_pics": {
+      "name": "profile_pics",
+      "schema": "",
+      "columns": {
+        "20": {
+          "name": "20",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "id": {
+          "name": "id",
+          "type": "char(26)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "selected": {
+          "name": "selected",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "success": {
+          "name": "success",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "char(26)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "profile_pics_user_id_users_id_fk": {
+          "name": "profile_pics_user_id_users_id_fk",
+          "tableFrom": "profile_pics",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.rooms": {
       "name": "rooms",
       "schema": "",
       "columns": {
-        "admin_id": {
-          "name": "admin_id",
-          "type": "char(21)",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -108,7 +212,7 @@
         },
         "id": {
           "name": "id",
-          "type": "char(21)",
+          "type": "char(26)",
           "primaryKey": true,
           "notNull": true
         },
@@ -127,21 +231,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "rooms_admin_id_users_id_fk": {
-          "name": "rooms_admin_id_users_id_fk",
-          "tableFrom": "rooms",
-          "tableTo": "users",
-          "columnsFrom": [
-            "admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -173,7 +263,7 @@
         },
         "id": {
           "name": "id",
-          "type": "char(21)",
+          "type": "char(26)",
           "primaryKey": true,
           "notNull": true
         },
@@ -207,31 +297,31 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users_to_chats": {
-      "name": "users_to_chats",
+    "public.users_to_direct_messages": {
+      "name": "users_to_direct_messages",
       "schema": "",
       "columns": {
-        "chat_id": {
-          "name": "chat_id",
-          "type": "char(21)",
+        "from_id": {
+          "name": "from_id",
+          "type": "char(26)",
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "char(21)",
+        "to_id": {
+          "name": "to_id",
+          "type": "char(26)",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "users_to_chats_chat_id_chats_id_fk": {
-          "name": "users_to_chats_chat_id_chats_id_fk",
-          "tableFrom": "users_to_chats",
-          "tableTo": "chats",
+        "users_to_direct_messages_from_id_users_id_fk": {
+          "name": "users_to_direct_messages_from_id_users_id_fk",
+          "tableFrom": "users_to_direct_messages",
+          "tableTo": "users",
           "columnsFrom": [
-            "chat_id"
+            "from_id"
           ],
           "columnsTo": [
             "id"
@@ -239,12 +329,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "users_to_chats_user_id_users_id_fk": {
-          "name": "users_to_chats_user_id_users_id_fk",
-          "tableFrom": "users_to_chats",
+        "users_to_direct_messages_to_id_users_id_fk": {
+          "name": "users_to_direct_messages_to_id_users_id_fk",
+          "tableFrom": "users_to_direct_messages",
           "tableTo": "users",
           "columnsFrom": [
-            "user_id"
+            "to_id"
           ],
           "columnsTo": [
             "id"
@@ -254,71 +344,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "users_to_chats_user_id_chat_id_pk": {
-          "name": "users_to_chats_user_id_chat_id_pk",
+        "users_to_direct_messages_from_id_to_id_pk": {
+          "name": "users_to_direct_messages_from_id_to_id_pk",
           "columns": [
-            "user_id",
-            "chat_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users_to_rooms": {
-      "name": "users_to_rooms",
-      "schema": "",
-      "columns": {
-        "room_id": {
-          "name": "room_id",
-          "type": "char(21)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "char(21)",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "users_to_rooms_room_id_rooms_id_fk": {
-          "name": "users_to_rooms_room_id_rooms_id_fk",
-          "tableFrom": "users_to_rooms",
-          "tableTo": "rooms",
-          "columnsFrom": [
-            "room_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "users_to_rooms_user_id_users_id_fk": {
-          "name": "users_to_rooms_user_id_users_id_fk",
-          "tableFrom": "users_to_rooms",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "users_to_rooms_user_id_room_id_pk": {
-          "name": "users_to_rooms_user_id_room_id_pk",
-          "columns": [
-            "user_id",
-            "room_id"
+            "from_id",
+            "to_id"
           ]
         }
       },

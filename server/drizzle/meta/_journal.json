@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1757315126477,
-      "tag": "0000_woozy_spirit",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1757550180679,
-      "tag": "0001_serious_blackheart",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758016445779,
-      "tag": "0002_stiff_major_mapleleaf",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1758018810851,
-      "tag": "0003_hot_vermin",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1758018866504,
-      "tag": "0004_safe_salo",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1758055999011,
-      "tag": "0005_futuristic_gladiator",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1758057928780,
-      "tag": "0006_cynical_joshua_kane",
+      "when": 1758159851528,
+      "tag": "0000_cheerful_photon",
       "breakpoints": true
     }
   ]
