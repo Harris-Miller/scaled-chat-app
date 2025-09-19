@@ -1,0 +1,17 @@
+{
+  "name": "elysia-logging",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "elysia": "^1.4.6"
+  }
+}

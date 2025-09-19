@@ -1,0 +1,31 @@
+import { opentelemetry } from '@elysiajs/opentelemetry';
+import { serverTiming } from '@elysiajs/server-timing';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
+import { Elysia } from 'elysia';
+import prometheusPlugin from 'elysia-prometheus';
+
+import { logger } from './logger';
+
+export const otel = new Elysia()
+  .use(serverTiming())
+  .use(
+    prometheusPlugin({
+      dynamicLabels: {
+        userAgent: ctx => ctx.request.headers.get('user-agent') ?? 'unknown',
+      },
+      staticLabels: { service: 'chat-server' },
+    }),
+  )
+  .use(
+    elysiaLogging(logger, {
+      format: 'json',
+      level: 'http',
+    }),
+  )
+  .use(
+    opentelemetry({
+      spanProcessors: [new BatchSpanProcessor(new OTLPTraceExporter())],
+    }),
+  );

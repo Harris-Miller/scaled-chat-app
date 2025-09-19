@@ -43,7 +43,7 @@ const postChat = async () => {
   const ipSuffix = Math.floor(Math.random() * 9);
 
   try {
-    await Bun.fetch(`http://localhost/api/rooms/${roomId}/chats`, {
+    await Bun.fetch(`http://localhost:3000/rooms/${roomId}/chats`, {
       body: JSON.stringify({ text }),
       headers: { Accept: '*/*', Authorization: `Bearer ${userId}`, 'Content-Type': 'application/json' },
       method: 'POST',

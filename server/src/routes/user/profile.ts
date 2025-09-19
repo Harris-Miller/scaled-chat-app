@@ -11,7 +11,7 @@ import { s3 } from '../../s3';
 const supportedProfilePicContentType = new Set<string | null>(['image/png', 'image/jpg', 'image/jpeg']);
 
 const contentTypeToExt = {
-  'image/jpeg': 'jpg',
+  'image/jpeg': 'jpeg',
   'image/jpg': 'jpg',
   'image/png': 'png',
 } as const;
@@ -102,6 +102,8 @@ export const profileRoutes = new Elysia()
       // eslint-disable-next-line @typescript-eslint/prefer-destructuring
       const file = body.file;
       const contentType = file.type;
+
+      console.log(contentType);
 
       if (!supportedProfilePicContentType.has(contentType)) {
         return status(500, 'Content-Type requested to be one of: image/png, image/jpg, image/jpeg');

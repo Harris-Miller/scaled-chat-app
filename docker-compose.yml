@@ -191,7 +191,7 @@ services:
     container_name: thumbail-micro
     restart: on-failure:3
     ports:
-      - 3008:3000
+      - 3008:3008
     networks:
       - testnet
 

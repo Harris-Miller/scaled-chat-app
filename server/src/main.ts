@@ -1,15 +1,11 @@
 import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
-import { opentelemetry } from '@elysiajs/opentelemetry';
-import { serverTiming } from '@elysiajs/server-timing';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 // import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
 import { Elysia } from 'elysia';
-import prometheusPlugin from 'elysia-prometheus';
 
 import { kubeProbes } from './kubeProbes';
 import { logger } from './logger';
+import { otel } from './otel';
 import { roomsRoute } from './routes/rooms';
 import { testsRoute } from './routes/tests';
 import { userRoute } from './routes/user';
@@ -42,32 +38,7 @@ const app = new Elysia()
       preflight: true,
     }),
   )
-  .use(serverTiming())
-  .use(
-    prometheusPlugin({
-      dynamicLabels: {
-        userAgent: ctx => ctx.request.headers.get('user-agent') ?? 'unknown',
-      },
-      staticLabels: { service: 'chat-server' },
-    }),
-  )
-  // .use(
-  //   elysiaLogging(logger, {
-  //     format: 'json',
-  //     level: 'http',
-  //   }),
-  // )
-  .use(
-    opentelemetry({
-      spanProcessors: [
-        new BatchSpanProcessor(
-          new OTLPTraceExporter({
-            url: process.env.OTLP_TRACES_URL,
-          }),
-        ),
-      ],
-    }),
-  )
+  .use(otel)
   .use(openapi())
   .use(api);
 
