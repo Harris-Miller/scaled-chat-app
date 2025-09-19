@@ -1,6 +1,5 @@
 import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
-// import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
 import { Elysia } from 'elysia';
 
 import { kubeProbes } from './kubeProbes';
@@ -13,13 +12,15 @@ import { s3 } from './s3';
 import { engine, websocket } from './socket';
 
 // Call an S3 API using the LocalStack endpoint
-// eslint-disable-next-line no-console
-console.log('s3 connection test (should display false)', await s3.exists('non-existent-file.jpg'));
+const didPass = !(await s3.exists('non-existent-file.jpg'));
+if (didPass) {
+  logger.info(`s3 connection test passed.`);
+} else {
+  logger.error(`s3 connection test failed!`);
+}
 
 const api = new Elysia()
   .onError(({ error }) => {
-    // eslint-disable-next-line no-console
-    console.log(error);
     logger.error(error);
     return error;
   })
@@ -30,6 +31,7 @@ const api = new Elysia()
   .use(roomsRoute);
 
 const app = new Elysia()
+  .use(otel)
   .use(
     cors({
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -38,7 +40,6 @@ const app = new Elysia()
       preflight: true,
     }),
   )
-  .use(otel)
   .use(openapi())
   .use(api);
 

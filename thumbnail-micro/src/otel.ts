@@ -4,7 +4,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { Elysia } from 'elysia';
 import prometheusPlugin from 'elysia-prometheus';
-import { ElysiaLogging as elysiaLogging } from '@otherguy/elysia-logging';
+import { ElysiaLogging as elysiaLogging } from 'elysia-logging';
 
 import { logger } from './logger';
 
@@ -21,14 +21,15 @@ export const otel = new Elysia()
   .use(
     elysiaLogging(logger, {
       format: 'json',
-      level: 'http',
+      level: 'verbose',
     }),
   )
   .use(
     opentelemetry({
+      serviceName: 'thumbnail-micro',
       spanProcessors: [
         new BatchSpanProcessor(
-          new OTLPTraceExporter(),
+          new OTLPTraceExporter({ url: process.env.OTLP_TRACES_URL }),
         ),
       ],
     }),

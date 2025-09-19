@@ -33,68 +33,52 @@ export const profileRoutes = new Elysia()
       profilePicId: profilePic?.id,
     };
   })
-  .get(
-    '/profile/pic/:id',
-    async function userRouteGetProfilePicId({ set, status, params: { id: picId } }) {
-      const [profilePic] = await db.select().from(profilePics).where(eq(profilePics.id, picId)).limit(1);
+  .get('/profile/pic/:id', async function userRouteGetProfilePicId({ set, status, params: { id: picId } }) {
+    const [profilePic] = await db.select().from(profilePics).where(eq(profilePics.id, picId)).limit(1);
 
-      if (profilePic == null) {
-        return status(404, 'Not Found');
-      }
+    if (profilePic == null) {
+      return status(404, 'Not Found');
+    }
 
-      if (!profilePic.success) {
-        return status(404, 'Not Found');
-      }
+    if (!profilePic.success) {
+      return status(404, 'Not Found');
+    }
 
-      const { contentType } = profilePic;
+    const { contentType } = profilePic;
 
-      const fileName = `profilePic:${picId}.${contentTypeToExt[contentType as ContentType]}`;
+    const fileName = `profilePic:${picId}.${contentTypeToExt[contentType as ContentType]}`;
 
-      // TODO: handle error
-      const fileBuffer = await s3.file(fileName).arrayBuffer();
+    // TODO: handle error
+    const fileBuffer = await s3.file(fileName).arrayBuffer();
 
-      const fileBlob = new Blob([fileBuffer], { type: contentType });
+    const fileBlob = new Blob([fileBuffer], { type: contentType });
 
-      set.headers = { 'Content-Type': contentType };
-      return status(200, fileBlob);
-    },
-    {
-      params: t.Object({
-        id: t.String({ maxLength: 21, minLength: 21 }),
-      }),
-    },
-  )
-  .get(
-    '/profile/pic/:id/thumb',
-    async function userRouteGetProfilePicIdThumb({ set, status, params: { id: picId } }) {
-      const [profilePic] = await db.select().from(profilePics).where(eq(profilePics.id, picId)).limit(1);
+    set.headers = { 'Content-Type': contentType };
+    return status(200, fileBlob);
+  })
+  .get('/profile/pic/:id/thumb', async function userRouteGetProfilePicIdThumb({ set, status, params: { id: picId } }) {
+    const [profilePic] = await db.select().from(profilePics).where(eq(profilePics.id, picId)).limit(1);
 
-      if (profilePic == null) {
-        return status(404, 'Not Found');
-      }
+    if (profilePic == null) {
+      return status(404, 'Not Found');
+    }
 
-      if (!profilePic.success) {
-        return status(404, 'Not Found');
-      }
+    if (!profilePic.success) {
+      return status(404, 'Not Found');
+    }
 
-      const { contentType } = profilePic;
+    const { contentType } = profilePic;
 
-      const fileName = `profilePic:${picId}:thumb.${contentTypeToExt[contentType as ContentType]}`;
+    const fileName = `profilePic:${picId}:thumb.${contentTypeToExt[contentType as ContentType]}`;
 
-      // TODO: handle error
-      const fileBuffer = await s3.file(fileName).arrayBuffer();
+    // TODO: handle error
+    const fileBuffer = await s3.file(fileName).arrayBuffer();
 
-      const fileBlob = new Blob([fileBuffer], { type: contentType });
+    const fileBlob = new Blob([fileBuffer], { type: contentType });
 
-      set.headers = { 'Content-Type': contentType };
-      return status(200, fileBlob);
-    },
-    {
-      params: t.Object({
-        id: t.String({ maxLength: 21, minLength: 21 }),
-      }),
-    },
-  )
+    set.headers = { 'Content-Type': contentType };
+    return status(200, fileBlob);
+  })
   .post(
     '/profile/pic',
     async function userRoutePostProfilePic({ status, body, user }) {
@@ -102,8 +86,6 @@ export const profileRoutes = new Elysia()
       // eslint-disable-next-line @typescript-eslint/prefer-destructuring
       const file = body.file;
       const contentType = file.type;
-
-      console.log(contentType);
 
       if (!supportedProfilePicContentType.has(contentType)) {
         return status(500, 'Content-Type requested to be one of: image/png, image/jpg, image/jpeg');

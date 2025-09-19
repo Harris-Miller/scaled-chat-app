@@ -2,6 +2,7 @@ import { cors } from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import sharp from 'sharp';
 import { otel } from './otel';
+import { logger } from './logger';
 
 const acceptableContentTypes = ['image/png', 'image/jpg', 'image/jpeg'] as const;
 
@@ -12,6 +13,11 @@ const supportedProfilePicContentType = new Set<string | undefined>(acceptableCon
 const isSupportedContentType = (contentType: string | undefined): contentType is ContentType => supportedProfilePicContentType.has(contentType)
 
 new Elysia()
+  .use(otel)
+  .onError(({ error }) => {
+    logger.error(error);
+    return error;
+  })
   .use(
     cors({
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -20,7 +26,6 @@ new Elysia()
       preflight: true,
     }),
   )
-  .use(otel)
   .get('/ping', ({ status }) => status(200, 'pong'))
   .post('/thumbnail', async ({ status, headers, request, set }) => {
     const contentType = headers['Content-Type'] ?? headers['content-type'];
