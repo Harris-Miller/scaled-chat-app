@@ -24,44 +24,7 @@ const numRooms = roomIds.length;
 
 console.log(`${numUsers} users found. ${numRooms} rooms found.`);
 
-const coloradoRoomId = '9Q5yMi8VkkZZCoZeevEQZ';
-
-const createSocket = (i: number) => {
-  // const fakeLocalIp = `127.0.0.${i}`;
-  // const transport = net.connect({
-  //   host: '127.0.0.1',
-  //   localAddress: fakeLocalIp,
-  //   port: 80,
-  // });
-
-  const socket = io(`http://nginx`, {
-    autoConnect: false,
-    // extraHeaders: {
-    //   'x-forwarded-for': `172.18.0.9${i}`,
-    // },
-    path: '/api/ws/',
-    // transportOptions: {
-    //   websocket: { createConnection: () => transport },
-    // },
-  });
-
-  socket.on('connect', () => {
-    console.log('socket.IO connected');
-
-    const text = randomChatGptGeneratedPhrases[Math.floor(Math.random() * numPhrases)];
-    const userId = userIds[Math.floor(Math.random() * numUsers)];
-
-    socket.emit('chat:text', { roomId: coloradoRoomId, text, userId });
-  });
-  socket.on('connect_error', error => {
-    console.log('socket.IO errored on connection', error.message);
-  });
-  socket.on('disconnect', (reason, details) => {
-    console.log('socket.IO disconnected!', reason, details);
-  });
-
-  return socket;
-};
+const earthRoomId = '01K5D88GE1E3E5VPZR9Z227JXK';
 
 // const sockets = Array(1)
 //   .fill(undefined)
@@ -74,8 +37,8 @@ const createSocket = (i: number) => {
 const postChat = async () => {
   const text = randomChatGptGeneratedPhrases[Math.floor(Math.random() * numPhrases)];
   const userId = userIds[Math.floor(Math.random() * numUsers)];
-  // const roomId = '9Q5yMi8VkkZZCoZeevEQZ'; // colorado
-  const roomId = roomIds[Math.floor(Math.random() * numRooms)];
+  const roomId = earthRoomId;
+  // const roomId = roomIds[Math.floor(Math.random() * numRooms)];
 
   const ipSuffix = Math.floor(Math.random() * 9);
 
