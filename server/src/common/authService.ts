@@ -4,7 +4,7 @@ import { Elysia, t } from 'elysia';
 
 import { db } from '../db';
 import { users } from '../db/schema';
-import { logger } from '../logger';
+import { logger } from '../monitoring/logger';
 import { getRedisClient } from '../redis/redisClient';
 
 export const ACCESS_TOKEN_EXP = 60 * 24; // 1 day in seconds

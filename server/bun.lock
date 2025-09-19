@@ -16,12 +16,13 @@
         "@socket.io/bun-engine": "^0.0.2",
         "@socket.io/redis-adapter": "^8.3.0",
         "bun": "^1.2.22",
+        "date-fns": "^4.1.0",
+        "date-fns-tz": "^3.2.0",
         "dotenv": "^17.2.2",
         "drizzle-orm": "^0.44.5",
         "drizzle-seed": "^0.3.1",
         "drizzle-typebox": "^0.3.3",
         "elysia": "^1.4.6",
-        "elysia-logging": "file:./modules/elysia-logging",
         "elysia-prometheus": "^1.0.0",
         "install": "^0.13.0",
         "neverthrow": "^8.2.0",
@@ -717,8 +718,6 @@
     "dunder-proto": ["dunder-proto@1.0.1", "", { "dependencies": { "call-bind-apply-helpers": "^1.0.1", "es-errors": "^1.3.0", "gopd": "^1.2.0" } }, "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A=="],
 
     "elysia": ["elysia@1.4.6", "", { "dependencies": { "cookie": "^1.0.2", "exact-mirror": "0.2.2", "fast-decode-uri-component": "^1.0.1" }, "optionalDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "openapi-types": ">= 12.0.0" }, "peerDependencies": { "file-type": ">= 20.0.0", "typescript": ">= 5.0.0" } }, "sha512-u2CorXLPs5ZXyWP+tQR+bgka/lJA4vNpB8lDE2w/sTmdaIwoPQmHEL4J3ai6OAlluWR1kfG7T9gO3EYT9D8viQ=="],
-
-    "elysia-logging": ["elysia-logging@file:modules/elysia-logging", { "dependencies": { "date-fns": "^4.1.0", "date-fns-tz": "^3.2.0" }, "devDependencies": { "@types/bun": "latest", "typescript": "^5.9.2" }, "peerDependencies": { "elysia": "^1.4.6" } }],
 
     "elysia-prometheus": ["elysia-prometheus@1.0.0", "", { "dependencies": { "prom-client": "^15.1.3" }, "peerDependencies": { "elysia": ">= 1.2.0" } }, "sha512-imyEWHOXfkhBBTedSp1uM6W7BylkkUE0g7hCWBgpCDE99z7Y3l5MIOPFkqcAloIC2tCgx4dKRkkEfvCL4nhlYg=="],
 
@@ -1578,8 +1577,6 @@
 
     "colorspace/color": ["color@3.2.1", "", { "dependencies": { "color-convert": "^1.9.3", "color-string": "^1.6.0" } }, "sha512-aBl7dZI9ENN6fUGC7mWpMTPNHmWUSNan9tuWN6ahh5ZLNk9baLJOnSMlrQkHcrfFgz2/RigjUVAjdx36VcemKA=="],
 
-    "elysia-logging/@types/bun": ["@types/bun@1.2.22", "", { "dependencies": { "bun-types": "1.2.22" } }, "sha512-5A/KrKos2ZcN0c6ljRSOa1fYIyCKhZfIVYeuyb4snnvomnpFqC0tTsEkdqNxbAgExV384OETQ//WAjl3XbYqQA=="],
-
     "engine.io/cookie": ["cookie@0.7.2", "", {}, "sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w=="],
 
     "engine.io/debug": ["debug@4.3.7", "", { "dependencies": { "ms": "^2.1.3" } }, "sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ=="],
@@ -1873,8 +1870,6 @@
     "@unrs/resolver-binding-wasm32-wasi/@napi-rs/wasm-runtime/@tybys/wasm-util": ["@tybys/wasm-util@0.9.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw=="],
 
     "colorspace/color/color-convert": ["color-convert@1.9.3", "", { "dependencies": { "color-name": "1.1.3" } }, "sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg=="],
-
-    "elysia-logging/@types/bun/bun-types": ["bun-types@1.2.22", "", { "dependencies": { "@types/node": "*" }, "peerDependencies": { "@types/react": "^19" } }, "sha512-hwaAu8tct/Zn6Zft4U9BsZcXkYomzpHJX28ofvx7k0Zz2HNz54n1n+tDgxoWFGB4PcFvJXJQloPhaV2eP3Q6EA=="],
 
     "eslint-plugin-sort-keys-fix/espree/acorn": ["acorn@7.4.1", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A=="],
 

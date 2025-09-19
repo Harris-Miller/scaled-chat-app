@@ -8,7 +8,6 @@ WORKDIR /usr/src/app
 FROM base AS install
 RUN mkdir -p /temp/prod
 COPY package.json bun.lock /temp/prod/
-COPY modules/ /temp/prod/modules/
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 # copy node_modules from temp directory

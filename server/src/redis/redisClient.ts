@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 
-import { logger } from '../logger';
+import { logger } from '../monitoring/logger';
 
 let instance: ReturnType<typeof createClient> | undefined;
 let subClient: ReturnType<typeof createClient> | undefined;

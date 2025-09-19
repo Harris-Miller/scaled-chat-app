@@ -2,9 +2,9 @@ import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
 import { Elysia } from 'elysia';
 
-import { kubeProbes } from './kubeProbes';
-import { logger } from './logger';
-import { otel } from './otel';
+import { kubeProbes } from './monitoring/kubeProbes';
+import { logger } from './monitoring/logger';
+import { otel } from './monitoring/otel';
 import { roomsRoute } from './routes/rooms';
 import { testsRoute } from './routes/tests';
 import { userRoute } from './routes/user';

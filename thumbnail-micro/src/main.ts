@@ -1,8 +1,8 @@
 import { cors } from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import sharp from 'sharp';
-import { otel } from './otel';
-import { logger } from './logger';
+import { otel } from './monitoring/otel';
+import { logger } from './monitoring/logger';
 
 const acceptableContentTypes = ['image/png', 'image/jpg', 'image/jpeg'] as const;
 

@@ -5,7 +5,7 @@ import { Result } from 'try';
 import { getUser } from '../../common/authService';
 import { db } from '../../db';
 import { chats, rooms } from '../../db/schema';
-import { logger } from '../../logger';
+import { logger } from '../../monitoring/logger';
 import { io } from '../../socket';
 
 export const chatRoutes = new Elysia()

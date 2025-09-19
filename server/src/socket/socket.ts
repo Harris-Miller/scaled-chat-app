@@ -4,7 +4,7 @@ import { Server as SocketIoServer } from 'socket.io';
 
 import { db } from '../db';
 import { chats } from '../db/schema';
-import { logger } from '../logger';
+import { logger } from '../monitoring/logger';
 import { createRedisInstance, getRedisClient, getRedisSubClient } from '../redis/redisClient';
 
 await createRedisInstance();

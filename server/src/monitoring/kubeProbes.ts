@@ -1,8 +1,8 @@
 import { sql } from 'drizzle-orm';
 import { Elysia } from 'elysia';
 
-import { db } from './db';
-import { getRedisStatus } from './redis/redisClient';
+import { db } from '../db';
+import { getRedisStatus } from '../redis/redisClient';
 
 /**
  * A minimal query to check the database connection
