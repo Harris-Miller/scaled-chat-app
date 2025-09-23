@@ -126,3 +126,13 @@ TODO: figure out how to config file this so I don't have to re-add manually each
     - unsubscribe from incoming updates
   - Display active / inactive icons for users
     - keep it simple for starters: just show when other users are connected via the websocket
+
+- Slack like "Canvas" page, auto-created per room
+  - Integrated Markdown editing (eg like how Confluence does it)
+  - Always "live"
+    - Shows active users
+    - Cursor Positions
+    - All updates live via CRDTs
+    - Basic offline support: no edit, once back online queries for updates, attempts to reconcile would-be-in-flight changes
+
+
