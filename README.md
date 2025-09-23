@@ -98,6 +98,9 @@ TODO: figure out how to config file this so I don't have to re-add manually each
 - redis id: 12776
 - nodejs id (for bun server app): 11159
 
+# To Fix
+
+- elysia-logging `.onAfterResponse()` doesn't fire as expected, look into
 
 # TODO and Ideas
 

@@ -1,7 +1,9 @@
-import type { IPHeaders, LogObject, Logger, RequestLoggerOptions } from "./types";
-import type { Elysia } from "elysia";
-import { getIP, getFormattingMethodName } from "./helpers";
-import { Log } from "./log";
+/* eslint-disable complexity */
+import type { Elysia } from 'elysia';
+
+import { getFormattingMethodName, getIP } from './helpers';
+import { Log } from './log';
+import type { IPHeaders, Logger, LogObject, RequestLoggerOptions } from './types';
 
 /**
  * List of IP headers to check in order of priority.
@@ -23,7 +25,7 @@ export const headersToCheck: IPHeaders[] = [
   'appengine-user-ip', // GCP
   'true-client-ip', // Akamai and Cloudflare
   'cf-pseudo-ipv4', // Cloudflare
-]
+];
 
 /**
  * Creates a middleware function that logs incoming requests and outgoing responses.
@@ -40,60 +42,62 @@ export const headersToCheck: IPHeaders[] = [
  */
 export const ElysiaLogging =
   (logger: Logger = console, options: RequestLoggerOptions = {}) =>
-  (app: Elysia) : Elysia => {
+  (app: Elysia): Elysia => {
     // Options
     const {
-      level = "info",
-      format = "json",
+      level = 'info',
+      format = 'json',
       skip = undefined,
-      includeHeaders = ["x-forwarded-for", "authorization"],
+      includeHeaders = ['x-forwarded-for', 'authorization'],
       ipHeaders = headersToCheck,
     } = options;
 
-
     // If the formatting method does not exist, throw an error
-    if (typeof format === 'string' && getFormattingMethodName(format) in Log.prototype === false) {
+    if (typeof format === 'string' && !(getFormattingMethodName(format) in Log.prototype)) {
       throw new Error(`Formatter '${format}' not found!`);
     }
 
     // @ts-expect-error
     return app
-      .derive((ctx) => {
-        const clientIP = app.server ? ( getIP(ctx.request.headers, ipHeaders) ?? app.server.requestIP(ctx.request)?.address) ?? undefined : undefined;
+      .derive(ctx => {
+        const clientIP = app.server
+          ? (getIP(ctx.request.headers, ipHeaders) ?? app.server.requestIP(ctx.request)?.address ?? undefined)
+          : undefined;
         return { ip: clientIP };
       })
-      .onError((ctx) => {
+      .onError(ctx => {
         ctx.store = { error: ctx.error, ...ctx.store };
       })
-      .onRequest((ctx) => {
+      .onRequest(ctx => {
         ctx.store = { requestStart: process.hrtime.bigint(), ...ctx.store };
       })
-      .onAfterHandle((ctx) => {
+      .onAfterHandle(ctx => {
         ctx.store = { responseSize: undefined, ...ctx.store };
       })
-      .onAfterResponse((ctx) => {
+      .onAfterResponse(ctx => {
         // Skip logging if skip function returns true
-        if (skip && typeof skip === "function" && skip(ctx)) {
+        if (skip && typeof skip === 'function' && skip(ctx)) {
           return;
         }
 
         // Calculate duration if it's set on the context
-        let duration: number = 0;
+        let duration = 0;
 
-        if ((ctx.store as { requestStart? : bigint }).requestStart!== undefined && typeof (ctx.store as { requestStart? : bigint }).requestStart === 'bigint') {
-          duration = Number(
-            process.hrtime.bigint() - (ctx.store as { requestStart : bigint }).requestStart
-          );
+        if (
+          (ctx.store as { requestStart?: bigint }).requestStart !== undefined &&
+          typeof (ctx.store as { requestStart?: bigint }).requestStart === 'bigint'
+        ) {
+          duration = Number(process.hrtime.bigint() - (ctx.store as { requestStart: bigint }).requestStart);
         }
 
         // Construct log object
-        const logObject : Log = new Log({
+        const logObject: Log = new Log({
           request: {
             ip: ctx.ip,
             method: ctx.request.method,
             url: {
-              path: ctx.path,
               params: Object.fromEntries(new URLSearchParams(new URL(ctx.request.url).search)),
+              path: ctx.path,
             },
           },
           response: {
@@ -102,14 +106,13 @@ export const ElysiaLogging =
           },
         });
 
-        if ((ctx.store as { error? : string | Error | object }).error !== undefined) {
-          logObject.error = (ctx.store as { error : string | Error | object }).error;
+        if ((ctx.store as { error?: Error | object | string }).error !== undefined) {
+          logObject.error = (ctx.store as { error: Error | object | string }).error;
         }
 
         // Add request ID if it exists
-        if (ctx.request.headers.has("x-request-id")) {
-          logObject.log.request.requestID =
-            ctx.request.headers.get("x-request-id")!;
+        if (ctx.request.headers.has('x-request-id')) {
+          logObject.log.request.requestID = ctx.request.headers.get('x-request-id')!;
         }
 
         // Include headers
@@ -122,15 +125,16 @@ export const ElysiaLogging =
           }
         }
 
-        let logOutput: string | LogObject;
+        let logOutput: LogObject | string;
 
         // If the log format is a function, call it and log the output
-        if(typeof format === 'function') {
+        if (typeof format === 'function') {
           logOutput = format(logObject.log);
-        } else if(typeof format === 'string') {
-          const formattingMethod = getFormattingMethodName(
-            format
-          ) as Exclude<Exclude<Exclude<keyof typeof logObject, "prototype">, "log">, "error">
+        } else if (typeof format === 'string') {
+          const formattingMethod = getFormattingMethodName(format) as Exclude<
+            Exclude<Exclude<keyof typeof logObject, 'prototype'>, 'log'>,
+            'error'
+          >;
           logOutput = logObject[formattingMethod]();
         } else {
           throw new Error(`Invalid formatting method type '${typeof format}'!`);
