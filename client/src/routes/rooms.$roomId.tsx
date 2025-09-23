@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import { head } from 'ramda';
@@ -11,8 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Chat } from '../api/chats';
 import { postChat } from '../api/chats';
 import { queryClient } from '../api/queryClient';
-import { useRoom } from '../api/rooms';
-import type { Room } from '../api/rooms';
+import { getRoomByIdOptions } from '../api/rooms';
 import { socket } from '../socket';
 import { useActiveUser } from '../store/user.selectors';
 import { handle } from '../utils';
@@ -38,7 +37,12 @@ const addChatToBottom = (roomId: string, chat: Chat) => {
   });
 };
 
-const SubComponent: FC<Room> = ({ description, id, name }) => {
+const RoomComponent: FC = () => {
+  const { roomId } = Route.useParams();
+  const {
+    data: { description, id, name },
+  } = useSuspenseQuery(getRoomByIdOptions(roomId));
+
   const user = useActiveUser();
   const scrollableBoxRef = useRef<HTMLElement>(null);
   const innerBoxRef = useRef<HTMLElement>(null);
@@ -166,32 +170,17 @@ const SubComponent: FC<Room> = ({ description, id, name }) => {
   );
 };
 
-export const RoomComponent: FC = () => {
-  // TODO: redirect to `/` if not authed
-
-  const { roomId } = Route.useParams();
-
-  const query = useRoom(roomId);
-
-  if (query.isPending) {
-    return (
-      <Box alignContent="center" display="flex" justifyContent="center">
-        <Typography>Loading Room...</Typography>
-      </Box>
-    );
-  }
-
-  if (!query.isSuccess) {
-    return (
-      <Box alignContent="center" display="flex" justifyContent="center" overflow="hidden">
-        <Typography>There was an error loading the room</Typography>
-      </Box>
-    );
-  }
-
-  return <SubComponent {...query.data} />;
-};
-
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomComponent,
+  errorComponent: () => (
+    <Box alignContent="center" display="flex" justifyContent="center" overflow="hidden">
+      <Typography>There was an error loading the room</Typography>
+    </Box>
+  ),
+  loader: ({ params: { roomId } }) => queryClient.ensureQueryData(getRoomByIdOptions(roomId)),
+  pendingComponent: () => (
+    <Box alignContent="center" display="flex" justifyContent="center">
+      <Typography>Loading Room...</Typography>
+    </Box>
+  ),
 });

@@ -1,7 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-
-import { queryClient } from './queryClient';
 
 export interface Chat {
   authorId: string;

@@ -1,4 +1,4 @@
-import { createTheme, CssBaseline } from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
@@ -9,7 +9,7 @@ import { ThemeWrapper } from './components/ThemeWrapper';
 import { routeTree } from './routeTree.gen';
 
 // Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({ context: { queryClient }, routeTree });
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

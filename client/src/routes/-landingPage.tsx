@@ -17,7 +17,7 @@ export const LandingPage: FC = () => {
   const createRoom = useCreateRoom();
 
   const roomsQuery = useQuery({
-    queryFn: () => getRooms().then(({ data }) => data),
+    queryFn: () => getRooms(),
     queryKey: ['rooms'],
   });
 
@@ -34,9 +34,9 @@ export const LandingPage: FC = () => {
     }
 
     getRoom(roomId)
-      .then(({ data }) => {
-        queryClient.setQueryData(['room', data.id], data);
-        navigate({ params: { roomId: data.id }, to: '/rooms/$roomId' });
+      .then(room => {
+        queryClient.setQueryData(['room', room.id], room);
+        navigate({ params: { roomId: room.id }, to: '/rooms/$roomId' });
       })
       .catch(() => {
         // TODO: error message

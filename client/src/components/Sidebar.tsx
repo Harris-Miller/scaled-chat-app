@@ -20,7 +20,7 @@ const drawerWidth = 360;
 
 export const Sidebar: FC = () => {
   const roomsQuery = useQuery({
-    queryFn: () => getRooms().then(({ data }) => data),
+    queryFn: () => getRooms(),
     queryKey: ['rooms'],
   });
 
