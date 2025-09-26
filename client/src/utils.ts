@@ -5,3 +5,8 @@ export const handle =
   e => {
     fn(e.currentTarget.value);
   };
+
+export const wait = (ms: number) =>
+  new Promise<void>(resolve => {
+    window.setTimeout(resolve, ms);
+  });

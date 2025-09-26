@@ -1,9 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { Elysia, t } from 'elysia';
+import { Result } from 'try';
 
 import { getUser } from '../../common/authService';
 import { db } from '../../db';
 import { rooms } from '../../db/schema';
+import { logger } from '../../monitoring/logger';
 
 import { chatRoutes } from './chats';
 
@@ -13,6 +15,26 @@ export const roomsRoute = new Elysia({ prefix: '/rooms' })
     const results = await db.select().from(rooms);
     return results;
   })
+  .get(
+    '/available/:name',
+    async function roomsRouteGetAvailable({ status, params: { name } }) {
+      const countResult = await Result.try(db.$count(rooms, eq(rooms.name, name)).then(i => i));
+      if (!countResult.ok) {
+        return status(500, 'Server Error');
+      }
+
+      logger.info(`countResult.value: ${countResult.value}`);
+
+      const available = countResult.value === 0;
+
+      return status(200, { available, name });
+    },
+    {
+      params: t.Object({
+        name: t.String(),
+      }),
+    },
+  )
   .post(
     '/',
     async function roomsRoutePostIndex({ body: { name }, status }) {

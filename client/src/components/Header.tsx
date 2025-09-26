@@ -15,11 +15,10 @@ export const Header: FC = () => {
   useEffect(() => {
     getProfile()
       .then(resp => {
-        console.log(resp.data);
         setUser(resp.data);
       })
-      .catch((resp: unknown) => {
-        console.log(resp);
+      .catch((_resp: unknown) => {
+        // TODO
       });
   }, [setUser]);
 

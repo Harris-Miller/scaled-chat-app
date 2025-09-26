@@ -1,7 +1,9 @@
+import AddIcon from '@mui/icons-material/Add';
 import TagIcon from '@mui/icons-material/Tag';
 import {
   Box,
   Drawer,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
@@ -10,19 +12,19 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
+import { useState } from 'react';
 
-import { getRooms } from '../api/rooms';
+import { useRooms } from '../api/rooms';
+
+import { CreateChannelDialog } from './dialogs/CreateChannelDialog';
 
 const drawerWidth = 360;
 
 export const Sidebar: FC = () => {
-  const roomsQuery = useQuery({
-    queryFn: () => getRooms(),
-    queryKey: ['rooms'],
-  });
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const roomsQuery = useRooms();
 
   const { roomId } = useParams({ from: '/rooms/$roomId', shouldThrow: false }) ?? { roomId: null };
 
@@ -42,7 +44,17 @@ export const Sidebar: FC = () => {
       <Box sx={{ overflow: 'auto', padding: 2 }}>
         <Stack mb={2}>
           <Box mb={1}>
-            <Typography variant="h3">Channels</Typography>
+            <Typography variant="h3">
+              Channels{' '}
+              <IconButton
+                onClick={() => {
+                  setDialogOpen(true);
+                }}
+              >
+                <AddIcon />
+              </IconButton>
+            </Typography>
+            <CreateChannelDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
           </Box>
           <Box pl={1}>
             <List dense>

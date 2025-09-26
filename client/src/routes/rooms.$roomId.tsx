@@ -177,7 +177,7 @@ export const Route = createFileRoute('/rooms/$roomId')({
       <Typography>There was an error loading the room</Typography>
     </Box>
   ),
-  loader: ({ params: { roomId } }) => queryClient.ensureQueryData(getRoomByIdOptions(roomId)),
+  loader: ({ params: { roomId } }) => queryClient.prefetchQuery(getRoomByIdOptions(roomId)),
   pendingComponent: () => (
     <Box alignContent="center" display="flex" justifyContent="center">
       <Typography>Loading Room...</Typography>
