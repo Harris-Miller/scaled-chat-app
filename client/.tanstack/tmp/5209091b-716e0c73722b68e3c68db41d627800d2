@@ -13,9 +13,8 @@ import { Route as RoomsRouteRouteImport } from './routes/rooms/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
-import { Route as RoomsRoomIdRouteRouteImport } from './routes/rooms/$roomId/route'
-import { Route as RoomsRoomIdIndexRouteImport } from './routes/rooms/$roomId/index'
-import { Route as RoomsRoomIdCanvasRouteImport } from './routes/rooms/$roomId/canvas'
+import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
+import { Route as RoomsRoomIdCanvasRouteImport } from './routes/rooms/$roomId.canvas'
 
 const RoomsRouteRoute = RoomsRouteRouteImport.update({
   id: '/rooms',
@@ -37,47 +36,40 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RoomsRoomIdRouteRoute = RoomsRoomIdRouteRouteImport.update({
+const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
   id: '/$roomId',
   path: '/$roomId',
   getParentRoute: () => RoomsRouteRoute,
 } as any)
-const RoomsRoomIdIndexRoute = RoomsRoomIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => RoomsRoomIdRouteRoute,
-} as any)
 const RoomsRoomIdCanvasRoute = RoomsRoomIdCanvasRouteImport.update({
   id: '/canvas',
   path: '/canvas',
-  getParentRoute: () => RoomsRoomIdRouteRoute,
+  getParentRoute: () => RoomsRoomIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rooms': typeof RoomsRouteRouteWithChildren
-  '/rooms/$roomId': typeof RoomsRoomIdRouteRouteWithChildren
+  '/rooms/$roomId': typeof RoomsRoomIdRouteWithChildren
   '/profile': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
   '/rooms/$roomId/canvas': typeof RoomsRoomIdCanvasRoute
-  '/rooms/$roomId/': typeof RoomsRoomIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRouteWithChildren
   '/profile': typeof ProfileIndexRoute
   '/rooms': typeof RoomsIndexRoute
   '/rooms/$roomId/canvas': typeof RoomsRoomIdCanvasRoute
-  '/rooms/$roomId': typeof RoomsRoomIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/rooms': typeof RoomsRouteRouteWithChildren
-  '/rooms/$roomId': typeof RoomsRoomIdRouteRouteWithChildren
+  '/rooms/$roomId': typeof RoomsRoomIdRouteWithChildren
   '/profile/': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
   '/rooms/$roomId/canvas': typeof RoomsRoomIdCanvasRoute
-  '/rooms/$roomId/': typeof RoomsRoomIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,9 +80,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rooms/'
     | '/rooms/$roomId/canvas'
-    | '/rooms/$roomId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/rooms' | '/rooms/$roomId/canvas' | '/rooms/$roomId'
+  to: '/' | '/rooms/$roomId' | '/profile' | '/rooms' | '/rooms/$roomId/canvas'
   id:
     | '__root__'
     | '/'
@@ -99,7 +90,6 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/rooms/'
     | '/rooms/$roomId/canvas'
-    | '/rooms/$roomId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,46 +132,38 @@ declare module '@tanstack/react-router' {
       id: '/rooms/$roomId'
       path: '/$roomId'
       fullPath: '/rooms/$roomId'
-      preLoaderRoute: typeof RoomsRoomIdRouteRouteImport
+      preLoaderRoute: typeof RoomsRoomIdRouteImport
       parentRoute: typeof RoomsRouteRoute
-    }
-    '/rooms/$roomId/': {
-      id: '/rooms/$roomId/'
-      path: '/'
-      fullPath: '/rooms/$roomId/'
-      preLoaderRoute: typeof RoomsRoomIdIndexRouteImport
-      parentRoute: typeof RoomsRoomIdRouteRoute
     }
     '/rooms/$roomId/canvas': {
       id: '/rooms/$roomId/canvas'
       path: '/canvas'
       fullPath: '/rooms/$roomId/canvas'
       preLoaderRoute: typeof RoomsRoomIdCanvasRouteImport
-      parentRoute: typeof RoomsRoomIdRouteRoute
+      parentRoute: typeof RoomsRoomIdRoute
     }
   }
 }
 
-interface RoomsRoomIdRouteRouteChildren {
+interface RoomsRoomIdRouteChildren {
   RoomsRoomIdCanvasRoute: typeof RoomsRoomIdCanvasRoute
-  RoomsRoomIdIndexRoute: typeof RoomsRoomIdIndexRoute
 }
 
-const RoomsRoomIdRouteRouteChildren: RoomsRoomIdRouteRouteChildren = {
+const RoomsRoomIdRouteChildren: RoomsRoomIdRouteChildren = {
   RoomsRoomIdCanvasRoute: RoomsRoomIdCanvasRoute,
-  RoomsRoomIdIndexRoute: RoomsRoomIdIndexRoute,
 }
 
-const RoomsRoomIdRouteRouteWithChildren =
-  RoomsRoomIdRouteRoute._addFileChildren(RoomsRoomIdRouteRouteChildren)
+const RoomsRoomIdRouteWithChildren = RoomsRoomIdRoute._addFileChildren(
+  RoomsRoomIdRouteChildren,
+)
 
 interface RoomsRouteRouteChildren {
-  RoomsRoomIdRouteRoute: typeof RoomsRoomIdRouteRouteWithChildren
+  RoomsRoomIdRoute: typeof RoomsRoomIdRouteWithChildren
   RoomsIndexRoute: typeof RoomsIndexRoute
 }
 
 const RoomsRouteRouteChildren: RoomsRouteRouteChildren = {
-  RoomsRoomIdRouteRoute: RoomsRoomIdRouteRouteWithChildren,
+  RoomsRoomIdRoute: RoomsRoomIdRouteWithChildren,
   RoomsIndexRoute: RoomsIndexRoute,
 }
 

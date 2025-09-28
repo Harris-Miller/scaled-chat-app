@@ -5,16 +5,15 @@ import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import { head } from 'ramda';
-import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import type { Chat } from '../../api/chats';
-import { postChat } from '../../api/chats';
-import { queryClient } from '../../api/queryClient';
-import { getRoomByIdOptions } from '../../api/rooms';
-import { socket } from '../../socket';
-import { useActiveUser } from '../../store/user.selectors';
-import { handle } from '../../utils';
+import { postChat } from '../../../api/chats';
+import type { Chat } from '../../../api/chats';
+import { queryClient } from '../../../api/queryClient';
+import { getRoomByIdOptions } from '../../../api/rooms';
+import { socket } from '../../../socket';
+import { useActiveUser } from '../../../store/user.selectors';
+import { handle } from '../../../utils';
 
 const addChatToBottom = (roomId: string, chat: Chat) => {
   queryClient.setQueryData<{ pageParams: string[]; pages: Chat[][] }>(['chats', roomId], oldData => {
@@ -37,10 +36,10 @@ const addChatToBottom = (roomId: string, chat: Chat) => {
   });
 };
 
-const RoomComponent: FC = () => {
+const MessagesComponent = () => {
   const { roomId } = Route.useParams();
   const {
-    data: { description, id, name },
+    data: { id },
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
 
   const user = useActiveUser();
@@ -101,20 +100,8 @@ const RoomComponent: FC = () => {
     postChat(id, message);
     setMessage('');
   };
-
   return (
-    <Box
-      data-id="SubComponent"
-      display="flex"
-      flexDirection="column"
-      // 64px is height of Header
-      sx={{ height: 'calc(100vh - 64px)', overflow: 'auto' }}
-    >
-      <Box>
-        <Typography>
-          {name} - {description}
-        </Typography>
-      </Box>
+    <>
       {/* Outer, scrollable element  */}
       <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ flexGrow: 2, overflow: 'scroll' }}>
         {/* Inner element to container the items to scroll through  */}
@@ -161,21 +148,10 @@ const RoomComponent: FC = () => {
           Submit
         </Button>
       </Box>
-    </Box>
+    </>
   );
 };
 
-export const Route = createFileRoute('/rooms/$roomId')({
-  component: RoomComponent,
-  errorComponent: () => (
-    <Box alignContent="center" display="flex" justifyContent="center" overflow="hidden">
-      <Typography>There was an error loading the room</Typography>
-    </Box>
-  ),
-  loader: ({ params: { roomId } }) => queryClient.prefetchQuery(getRoomByIdOptions(roomId)),
-  pendingComponent: () => (
-    <Box alignContent="center" display="flex" justifyContent="center">
-      <Typography>Loading Room...</Typography>
-    </Box>
-  ),
+export const Route = createFileRoute('/rooms/$roomId/')({
+  component: MessagesComponent,
 });
