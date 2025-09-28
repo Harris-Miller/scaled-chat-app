@@ -9,13 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as RoomsRouteRouteImport } from './routes/rooms/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RoomsIndexRouteImport } from './routes/rooms.index'
-import { Route as ProfileIndexRouteImport } from './routes/profile.index'
-import { Route as RoomsRoomIdRouteImport } from './routes/rooms.$roomId'
+import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 
-const RoomsRoute = RoomsRouteImport.update({
+const RoomsRouteRoute = RoomsRouteRouteImport.update({
   id: '/rooms',
   path: '/rooms',
   getParentRoute: () => rootRouteImport,
@@ -28,7 +28,7 @@ const IndexRoute = IndexRouteImport.update({
 const RoomsIndexRoute = RoomsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => RoomsRoute,
+  getParentRoute: () => RoomsRouteRoute,
 } as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
@@ -38,12 +38,12 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
 const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
   id: '/$roomId',
   path: '/$roomId',
-  getParentRoute: () => RoomsRoute,
+  getParentRoute: () => RoomsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/rooms': typeof RoomsRouteWithChildren
+  '/rooms': typeof RoomsRouteRouteWithChildren
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/profile': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
@@ -57,7 +57,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/rooms': typeof RoomsRouteWithChildren
+  '/rooms': typeof RoomsRouteRouteWithChildren
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/profile/': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
@@ -72,7 +72,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  RoomsRoute: typeof RoomsRouteWithChildren
+  RoomsRouteRoute: typeof RoomsRouteRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
@@ -82,7 +82,7 @@ declare module '@tanstack/react-router' {
       id: '/rooms'
       path: '/rooms'
       fullPath: '/rooms'
-      preLoaderRoute: typeof RoomsRouteImport
+      preLoaderRoute: typeof RoomsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -97,7 +97,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/rooms/'
       preLoaderRoute: typeof RoomsIndexRouteImport
-      parentRoute: typeof RoomsRoute
+      parentRoute: typeof RoomsRouteRoute
     }
     '/profile/': {
       id: '/profile/'
@@ -111,26 +111,28 @@ declare module '@tanstack/react-router' {
       path: '/$roomId'
       fullPath: '/rooms/$roomId'
       preLoaderRoute: typeof RoomsRoomIdRouteImport
-      parentRoute: typeof RoomsRoute
+      parentRoute: typeof RoomsRouteRoute
     }
   }
 }
 
-interface RoomsRouteChildren {
+interface RoomsRouteRouteChildren {
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   RoomsIndexRoute: typeof RoomsIndexRoute
 }
 
-const RoomsRouteChildren: RoomsRouteChildren = {
+const RoomsRouteRouteChildren: RoomsRouteRouteChildren = {
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   RoomsIndexRoute: RoomsIndexRoute,
 }
 
-const RoomsRouteWithChildren = RoomsRoute._addFileChildren(RoomsRouteChildren)
+const RoomsRouteRouteWithChildren = RoomsRouteRoute._addFileChildren(
+  RoomsRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  RoomsRoute: RoomsRouteWithChildren,
+  RoomsRouteRoute: RoomsRouteRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport

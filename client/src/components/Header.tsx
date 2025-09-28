@@ -44,7 +44,14 @@ export const Header: FC = () => {
   return (
     <AppBar position="fixed" sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}>
       <Toolbar>
-        <IconButton aria-label="menu" color="inherit" edge="start" size="large" sx={{ mr: 2 }}>
+        <IconButton
+          aria-label="menu"
+          color="inherit"
+          edge="start"
+          onClick={() => navigate({ to: '/' })}
+          size="large"
+          sx={{ mr: 2 }}
+        >
           <MenuIcon />
         </IconButton>
         <Typography component="div" sx={{ flexGrow: 1 }} variant="h1">

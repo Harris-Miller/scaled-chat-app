@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
@@ -8,13 +8,13 @@ import { head } from 'ramda';
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import type { Chat } from '../api/chats';
-import { postChat } from '../api/chats';
-import { queryClient } from '../api/queryClient';
-import { getRoomByIdOptions } from '../api/rooms';
-import { socket } from '../socket';
-import { useActiveUser } from '../store/user.selectors';
-import { handle } from '../utils';
+import type { Chat } from '../../api/chats';
+import { postChat } from '../../api/chats';
+import { queryClient } from '../../api/queryClient';
+import { getRoomByIdOptions } from '../../api/rooms';
+import { socket } from '../../socket';
+import { useActiveUser } from '../../store/user.selectors';
+import { handle } from '../../utils';
 
 const addChatToBottom = (roomId: string, chat: Chat) => {
   queryClient.setQueryData<{ pageParams: string[]; pages: Chat[][] }>(['chats', roomId], oldData => {
@@ -107,32 +107,16 @@ const RoomComponent: FC = () => {
       data-id="SubComponent"
       display="flex"
       flexDirection="column"
-      sx={{ height: 'calc(100vh - 48px)', overflow: 'auto' }}
+      // 64px is height of Header
+      sx={{ height: 'calc(100vh - 64px)', overflow: 'auto' }}
     >
-      <Stack data-id="Stack">
-        <Box>
-          <Typography>Room: {id}</Typography>
-        </Box>
-        <Box>
-          <Typography>Name: {name}</Typography>
-        </Box>
-        <Box>
-          <Typography>Description: {description}</Typography>
-        </Box>
-        <Box>
-          <TextField label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
-          <Button
-            onClick={() => {
-              messageHandler();
-            }}
-            variant="contained"
-          >
-            Submit
-          </Button>
-        </Box>
-      </Stack>
+      <Box>
+        <Typography>
+          {name} - {description}
+        </Typography>
+      </Box>
       {/* Outer, scrollable element  */}
-      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ height: '500px', overflow: 'scroll' }}>
+      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ flexGrow: 2, overflow: 'scroll' }}>
         {/* Inner element to container the items to scroll through  */}
         <Box data-id="inner" ref={innerBoxRef} sx={{ position: 'relative' }}>
           {isFetchingPreviousPage ? (
@@ -165,6 +149,17 @@ const RoomComponent: FC = () => {
             </Box>
           ))}
         </Box>
+      </Box>
+      <Box>
+        <TextField label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
+        <Button
+          onClick={() => {
+            messageHandler();
+          }}
+          variant="contained"
+        >
+          Submit
+        </Button>
       </Box>
     </Box>
   );

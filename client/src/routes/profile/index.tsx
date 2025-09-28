@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import type { ChangeEventHandler, FC } from 'react';
 
-import { useStore } from '../store';
+import { useStore } from '../../store';
 
 const VisuallyHiddenInput = styled('input')({
   bottom: 0,
