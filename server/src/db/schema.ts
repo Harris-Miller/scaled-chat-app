@@ -76,12 +76,25 @@ export const chats = pgTable('chats', {
 
 export const directMessages = pgTable('direct_messages', {
   createdAt: timestamp().defaultNow().notNull(),
-
   id: ulid()
     .primaryKey()
     .$defaultFn(() => getUlid()),
   text: text().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
 
+export const canvas = pgTable('canvas', {
+  createdAt: timestamp().defaultNow().notNull(),
+  id: ulid()
+    .primaryKey()
+    .$defaultFn(() => getUlid()),
+  roomId: ulid()
+    .notNull()
+    .references(() => rooms.id),
+  text: text().notNull(),
   updatedAt: timestamp()
     .defaultNow()
     .notNull()
@@ -133,7 +146,12 @@ export const chatRelations = relations(chats, ({ one }) => ({
   room: one(rooms, { fields: [chats.roomId], references: [rooms.id] }),
 }));
 
-export const roomRelations = relations(rooms, ({ many }) => ({
+export const canvasRelations = relations(canvas, ({ one }) => ({
+  room: one(rooms, { fields: [canvas.roomId], references: [rooms.id] }),
+}));
+
+export const roomRelations = relations(rooms, ({ many, one }) => ({
+  canvas: one(canvas),
   chats: many(chats),
   // usersToRooms: many(usersToRooms),
 }));
