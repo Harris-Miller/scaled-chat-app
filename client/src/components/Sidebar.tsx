@@ -39,7 +39,7 @@ export const Sidebar: FC = () => {
       }}
       variant="permanent"
     >
-      {/* Empty <Toolbar /> is here to add the height of the AppBar */}
+      {/* empty Toolbar is to pushdown Container the same height as the absolutely positioned Header */}
       <Toolbar />
       <Box sx={{ overflow: 'auto', padding: 2 }}>
         <Stack mb={2}>

@@ -9,7 +9,11 @@ import { getProfile, signIn, signUp } from '../../api/user';
 import { useStore } from '../../store';
 import { handle } from '../../utils';
 
-export const LoginDialog: FC<DialogProps> = props => {
+export interface LoginDialogProps extends DialogProps {
+  setOpen: (isOpen: boolean) => void;
+}
+
+export const LoginDialog: FC<LoginDialogProps> = ({ setOpen, ...props }) => {
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
@@ -22,7 +26,7 @@ export const LoginDialog: FC<DialogProps> = props => {
       const response = await signUp(email, password).then(getProfile);
       console.log(response.data);
       setUser(response.data);
-      // setDialogOpen(false);
+      setOpen(false);
     } catch (err) {
       console.log(err);
       setErrorMessage((err as AxiosError<ApiError>).response?.data.message ?? 'Unable to reach server');
@@ -35,7 +39,7 @@ export const LoginDialog: FC<DialogProps> = props => {
 
       console.log(response);
       setUser(response.data);
-      // setDialogOpen(false);
+      setOpen(false);
     } catch (err) {
       console.log(err);
       setErrorMessage((err as AxiosError<ApiError>).response?.data.message ?? 'Unable to reach server');
@@ -62,7 +66,7 @@ export const LoginDialog: FC<DialogProps> = props => {
       <DialogActions>
         <Button
           onClick={() => {
-            // setDialogOpen(false);
+            setOpen(false);
             setErrorMessage(null);
           }}
         >

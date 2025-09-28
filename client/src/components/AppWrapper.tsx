@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { socket } from '../socket';
 
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
@@ -36,8 +35,6 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
     <Box sx={{ display: 'flex' }}>
       <Header />
 
-      <Sidebar />
-
       <Box
         component="main"
         sx={{
@@ -48,8 +45,9 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
           overflow: 'auto',
         }}
       >
+        {/* empty Toolbar is to pushdown Container the same height as the absolutely positioned Header */}
         <Toolbar />
-        <Container maxWidth={false}>{children}</Container>
+        {children}
       </Box>
     </Box>
   );

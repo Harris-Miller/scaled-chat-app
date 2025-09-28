@@ -107,7 +107,7 @@ const RoomComponent: FC = () => {
       data-id="SubComponent"
       display="flex"
       flexDirection="column"
-      sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden' }}
+      sx={{ height: 'calc(100vh - 48px)', overflow: 'auto' }}
     >
       <Stack data-id="Stack">
         <Box>
