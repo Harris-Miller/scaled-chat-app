@@ -10,7 +10,7 @@ const ulid = monotonicFactory();
 
 const harrisId = '01K5D89QE73Q6H11QP051DP01E';
 
-const roomNames = ['Mercery', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+const roomNames = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
 
 const rightNow = new Date();
 

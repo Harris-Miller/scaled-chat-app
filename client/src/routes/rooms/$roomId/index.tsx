@@ -130,23 +130,26 @@ const MessagesComponent = () => {
           ) : null}
           {allChats.map(chat => (
             <Box key={chat.id}>
-              <Typography>
-                id: {chat.id} :: text: {chat.text}
-              </Typography>
+              <Typography>{chat.text}</Typography>
             </Box>
           ))}
         </Box>
       </Box>
-      <Box>
-        <TextField label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
-        <Button
-          onClick={() => {
-            messageHandler();
-          }}
-          variant="contained"
-        >
-          Submit
-        </Button>
+      <Box display="flex" flexDirection="row">
+        <Box flexGrow={2}>
+          <TextField fullWidth label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
+        </Box>
+        <Box alignContent="center" mr={12}>
+          <Button
+            onClick={() => {
+              messageHandler();
+            }}
+            size="large"
+            variant="contained"
+          >
+            Submit
+          </Button>
+        </Box>
       </Box>
     </>
   );
