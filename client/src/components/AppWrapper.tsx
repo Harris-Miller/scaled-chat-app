@@ -1,10 +1,12 @@
-import { Box, Container, Toolbar } from '@mui/material';
+// import { Box, Container, Toolbar } from '@mui/material';
 import type { FC, PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
 import { socket } from '../socket';
 
-import { Header } from './Header';
+import { Toolbar } from './Toolbar';
+
+// import { Header } from './Header';
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
@@ -32,23 +34,9 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Header />
-
-      <Box
-        component="main"
-        sx={{
-          backgroundColor: theme =>
-            theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
-          flexGrow: 1,
-          height: '100vh',
-          overflow: 'auto',
-        }}
-      >
-        {/* empty Toolbar is to pushdown Container the same height as the absolutely positioned Header */}
-        <Toolbar />
-        {children}
-      </Box>
-    </Box>
+    <>
+      <Toolbar />
+      {children}
+    </>
   );
 };
