@@ -9,8 +9,26 @@ import { queryClient } from './api/queryClient';
 import { ThemeWrapper } from './components/ThemeWrapper';
 import { routeTree } from './routeTree.gen';
 
+import { Container, Flex, Section, Spinner } from '@radix-ui/themes';
+
 // Create a new router instance
-const router = createRouter({ context: { queryClient }, routeTree });
+const router = createRouter({
+  context: { queryClient },
+  defaultPendingComponent: () => (
+    <Container>
+      <Section>
+        <Flex justify="center">
+          <Spinner />
+          Loading...
+          <Spinner />
+        </Flex>
+      </Section>
+    </Container>
+  ),
+  defaultPendingMinMs: 500,
+  defaultPendingMs: 10,
+  routeTree,
+});
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

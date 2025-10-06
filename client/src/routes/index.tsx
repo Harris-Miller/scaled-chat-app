@@ -1,12 +1,21 @@
 import { FrameIcon } from '@radix-ui/react-icons';
 import { Box, Container, Flex, Grid, Heading, Section, Separator } from '@radix-ui/themes';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import type { FC } from 'react';
+
+import { useStore } from '../store';
 
 import { SignIn } from './-signin';
 import { SignUp } from './-signup';
 
 const IndexComponent: FC = () => {
+  const navigate = useNavigate();
+  const user = useStore(state => state.user);
+
+  if (user != null) {
+    navigate({ to: '/rooms' });
+    return null;
+  }
   return (
     <Container>
       <Grid columns="3">

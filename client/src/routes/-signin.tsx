@@ -35,9 +35,14 @@ export const SignIn: FC = () => {
         <Text>Password</Text>
         <TextField.Root id="pw" onChange={handle(setPassword)} type="password" value={password} />
       </Box>
-      <Box>
+      <Box my="2">
         <Button onClick={signInHandler}>Sign In</Button>
       </Box>
+      {errorMessage != null ? (
+        <Box>
+          <Text>{errorMessage}</Text>
+        </Box>
+      ) : null}
     </Flex>
   );
 };

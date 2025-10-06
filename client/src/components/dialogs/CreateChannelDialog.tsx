@@ -1,11 +1,10 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Box, Button, Dialog, TextField } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 import type { AxiosError } from 'axios';
 import type { Dispatch, FC, SetStateAction } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Result } from 'try';
 
-import { queryClient } from '../../api/queryClient';
 import { checkRoomNameAvailability, useCreateRoom } from '../../api/rooms';
 import { handle, wait } from '../../utils';
 
@@ -75,19 +74,12 @@ export const CreateChannelDialog: FC<{ dialogOpen: boolean; setDialogOpen: Dispa
   };
 
   return (
-    <Dialog open={dialogOpen}>
-      <DialogTitle>Create a Channel</DialogTitle>
-      <DialogContent>
-        <TextField
-          error={errorMessage != null}
-          helperText={errorMessage}
-          label="Channel name"
-          onChange={handle(setRoomName)}
-          value={roomName}
-          variant="outlined"
-        />
-      </DialogContent>
-      <DialogActions>
+    <Dialog.Root open={dialogOpen}>
+      <Dialog.Content>
+        <Dialog.Title>Create a Channel</Dialog.Title>
+        <TextField.Root onChange={handle(setRoomName)} value={roomName} />
+      </Dialog.Content>
+      <Box>
         <Button
           onClick={() => {
             setDialogOpen(false);
@@ -104,7 +96,7 @@ export const CreateChannelDialog: FC<{ dialogOpen: boolean; setDialogOpen: Dispa
         >
           Create Channel
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Dialog.Root>
   );
 };

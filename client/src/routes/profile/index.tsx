@@ -1,25 +1,13 @@
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { Box, Button, Paper, styled, Typography } from '@mui/material';
+import { UploadIcon } from '@radix-ui/react-icons';
+import { Box, Button, Card, Flex, Heading, Text, VisuallyHidden } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import type { ChangeEventHandler, FC } from 'react';
 
 import { useStore } from '../../store';
 
-const VisuallyHiddenInput = styled('input')({
-  bottom: 0,
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  left: 0,
-  overflow: 'hidden',
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  width: 1,
-});
-
 const ProfileComponent: FC = () => {
-  const { user } = useStore();
+  const user = useStore(state => state.user);
 
   const fileHandler: ChangeEventHandler<HTMLInputElement> = event => {
     console.log(event.currentTarget.files);
@@ -45,20 +33,20 @@ const ProfileComponent: FC = () => {
   // TODO: make this better
   if (user == null) {
     return (
-      <Box alignContent="center" display="flex" justifyContent="center">
-        <Typography>Return to homescreen to login</Typography>
-      </Box>
+      <Flex align="center" justify="center">
+        <Text>Return to homescreen to login</Text>
+      </Flex>
     );
   }
 
   return (
-    <Box alignContent="center" display="flex" justifyContent="center">
-      <Paper elevation={4}>
-        <Typography variant="h2">Profile</Typography>
+    <Flex align="center" justify="center">
+      <Card>
+        <Heading as="h2">Profile</Heading>
         <Box>
-          <Typography>{user.displayName}</Typography>
+          <Text>{user.displayName}</Text>
           <br />
-          <Typography>{user.email}</Typography>
+          <Text>{user.email}</Text>
           <br />
         </Box>
         {user.profilePicId != null && (
@@ -67,20 +55,18 @@ const ProfileComponent: FC = () => {
           </Box>
         )}
         <Box>
-          <Typography variant="h4">Upload Profile Pic</Typography>
+          <Heading as="h4">Upload Profile Pic</Heading>
           <Button
-            component="label"
-            role={undefined} // Recommended for accessibility
-            startIcon={<CloudUploadIcon />}
             tabIndex={-1} // Prevents the button from being focused directly
-            variant="contained"
           >
-            Uploadfiles
-            <VisuallyHiddenInput accept=".png,.jpg,.jpeg" onChange={fileHandler} type="file" />
+            <UploadIcon /> Uploadfiles
+            <VisuallyHidden>
+              <input accept=".png,.jpg,.jpeg" onChange={fileHandler} type="file" />
+            </VisuallyHidden>
           </Button>
         </Box>
-      </Paper>
-    </Box>
+      </Card>
+    </Flex>
   );
 };
 

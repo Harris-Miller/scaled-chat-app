@@ -4,22 +4,26 @@ import type { FC } from 'react';
 
 import { Sidebar } from '../../components/Sidebar';
 import { TabRail } from '../../components/TabRail';
+import { Toolbar } from '../../components/Toolbar';
 
 export const RoomsLayout: FC = () => {
   return (
-    <Flex>
-      <Box width="440px">
-        <Flex bottom="0" left="0" position="fixed" top="var(--toolbar-height)">
-          <TabRail />
-          <Sidebar />
+    <>
+      <Toolbar />
+      <Flex>
+        <Box width="440px">
+          <Flex bottom="0" left="0" position="fixed" top="var(--toolbar-height)">
+            <TabRail />
+            <Sidebar />
+          </Flex>
+        </Box>
+        <Flex maxWidth="100%">
+          <Section>
+            <Outlet />
+          </Section>
         </Flex>
-      </Box>
-      <Flex maxWidth="100%">
-        <Section>
-          <Outlet />
-        </Section>
       </Flex>
-    </Flex>
+    </>
   );
 };
 

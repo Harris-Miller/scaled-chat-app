@@ -40,9 +40,14 @@ export const SignUp: FC = () => {
         <Text>Password</Text>
         <TextField.Root id="pw" onChange={handle(setPassword)} type="password" value={password} />
       </Box>
-      <Box>
+      <Box my="2">
         <Button onClick={signUpHandler}>Sign Up</Button>
       </Box>
+      {errorMessage != null ? (
+        <Box>
+          <Text>{errorMessage}</Text>
+        </Box>
+      ) : null}
     </Flex>
   );
 };

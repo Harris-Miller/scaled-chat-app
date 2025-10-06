@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import type { FC, SyntheticEvent } from 'react';
@@ -13,61 +13,62 @@ const RoomComponent: FC = () => {
     data: { description, name },
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   console.log(location);
 
-  const tabValue = location.pathname.endsWith('canvas') ? 1 : 0;
+  // const tabValue = location.pathname.endsWith('canvas') ? 1 : 0;
 
-  const handleTab = (_e: SyntheticEvent, tabId: number) => {
-    switch (tabId) {
-      case 0: {
-        navigate({ params: { roomId }, to: '/rooms/$roomId' });
-        break;
-      }
-      case 1: {
-        navigate({ params: { roomId }, to: '/rooms/$roomId/canvas' });
-        break;
-      }
-      default: {
-        // do nothing
-      }
-    }
-  };
+  // const handleTab = (_e: SyntheticEvent, tabId: number) => {
+  //   switch (tabId) {
+  //     case 0: {
+  //       navigate({ params: { roomId }, to: '/rooms/$roomId' });
+  //       break;
+  //     }
+  //     case 1: {
+  //       navigate({ params: { roomId }, to: '/rooms/$roomId/canvas' });
+  //       break;
+  //     }
+  //     default: {
+  //       // do nothing
+  //     }
+  //   }
+  // };
 
   return (
-    <Box
-      data-id="SubComponent"
-      display="flex"
-      flexDirection="column"
+    <Flex
+      direction="column"
       // 64px is height of Header
-      sx={{ height: 'calc(100vh - 64px)', overflow: 'auto' }}
+      height="calc(100vh - --var(--toolbar-height))"
+      overflow="auto"
     >
       <Box>
-        <Typography>
+        <Text>
           {name} - {description}
-        </Typography>
+        </Text>
       </Box>
-      <Tabs onChange={handleTab} value={tabValue}>
-        <Tab label="Messages" />
-        <Tab label="Canvas" />
-      </Tabs>
+      <Tabs.Root defaultValue="messages">
+        <Tabs.List>
+          <Tabs.Trigger value="messages">Messages</Tabs.Trigger>
+          <Tabs.Trigger value="canvas">Canvas</Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>
       <Outlet />
-    </Box>
+    </Flex>
   );
 };
 
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomComponent,
   errorComponent: () => (
-    <Box alignContent="center" display="flex" justifyContent="center" overflow="hidden">
-      <Typography>There was an error loading the room</Typography>
-    </Box>
+    <Flex align="center" display="flex" justify="center" overflow="hidden">
+      <Text>There was an error loading the room</Text>
+    </Flex>
   ),
   loader: ({ params: { roomId } }) => queryClient.prefetchQuery(getRoomByIdOptions(roomId)),
   pendingComponent: () => (
-    <Box alignContent="center" display="flex" justifyContent="center">
-      <Typography>Loading Room...</Typography>
-    </Box>
+    <Flex align="center" justify="center">
+      <Text>Loading Room...</Text>
+    </Flex>
   ),
 });

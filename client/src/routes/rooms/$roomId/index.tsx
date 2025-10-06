@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { Box, Button, Flex, Text, TextField } from '@radix-ui/themes';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import { head } from 'ramda';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { postChat } from '../../../api/chats';
 import type { Chat } from '../../../api/chats';
@@ -43,8 +43,6 @@ const MessagesComponent = () => {
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
 
   const user = useActiveUser();
-  const scrollableBoxRef = useRef<HTMLElement>(null);
-  const innerBoxRef = useRef<HTMLElement>(null);
   const [message, setMessage] = useState('');
 
   const { data, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } = useInfiniteQuery({
@@ -63,21 +61,6 @@ const MessagesComponent = () => {
 
   // TODO: add virtualization scrolling
   const allChats = data?.pages.flat() ?? [];
-
-  useEffect(() => {
-    if (scrollableBoxRef.current == null) return;
-    if (innerBoxRef.current == null) return;
-    if (isFetchingPreviousPage) return;
-
-    if (scrollableBoxRef.current.clientHeight >= innerBoxRef.current.clientHeight) {
-      fetchPreviousPage();
-    }
-  }, [
-    scrollableBoxRef.current?.clientHeight,
-    innerBoxRef.current?.clientHeight,
-    isFetchingPreviousPage,
-    fetchPreviousPage,
-  ]);
 
   useEffect(() => {
     const callbackFn = (newChat: Chat) => {
@@ -102,55 +85,48 @@ const MessagesComponent = () => {
   };
   return (
     <>
-      {/* Outer, scrollable element  */}
-      <Box data-id="scrollableBox" ref={scrollableBoxRef} sx={{ flexGrow: 2, overflow: 'scroll' }}>
-        {/* Inner element to container the items to scroll through  */}
-        <Box data-id="inner" ref={innerBoxRef} sx={{ position: 'relative' }}>
-          {isFetchingPreviousPage ? (
-            <Box sx={{ padding: '10px', textAlign: 'center' }}>
-              <RefreshIcon fontSize="small" />
-            </Box>
-          ) : null}
-          {!isFetchingPreviousPage && !hasPreviousPage && (
-            <Box sx={{ padding: '10px', textAlign: 'center' }}>
-              <Typography variant="body2">You&apos;re at the top!</Typography>
-            </Box>
-          )}
-          {!isFetchingPreviousPage && hasPreviousPage ? (
-            <Box sx={{ padding: '10px', textAlign: 'center' }}>
-              <Button
-                onClick={() => {
-                  fetchPreviousPage();
-                }}
-                size="small"
-              >
-                Load More
-              </Button>
-            </Box>
-          ) : null}
-          {allChats.map(chat => (
-            <Box key={chat.id}>
-              <Typography>{chat.text}</Typography>
-            </Box>
-          ))}
-        </Box>
+      <Box>
+        {isFetchingPreviousPage ? (
+          <Flex align="center" p="10px">
+            <ReloadIcon />
+          </Flex>
+        ) : null}
+        {!isFetchingPreviousPage && !hasPreviousPage && (
+          <Flex align="center" p="10px">
+            <Text>You&apos;re at the top!</Text>
+          </Flex>
+        )}
+        {!isFetchingPreviousPage && hasPreviousPage ? (
+          <Flex align="center" p="10px">
+            <Button
+              onClick={() => {
+                fetchPreviousPage();
+              }}
+            >
+              Load More
+            </Button>
+          </Flex>
+        ) : null}
+        {allChats.map(chat => (
+          <Box key={chat.id}>
+            <Text>{chat.text}</Text>
+          </Box>
+        ))}
       </Box>
-      <Box display="flex" flexDirection="row">
-        <Box flexGrow={2}>
-          <TextField fullWidth label="Message" onChange={handle(setMessage)} value={message} variant="outlined" />
+      <Flex direction="row">
+        <Box flexGrow="1">
+          <TextField.Root onChange={handle(setMessage)} value={message} />
         </Box>
-        <Box alignContent="center" mr={12}>
+        <Flex align="center" mr="12">
           <Button
             onClick={() => {
               messageHandler();
             }}
-            size="large"
-            variant="contained"
           >
             Submit
           </Button>
-        </Box>
-      </Box>
+        </Flex>
+      </Flex>
     </>
   );
 };

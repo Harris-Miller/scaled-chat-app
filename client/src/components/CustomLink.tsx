@@ -1,5 +1,5 @@
-import { Link } from '@mui/material';
-import type { LinkProps } from '@mui/material';
+import type { LinkProps } from '@radix-ui/themes';
+import { Link } from '@radix-ui/themes';
 import { createLink } from '@tanstack/react-router';
 import type { LinkComponent } from '@tanstack/react-router';
 import { forwardRef } from 'react';
