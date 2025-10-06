@@ -1,26 +1,14 @@
-import AddIcon from '@mui/icons-material/Add';
-import TagIcon from '@mui/icons-material/Tag';
-import {
-  Box,
-  Drawer,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { FrameIcon, PlusIcon } from '@radix-ui/react-icons';
+import { Box, Flex, Heading, IconButton, ScrollArea } from '@radix-ui/themes';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
 import { useState } from 'react';
 
+import './sidebar.css';
+
 import { useRooms } from '../api/rooms';
 
-import { CreateChannelDialog } from './dialogs/CreateChannelDialog';
-
-const drawerWidth = 360;
+// import { CreateChannelDialog } from './dialogs/CreateChannelDialog';
 
 export const Sidebar: FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -31,54 +19,45 @@ export const Sidebar: FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Drawer
-      sx={{
-        [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: drawerWidth },
-        flexShrink: 0,
-        width: drawerWidth,
-      }}
-      variant="permanent"
-    >
-      {/* empty Toolbar is to pushdown Container the same height as the absolutely positioned Header */}
-      <Toolbar />
-      <Box sx={{ overflow: 'auto', padding: 2 }}>
-        <Stack mb={2}>
-          <Box mb={1}>
-            <Typography variant="h3">
-              Channels{' '}
-              <IconButton
-                onClick={() => {
-                  setDialogOpen(true);
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Typography>
-            <CreateChannelDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
-          </Box>
-          <Box pl={1}>
-            <List dense>
+    <Box data-channel-list width="360px">
+      <Box className="">
+        <ScrollArea>
+          <Flex direction="column">
+            <Box>
+              <Heading as="h3">
+                Channels{' '}
+                <IconButton
+                  onClick={() => {
+                    setDialogOpen(true);
+                  }}
+                >
+                  <PlusIcon />
+                </IconButton>
+              </Heading>
+              {/* <CreateChannelDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} /> */}
+            </Box>
+            <Flex direction="column">
               {roomsQuery.data?.map(room => (
-                <ListItemButton
+                <Box
                   key={room.id}
                   onClick={() => navigate({ params: { roomId: room.id }, to: '/rooms/$roomId' })}
-                  selected={room.id === roomId}
+                  // selected={room.id === roomId}
                 >
-                  <ListItemIcon>
-                    <TagIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{room.name}</ListItemText>
-                </ListItemButton>
+                  <FrameIcon /> {room.name}
+                </Box>
               ))}
-            </List>
-          </Box>
-        </Stack>
-        <Stack mb={2}>
-          <Box>
-            <Typography variant="h3">Direct Messages</Typography>
-          </Box>
-        </Stack>
+            </Flex>
+            <Box>
+              <Heading as="h3">
+                Direct Messages{' '}
+                <IconButton>
+                  <PlusIcon />
+                </IconButton>
+              </Heading>
+            </Box>
+          </Flex>
+        </ScrollArea>
       </Box>
-    </Drawer>
+    </Box>
   );
 };

@@ -4,8 +4,6 @@ import { useEffect } from 'react';
 
 import { socket } from '../socket';
 
-import { Toolbar } from './Toolbar';
-
 // import { Header } from './Header';
 
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
@@ -33,10 +31,5 @@ export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
     };
   }, []);
 
-  return (
-    <>
-      <Toolbar />
-      {children}
-    </>
-  );
+  return children;
 };

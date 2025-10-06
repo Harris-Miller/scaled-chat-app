@@ -2,9 +2,11 @@ import { HamburgerMenuIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { Avatar, Box, Flex, TextField } from '@radix-ui/themes';
 import type { FC } from 'react';
 
+import './toolbar.css';
+
 export const Toolbar: FC = () => {
   return (
-    <Box position="fixed">
+    <Box className="toolbar">
       <Flex>
         <Flex align="center">
           <HamburgerMenuIcon />

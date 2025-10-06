@@ -1,0 +1,8 @@
+.sidebar {
+  position: fixed;
+  top: var(--toolbar-height);
+  bottom: 0;
+  left: 0;
+  width: inherit;
+  overflow-y: hidden;
+}

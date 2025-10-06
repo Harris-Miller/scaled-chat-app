@@ -1,66 +1,40 @@
-import { ChatBubbleIcon, HomeIcon } from '@radix-ui/react-icons';
-import { Avatar, Box, Flex, Heading, IconButton, ScrollArea, Section } from '@radix-ui/themes';
+import { FrameIcon } from '@radix-ui/react-icons';
+import { Box, Container, Flex, Grid, Heading, Section, Separator } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
 import type { FC } from 'react';
 
-// const IndexComponent: FC = () => {
-//   const { user } = useStore();
-//   const [open, setOpen] = useState(false);
-//   const navigate = useNavigate();
-
-//   if (user != null) {
-//     navigate({ to: '/rooms' });
-//     return null;
-//   }
-
-//   return (
-//     <>
-//       <Box display="flex" justifyContent="center">
-//         <Box flexDirection="column">
-//           <Box>Le Chat Rooms</Box>
-//           <Box>
-//             <Button
-//               onClick={() => {
-//                 setOpen(true);
-//               }}
-//             >
-//               Login
-//             </Button>
-//           </Box>
-//         </Box>
-//       </Box>
-//       <LoginDialog open={open} setOpen={setOpen} />
-//     </>
-//   );
-// };
+import { SignIn } from './-signin';
+import { SignUp } from './-signup';
 
 const IndexComponent: FC = () => {
   return (
-    <Flex>
-      <Flex align="center" data-tab-rail direction="column" gap="3" width="70px">
+    <Container>
+      <Grid columns="3">
+        <Box />
         <Box>
-          <Avatar fallback="S" />
+          <Section size="2">
+            <Flex align="center" gap="2" justify="center">
+              <FrameIcon height="20px" width="20px" />
+              <Heading>Scaled Chat App</Heading>
+            </Flex>
+          </Section>
+          <Section size="1">
+            <SignIn />
+            <Flex justify="center" py="4">
+              <Flex align="center" flexGrow="1">
+                <Separator size="4" />
+              </Flex>
+              <Box mx="4">OR</Box>
+              <Flex align="center" flexGrow="1">
+                <Separator size="4" />
+              </Flex>
+            </Flex>
+            <SignUp />
+          </Section>
         </Box>
-        <Box>
-          <IconButton>
-            <HomeIcon />
-          </IconButton>
-        </Box>
-        <Box>
-          <IconButton>
-            <ChatBubbleIcon />
-          </IconButton>
-        </Box>
-      </Flex>
-      <Box data-channel-list width="360px">
-        <ScrollArea>Sidebar</ScrollArea>
-      </Box>
-      <Flex maxWidth="100%">
-        <Section>
-          <Heading>Hello, World!</Heading>
-        </Section>
-      </Flex>
-    </Flex>
+        <Box />
+      </Grid>
+    </Container>
   );
 };
 
