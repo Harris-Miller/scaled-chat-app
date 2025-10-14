@@ -2,6 +2,7 @@ import { Theme } from '@radix-ui/themes';
 import type { FC, PropsWithChildren } from 'react';
 
 import '@radix-ui/themes/styles.css';
+import './themeOverrides.css';
 
 // export const ThemeWrapper: FC<PropsWithChildren> = ({ children }) => {
 //   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');

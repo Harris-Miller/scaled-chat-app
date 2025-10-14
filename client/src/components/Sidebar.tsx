@@ -2,16 +2,14 @@ import { FrameIcon, PlusIcon } from '@radix-ui/react-icons';
 import { Box, Button, Flex, Heading, IconButton, ScrollArea } from '@radix-ui/themes';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
-import { useState } from 'react';
 
 import './sidebar.css';
 
 import { useRooms } from '../api/rooms';
 
-// import { CreateChannelDialog } from './dialogs/CreateChannelDialog';
+import { CreateChannelDialog } from './dialogs/CreateChannelDialog';
 
 export const Sidebar: FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
   const roomsQuery = useRooms();
 
   const { roomId } = useParams({ from: '/rooms/$roomId', shouldThrow: false }) ?? { roomId: null };
@@ -23,19 +21,10 @@ export const Sidebar: FC = () => {
       <Box>
         <ScrollArea>
           <Flex direction="column">
-            <Box>
-              <Heading as="h3">
-                Channels{' '}
-                <IconButton
-                  onClick={() => {
-                    setDialogOpen(true);
-                  }}
-                >
-                  <PlusIcon />
-                </IconButton>
-              </Heading>
-              {/* <CreateChannelDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} /> */}
-            </Box>
+            <Flex>
+              <Heading as="h3">Channels </Heading>
+              <CreateChannelDialog />
+            </Flex>
             <Flex direction="column">
               {roomsQuery.data?.map(room => (
                 <Button
