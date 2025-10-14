@@ -6,3 +6,14 @@
   width: inherit;
   overflow-y: hidden;
 }
+
+.channel-button {
+  box-shadow: none;
+  cursor: pointer;
+  justify-content: flex-start;
+}
+
+.channel-button-selected {
+  cursor: pointer;
+  justify-content: flex-start;
+}

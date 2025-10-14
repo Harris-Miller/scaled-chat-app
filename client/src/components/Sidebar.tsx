@@ -1,5 +1,5 @@
 import { FrameIcon, PlusIcon } from '@radix-ui/react-icons';
-import { Box, Flex, Heading, IconButton, ScrollArea } from '@radix-ui/themes';
+import { Box, Button, Flex, Heading, IconButton, ScrollArea } from '@radix-ui/themes';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
 import { useState } from 'react';
@@ -20,7 +20,7 @@ export const Sidebar: FC = () => {
 
   return (
     <Box data-channel-list width="360px">
-      <Box className="">
+      <Box>
         <ScrollArea>
           <Flex direction="column">
             <Box>
@@ -38,13 +38,14 @@ export const Sidebar: FC = () => {
             </Box>
             <Flex direction="column">
               {roomsQuery.data?.map(room => (
-                <Box
+                <Button
+                  className={room.id === roomId ? 'channel-button-selected' : 'channel-button'}
                   key={room.id}
                   onClick={() => navigate({ params: { roomId: room.id }, to: '/rooms/$roomId' })}
-                  // selected={room.id === roomId}
+                  variant="outline"
                 >
                   <FrameIcon /> {room.name}
-                </Box>
+                </Button>
               ))}
             </Flex>
             <Box>
