@@ -41,7 +41,7 @@ export const useCreateRoom = () =>
   useMutation({
     mutationFn: createRoom,
     onSuccess: room => {
-      queryClient.invalidateQueries<Room[]>({ exact: true, queryKey: ['rooms'] });
+      queryClient.invalidateQueries({ exact: true, queryKey: ['rooms'] });
       queryClient.setQueryData(['rooms', room.id], () => room);
     },
   });

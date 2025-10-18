@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
-import type { FC, SyntheticEvent } from 'react';
+import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
+import type { FC } from 'react';
 
 import { queryClient } from '../../../api/queryClient';
 import { getRoomByIdOptions } from '../../../api/rooms';

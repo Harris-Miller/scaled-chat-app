@@ -1,31 +1,9 @@
 /* eslint-disable complexity */
 import type { Elysia } from 'elysia';
 
-import { getFormattingMethodName, getIP } from './helpers';
+import { getFormattingMethodName, getIP, headersToCheck } from './helpers';
 import { Log } from './log';
-import type { IPHeaders, Logger, LogObject, RequestLoggerOptions } from './types';
-
-/**
- * List of IP headers to check in order of priority.
- *
- * @remarks
- * The order of the headers in this list determines the priority of the headers to use when determining the client IP address.
- * If the first header is not present, the second header is checked, and so on.
- */
-export const headersToCheck: IPHeaders[] = [
-  'x-forwarded-for', // X-Forwarded-For is the de-facto standard header
-  'x-real-ip', // Nginx proxy/FastCGI
-  'x-client-ip', // Apache [mod_remoteip](https://httpd.apache.org/docs/2.4/mod/mod_remoteip.html#page-header)
-  'cf-connecting-ip', // Cloudflare
-  'fastly-client-ip', // Fastly
-  'x-cluster-client-ip', // GCP
-  'x-forwarded', // RFC 7239
-  'forwarded-for', // RFC 7239
-  'forwarded', // RFC 7239
-  'appengine-user-ip', // GCP
-  'true-client-ip', // Akamai and Cloudflare
-  'cf-pseudo-ipv4', // Cloudflare
-];
+import type { Logger, LogObject, RequestLoggerOptions } from './types';
 
 /**
  * Creates a middleware function that logs incoming requests and outgoing responses.

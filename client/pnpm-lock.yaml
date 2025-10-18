@@ -57,7 +57,7 @@ importers:
         specifier: ^4.8.1
         version: 4.8.1
       try:
-        specifier: 1.0.0-beta.10
+        specifier: ^1.0.0-beta.10
         version: 1.0.0-beta.10
       ts-pattern:
         specifier: ^5.8.0
@@ -85,7 +85,7 @@ importers:
         specifier: ^9.35.0
         version: 9.35.0
       eslint-config-harris:
-        specifier: 5.0.0-beta.4
+        specifier: ^5.0.0-beta.4
         version: 5.0.0-beta.4(eslint@9.35.0)(typescript@5.9.2)
       globals:
         specifier: ^16.4.0

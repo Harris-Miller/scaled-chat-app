@@ -1,7 +1,8 @@
-import type { LogObject } from './types';
 import { format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+
 import { formatDuration, parseBasicAuthHeader } from './helpers';
+import type { LogObject } from './types';
 
 /**
  * Log class
@@ -22,7 +23,6 @@ import { formatDuration, parseBasicAuthHeader } from './helpers';
  * console.log(log.formatJson());
  **/
 export class Log {
-
   // Properties
   private logObject: LogObject;
 
@@ -32,11 +32,11 @@ export class Log {
   }
 
   // Getters and setters
-  public set error(error: string | object | Error) {
+  public set error(error: Error | object | string) {
     this.logObject.error = error;
   }
 
-  public get log() : LogObject {
+  public get log(): LogObject {
     return this.logObject;
   }
 
@@ -45,10 +45,13 @@ export class Log {
    *
    * @returns Log object as is
    */
-  formatJson() : LogObject {
-    return { ...{
-      message: `${this.logObject.request.method} ${this.logObject.request.url.path} completed with status ${this.logObject.response.status_code} in ${formatDuration(this.logObject.response.time)}`
-    }, ...this.logObject };
+  formatJson(): LogObject {
+    return {
+      ...{
+        message: `${this.logObject.request.method} ${this.logObject.request.url.path} completed with status ${this.logObject.response.status_code} in ${formatDuration(this.logObject.response.time)}`,
+      },
+      ...this.logObject,
+    };
   }
 
   /**
@@ -59,23 +62,25 @@ export class Log {
    *
    * @returns Log object as a common log format (NCSA) string
    */
-  formatCommon() : string {
+  formatCommon(): string {
     // Get basic auth user if set, else "-"
-    const basicAuthUser : string= parseBasicAuthHeader(this.logObject.request.headers?.authorization ?? "")?.username ?? "-";
+    const basicAuthUser: string =
+      parseBasicAuthHeader(this.logObject.request.headers?.authorization ?? '')?.username ?? '-';
 
     // @TODO: This is not yet exposed by Elysia (https://github.com/elysiajs/elysia/issues/324)
-    const requestProtocol : string = this.logObject.request.headers?.["x-forwarded-proto"] ?? "HTTP/1.1";
+    const requestProtocol: string = this.logObject.request.headers?.['x-forwarded-proto'] ?? 'HTTP/1.1';
 
     // Formate date/time of the request (%d/%b/%Y:%H:%M:%S %z)
-    const timeZone : string = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const zonedDate : Date = toZonedTime(Date.now(), timeZone);
-    const formattedDate : string = format(zonedDate, "dd/MMM/yyyy:HH:mm:ss xx");
+    const timeZone: string = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const zonedDate: Date = toZonedTime(Date.now(), timeZone);
+    const formattedDate: string = format(zonedDate, 'dd/MMM/yyyy:HH:mm:ss xx');
 
     // @TODO: This is not yet exposed by Elysia (https://github.com/elysiajs/elysia/issues/324)
-    const responseSize : number | undefined = undefined;
+    const responseSize: number | undefined = undefined;
 
     // Return formatted log string
-    return `${this.logObject.request.ip} - ${basicAuthUser} [${formattedDate}] "${this.logObject.request.method} ${this.logObject.request.url.path} ${requestProtocol}" ${this.logObject.response.status_code} ${responseSize ?? "-"}`
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return `${this.logObject.request.ip} - ${basicAuthUser} [${formattedDate}] "${this.logObject.request.method} ${this.logObject.request.url.path} ${requestProtocol}" ${this.logObject.response.status_code} ${responseSize != null ? '-' : ''}`;
   }
 
   /**
@@ -86,7 +91,9 @@ export class Log {
   formatShort(): string {
     const durationInNanoseconds = this.logObject.response.time;
     const timeMessage: string = formatDuration(durationInNanoseconds);
-    const queryString = Object.keys(this.logObject.request.url.params).length ? `?${new URLSearchParams(this.logObject.request.url.params).toString()}` : "";
+    const queryString = Object.keys(this.logObject.request.url.params).length
+      ? `?${new URLSearchParams(this.logObject.request.url.params).toString()}`
+      : '';
 
     const requestUri = this.logObject.request.url.path + queryString;
     return `[${this.logObject.request.ip}] ${this.logObject.request.method} ${requestUri} ${this.logObject.response.status_code} (${timeMessage})`;
