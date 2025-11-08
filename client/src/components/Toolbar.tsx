@@ -3,6 +3,7 @@ import { Avatar, Box, Flex, TextField } from '@radix-ui/themes';
 import type { FC } from 'react';
 
 import './toolbar.css';
+import { CustomLink } from './CustomLink';
 
 export const Toolbar: FC = () => {
   return (
@@ -21,7 +22,9 @@ export const Toolbar: FC = () => {
           </Box>
         </Flex>
         <Box>
-          <Avatar fallback="U" />
+          <CustomLink to="/profile">
+            <Avatar fallback="U" />
+          </CustomLink>
         </Box>
       </Flex>
     </Box>

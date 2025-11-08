@@ -3,10 +3,12 @@ import { Box, Button, Card, Flex, Heading, Text, VisuallyHidden } from '@radix-u
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import type { ChangeEventHandler, FC } from 'react';
+import { useRef } from 'react';
 
 import { useStore } from '../../store';
 
 const ProfileComponent: FC = () => {
+  const inputFileRef = useRef<HTMLInputElement>(null);
   const user = useStore(state => state.user);
 
   const fileHandler: ChangeEventHandler<HTMLInputElement> = event => {
@@ -57,13 +59,15 @@ const ProfileComponent: FC = () => {
         <Box>
           <Heading as="h4">Upload Profile Pic</Heading>
           <Button
-            tabIndex={-1} // Prevents the button from being focused directly
+            onClick={() => {
+              inputFileRef.current?.click();
+            }}
           >
             <UploadIcon /> Uploadfiles
-            <VisuallyHidden>
-              <input accept=".png,.jpg,.jpeg" onChange={fileHandler} type="file" />
-            </VisuallyHidden>
           </Button>
+          <VisuallyHidden>
+            <input accept=".png,.jpg,.jpeg" onChange={fileHandler} ref={inputFileRef} type="file" />
+          </VisuallyHidden>
         </Box>
       </Card>
     </Flex>
