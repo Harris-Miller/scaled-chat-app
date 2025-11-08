@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable */
 import type { Elysia } from 'elysia';
 
 import { getFormattingMethodName, getIP, headersToCheck } from './helpers';

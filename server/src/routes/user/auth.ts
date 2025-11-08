@@ -37,9 +37,8 @@ export const authRoutes = new Elysia()
         .returning({ userId: users.id })
         .then(r => r[0]!); // TODO: is there a better way?
 
-      const idAsString = userId.toString();
-      await createAccessToken(idAsString);
-      await createRefreshToken(idAsString);
+      await createAccessToken(userId);
+      await createRefreshToken(userId);
 
       return {
         message: `User created. Signed in as ${email}`,
@@ -61,9 +60,8 @@ export const authRoutes = new Elysia()
           success: false,
         });
 
-      const idAsString = user.id.toString();
-      await createAccessToken(idAsString);
-      await createRefreshToken(idAsString);
+      await createAccessToken(user.id);
+      await createRefreshToken(user.id);
 
       return {
         message: `Signed in as ${email}`,

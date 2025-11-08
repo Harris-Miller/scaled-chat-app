@@ -3,14 +3,13 @@ import { Box, Button, Dialog, IconButton, Text, TextField } from '@radix-ui/them
 import { useNavigate } from '@tanstack/react-router';
 import type { AxiosError } from 'axios';
 import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Result } from 'try';
 
 import { checkRoomNameAvailability, useCreateRoom } from '../../api/rooms';
 import { handle, wait } from '../../utils';
 
 export const CreateChannelDialog: FC = () => {
-  const debounceCounter = useRef(0);
   const [open, setOpen] = useState(false);
   const [roomName, setRoomName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -20,21 +19,21 @@ export const CreateChannelDialog: FC = () => {
   const createRoom = useCreateRoom();
 
   useEffect(() => {
+    let debounced = false;
     if (roomName.length < 4) {
-      setErrorMessage(null);
-      return;
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      return () => {};
     }
-
-    debounceCounter.current += 1;
-    const { current } = debounceCounter;
 
     wait(200)
       .then(async () => {
-        if (current !== debounceCounter.current) return;
+        if (debounced) return;
 
         const availResult = await Result.try(checkRoomNameAvailability(roomName));
 
-        if (current !== debounceCounter.current) return;
+        // false positive
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (debounced) return;
 
         if (!availResult.ok) {
           setErrorMessage((availResult.error as AxiosError).message);
@@ -52,9 +51,13 @@ export const CreateChannelDialog: FC = () => {
         setErrorMessage(err as string);
       })
       .finally(() => {
-        if (current !== debounceCounter.current) return;
+        if (debounced) return;
         setIsChecking(false);
       });
+
+    return () => {
+      debounced = true;
+    };
   }, [roomName]);
 
   const submit = () => {
@@ -84,7 +87,7 @@ export const CreateChannelDialog: FC = () => {
       <Dialog.Content>
         <Dialog.Title>Create a Channel</Dialog.Title>
         <TextField.Root onChange={handle(setRoomName)} value={roomName} />
-        {errorMessage != null ? <Text color="red">{errorMessage}</Text> : null}
+        {errorMessage != null && roomName.length > 4 ? <Text color="red">{errorMessage}</Text> : null}
         <Box>
           <Button
             onClick={() => {

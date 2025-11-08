@@ -1,8 +1,8 @@
+import { defineConfig } from 'eslint/config';
 import harrisConfig from 'eslint-config-harris';
-import globals from 'globals';
+import globals from 'eslint-config-harris/globals';
 
-/** @type {import('eslint').Linter.Config[]} */
-const eslintConfig = [
+const eslintConfig = defineConfig([
   ...harrisConfig,
   {
     ignores: ['node_modules/', 'src/database.types.ts', 'src/vite-env.d.ts'],
@@ -28,6 +28,6 @@ const eslintConfig = [
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { requireDefaultForNonUnion: true }],
     },
   },
-];
+]);
 
 export default eslintConfig;

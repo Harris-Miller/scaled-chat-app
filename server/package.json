@@ -54,9 +54,8 @@
     "@types/ramda": "^0.31.1",
     "@types/sharp": "^0.32.0",
     "drizzle-kit": "^0.31.4",
-    "eslint": "^9.35.0",
-    "eslint-config-harris": "^5.0.0-beta.4",
-    "globals": "^16.4.0",
+    "eslint": "^9.39.1",
+    "eslint-config-harris": "^5.0.0",
     "socket.io-client": "^4.8.1"
   },
   "peerDependencies": {
