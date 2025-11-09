@@ -1,9 +1,8 @@
 import { HamburgerMenuIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { Avatar, Box, Flex, TextField } from '@radix-ui/themes';
+import { Box, Flex, TextField } from '@radix-ui/themes';
 import type { FC } from 'react';
 
 import './toolbar.css';
-import { CustomLink } from './CustomLink';
 
 export const Toolbar: FC = () => {
   return (
@@ -21,11 +20,6 @@ export const Toolbar: FC = () => {
             </TextField.Root>
           </Box>
         </Flex>
-        <Box>
-          <CustomLink to="/profile">
-            <Avatar fallback="U" />
-          </CustomLink>
-        </Box>
       </Flex>
     </Box>
   );

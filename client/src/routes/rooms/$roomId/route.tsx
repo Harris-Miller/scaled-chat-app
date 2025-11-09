@@ -7,6 +7,8 @@ import type { FC } from 'react';
 import { queryClient } from '../../../api/queryClient';
 import { getRoomByIdOptions } from '../../../api/rooms';
 
+import './rooms.css';
+
 const RoomComponent: FC = () => {
   const { roomId } = Route.useParams();
   const {
@@ -37,6 +39,7 @@ const RoomComponent: FC = () => {
 
   return (
     <Flex
+      className="rooms-section"
       direction="column"
       // 64px is height of Header
       height="calc(100vh - --var(--toolbar-height))"

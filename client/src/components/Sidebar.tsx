@@ -17,12 +17,14 @@ export const Sidebar: FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box data-channel-list width="360px">
+    <Box className="sidebar" data-channel-list p="4" width="360px">
       <Box>
         <ScrollArea>
           <Flex direction="column">
-            <Flex>
-              <Heading as="h3">Channels </Heading>
+            <Flex align="center">
+              <Heading as="h3" mr="2">
+                Channels
+              </Heading>
               <CreateChannelDialog />
             </Flex>
             <Flex direction="column">
@@ -37,14 +39,14 @@ export const Sidebar: FC = () => {
                 </Button>
               ))}
             </Flex>
-            <Box>
-              <Heading as="h3">
-                Direct Messages{' '}
-                <IconButton>
-                  <PlusIcon />
-                </IconButton>
+            <Flex align="center">
+              <Heading as="h3" mr="2">
+                Direct Messages
               </Heading>
-            </Box>
+              <IconButton size="1">
+                <PlusIcon />
+              </IconButton>
+            </Flex>
           </Flex>
         </ScrollArea>
       </Box>

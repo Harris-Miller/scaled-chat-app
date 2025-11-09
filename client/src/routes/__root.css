@@ -1,0 +1,22 @@
+.background {
+  z-index: -1;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute;
+  filter: brightness(.9);
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      var(--plum-4) 20%,
+      transparent 80%
+    ),
+    conic-gradient(from 45deg at 50% 50%,
+      var(--plum-2) 0%,
+      var(--plum-4) 25%,
+      var(--plum-2) 50%,
+      var(--plum-4) 75%,
+      var(--plum-2) 100%
+    )
+}

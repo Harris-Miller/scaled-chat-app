@@ -38,9 +38,11 @@ export const signOut = () => {
 };
 
 export const uploadPic = (formData: FormData) => {
-  return axios.post<ProfilePic>('/api/user/profile/pic', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  return axios
+    .post<ProfilePic>('/api/user/profile/pic', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then(({ data }) => data);
 };

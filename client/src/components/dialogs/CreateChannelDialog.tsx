@@ -81,6 +81,7 @@ export const CreateChannelDialog: FC = () => {
         onClick={() => {
           setOpen(true);
         }}
+        size="1"
       >
         <PlusIcon />
       </IconButton>

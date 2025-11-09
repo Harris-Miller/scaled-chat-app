@@ -1,5 +1,6 @@
 import { UploadIcon } from '@radix-ui/react-icons';
 import { Box, Button, Card, Flex, Heading, Text, VisuallyHidden } from '@radix-ui/themes';
+import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { assoc } from 'ramda';
 import type { ChangeEventHandler, FC } from 'react';
@@ -12,6 +13,16 @@ const ProfileComponent: FC = () => {
   const inputFileRef = useRef<HTMLInputElement>(null);
   const { user, setUser } = useStore();
 
+  const profilePic = useMutation({
+    mutationFn: uploadPic,
+    onError: (_error, _variables, _onMutateResult, _context) => {
+      // TODO
+    },
+    onSuccess: (data, _variables, _onMutateResult, _context) => {
+      setUser(assoc('profilePicId', data.picId, user!));
+    },
+  });
+
   const fileHandler: ChangeEventHandler<HTMLInputElement> = event => {
     console.log(event.currentTarget.files);
 
@@ -22,9 +33,7 @@ const ProfileComponent: FC = () => {
     const formData = new FormData();
     formData.append('file', profilePicFile);
 
-    uploadPic(formData).then(resp => {
-      setUser(assoc('profilePicId', resp.data.picId, user!));
-    });
+    profilePic.mutate(formData);
   };
 
   // TODO: make this better

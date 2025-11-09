@@ -6,15 +6,18 @@ import { getProfile } from '../api/user';
 import { AppWrapper } from '../components/AppWrapper';
 import { store } from '../store';
 
+import './__root.css';
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   component: () => (
     <>
       <AppWrapper>
+        <div className="background" />
         <Outlet />
       </AppWrapper>
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
     </>
   ),
   loader: () => {
