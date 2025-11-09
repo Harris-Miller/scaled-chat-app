@@ -1,15 +1,16 @@
 import { UploadIcon } from '@radix-ui/react-icons';
 import { Box, Button, Card, Flex, Heading, Text, VisuallyHidden } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
-import axios from 'axios';
+import { assoc } from 'ramda';
 import type { ChangeEventHandler, FC } from 'react';
 import { useRef } from 'react';
 
+import { uploadPic } from '../../api/user';
 import { useStore } from '../../store';
 
 const ProfileComponent: FC = () => {
   const inputFileRef = useRef<HTMLInputElement>(null);
-  const user = useStore(state => state.user);
+  const { user, setUser } = useStore();
 
   const fileHandler: ChangeEventHandler<HTMLInputElement> = event => {
     console.log(event.currentTarget.files);
@@ -21,15 +22,9 @@ const ProfileComponent: FC = () => {
     const formData = new FormData();
     formData.append('file', profilePicFile);
 
-    axios
-      .post('/api/user/profile/pic', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then(resp => {
-        console.log(resp);
-      });
+    uploadPic(formData).then(resp => {
+      setUser(assoc('profilePicId', resp.data.picId, user!));
+    });
   };
 
   // TODO: make this better

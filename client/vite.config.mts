@@ -4,7 +4,14 @@ import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [tanstackRouter({ autoCodeSplitting: true, target: 'react' }), react()],
+  plugins: [
+    tanstackRouter({ autoCodeSplitting: true, target: 'react' }),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
+  ],
   server: {
     /* eslint-disable sort-keys-fix/sort-keys-fix */
     proxy: {

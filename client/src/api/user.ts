@@ -11,6 +11,10 @@ export interface User {
   updatedAt: string;
 }
 
+export interface ProfilePic {
+  picId: string;
+}
+
 export const getProfile = () => {
   return axios.get<User>('/api/user/profile');
 };
@@ -31,4 +35,12 @@ export const signUp = (email: string, password: string) => {
 
 export const signOut = () => {
   return axios.get<User>('/api/user/sign-out');
+};
+
+export const uploadPic = (formData: FormData) => {
+  return axios.post<ProfilePic>('/api/user/profile/pic', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
