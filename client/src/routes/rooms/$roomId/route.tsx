@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { FC } from 'react';
 
 import { queryClient } from '../../../api/queryClient';
@@ -14,37 +14,9 @@ const RoomComponent: FC = () => {
   const {
     data: { description, name },
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
-  const location = useLocation();
-  // const navigate = useNavigate();
-
-  console.log(location);
-
-  // const tabValue = location.pathname.endsWith('canvas') ? 1 : 0;
-
-  // const handleTab = (_e: SyntheticEvent, tabId: number) => {
-  //   switch (tabId) {
-  //     case 0: {
-  //       navigate({ params: { roomId }, to: '/rooms/$roomId' });
-  //       break;
-  //     }
-  //     case 1: {
-  //       navigate({ params: { roomId }, to: '/rooms/$roomId/canvas' });
-  //       break;
-  //     }
-  //     default: {
-  //       // do nothing
-  //     }
-  //   }
-  // };
 
   return (
-    <Flex
-      className="rooms-section"
-      direction="column"
-      // 64px is height of Header
-      height="calc(100vh - --var(--toolbar-height))"
-      overflow="auto"
-    >
+    <Flex direction="column" width="100%">
       <Box>
         <Text>
           {name} - {description}
@@ -56,7 +28,9 @@ const RoomComponent: FC = () => {
           <Tabs.Trigger value="canvas">Canvas</Tabs.Trigger>
         </Tabs.List>
       </Tabs.Root>
-      <Outlet />
+      <Flex flexGrow="1">
+        <Outlet />
+      </Flex>
     </Flex>
   );
 };

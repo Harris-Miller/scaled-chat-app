@@ -1,4 +1,4 @@
-import { Box, Flex } from '@radix-ui/themes';
+import { Flex } from '@radix-ui/themes';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { FC } from 'react';
 
@@ -13,14 +13,14 @@ export const RoomsLayout: FC = () => {
     <>
       <div className="background" />
       <Toolbar />
-      <Flex className="main-body">
+      <Flex className="rooms-container">
         <Flex width="440px">
           <TabRail />
           <Sidebar />
         </Flex>
-        <Box flexGrow="1">
+        <Flex className="main" flexGrow="1" p="3">
           <Outlet />
-        </Box>
+        </Flex>
       </Flex>
     </>
   );

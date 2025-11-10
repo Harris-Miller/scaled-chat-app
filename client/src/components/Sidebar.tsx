@@ -17,7 +17,7 @@ export const Sidebar: FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box className="sidebar" data-channel-list p="4" width="360px">
+    <Box className="sidebar" data-channel-list p="3" width="360px">
       <Box>
         <ScrollArea>
           <Flex direction="column">

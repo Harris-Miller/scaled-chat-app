@@ -21,7 +21,7 @@
     )
 }
 
-.main-body {
+.rooms-container {
   position: fixed;
   top: var(--toolbar-height);
   right: 0;
@@ -29,6 +29,11 @@
   bottom: 0;
 }
 
+.main {
+  background: var(--gray-3);
+}
+
+/* TODO: find better place for this */
 body {
   overflow: hidden;
 }

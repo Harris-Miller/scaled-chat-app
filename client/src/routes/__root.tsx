@@ -14,7 +14,7 @@ export const Route = createRootRouteWithContext<{
       <AppWrapper>
         <Outlet />
       </AppWrapper>
-      {/* <TanStackRouterDevtools /> */}
+      <TanStackRouterDevtools />
     </>
   ),
   loader: () => {

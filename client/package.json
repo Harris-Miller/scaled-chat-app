@@ -26,6 +26,7 @@
     "@tanstack/router-devtools": "^1.135.0",
     "@tanstack/router-plugin": "^1.135.0",
     "axios": "^1.13.2",
+    "date-fns": "^4.1.0",
     "dnd-data": "^1.0.0",
     "ramda": "^0.32.0",
     "react": "^19.2.0",

@@ -15,6 +15,8 @@ import { socket } from '../../../socket';
 import { useActiveUser } from '../../../store/user.selectors';
 import { handle } from '../../../utils';
 
+import { Message } from './-message';
+
 const addChatToBottom = (roomId: string, chat: Chat) => {
   queryClient.setQueryData<{ pageParams: string[]; pages: Chat[][] }>(['chats', roomId], oldData => {
     // oldData will be the existing cached data for your infinite query,
@@ -42,7 +44,7 @@ const MessagesComponent = () => {
     data: { id },
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
 
-  const user = useActiveUser();
+  const { user } = useActiveUser();
   const [message, setMessage] = useState('');
 
   const { data, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } = useInfiniteQuery({
@@ -83,51 +85,46 @@ const MessagesComponent = () => {
     postChat(id, message);
     setMessage('');
   };
+
   return (
-    <>
-      <Box>
-        {isFetchingPreviousPage ? (
-          <Flex align="center" p="10px">
-            <ReloadIcon />
-          </Flex>
-        ) : null}
-        {!isFetchingPreviousPage && !hasPreviousPage && (
-          <Flex align="center" p="10px">
-            <Text>You&apos;re at the top!</Text>
-          </Flex>
-        )}
-        {!isFetchingPreviousPage && hasPreviousPage ? (
-          <Flex align="center" p="10px">
-            <Button
-              onClick={() => {
-                fetchPreviousPage();
-              }}
-            >
-              Load More
-            </Button>
-          </Flex>
-        ) : null}
-        {allChats.map(chat => (
-          <Box key={chat.id}>
-            <Text>{chat.text}</Text>
-          </Box>
-        ))}
+    <Flex direction="column" width="100%">
+      <Box flexGrow="1" position="relative">
+        <Box height="80vh" overflow="scroll">
+          {isFetchingPreviousPage ? (
+            <Flex align="center" p="10px">
+              <ReloadIcon />
+            </Flex>
+          ) : null}
+          {!isFetchingPreviousPage && !hasPreviousPage && (
+            <Flex align="center" p="10px">
+              <Text>You&apos;re at the top!</Text>
+            </Flex>
+          )}
+          {!isFetchingPreviousPage && hasPreviousPage ? (
+            <Flex align="center" p="10px">
+              <Button
+                onClick={() => {
+                  fetchPreviousPage();
+                }}
+              >
+                Load More
+              </Button>
+            </Flex>
+          ) : null}
+          {allChats.map(chat => (
+            <Message chat={chat} key={chat.id} />
+          ))}
+        </Box>
       </Box>
       <Flex direction="row">
         <Box flexGrow="1">
           <TextField.Root onChange={handle(setMessage)} value={message} />
         </Box>
         <Flex align="center" mr="12">
-          <Button
-            onClick={() => {
-              messageHandler();
-            }}
-          >
-            Submit
-          </Button>
+          <Button onClick={messageHandler}>Submit</Button>
         </Flex>
       </Flex>
-    </>
+    </Flex>
   );
 };
 
