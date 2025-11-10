@@ -4,6 +4,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { createRoot } from 'react-dom/client';
 
+// TODO
+import './instrumentation';
 import './globals.css';
 
 import { queryClient } from './api/queryClient';

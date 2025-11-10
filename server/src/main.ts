@@ -2,6 +2,7 @@ import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
 import { Elysia } from 'elysia';
 
+import { instrumentation } from './instrumentation';
 import { kubeProbes } from './monitoring/kubeProbes';
 import { logger } from './monitoring/logger';
 import { otel } from './monitoring/otel';
@@ -20,6 +21,7 @@ if (didPass) {
 }
 
 const api = new Elysia()
+  .use(instrumentation)
   .onError(({ error }) => {
     logger.error(error);
     return error;
