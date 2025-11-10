@@ -20,3 +20,15 @@
       var(--plum-2) 100%
     )
 }
+
+.main-body {
+  position: fixed;
+  top: var(--toolbar-height);
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+
+body {
+  overflow: hidden;
+}

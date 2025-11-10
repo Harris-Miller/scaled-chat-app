@@ -1,4 +1,4 @@
-import { Box, Flex, Section } from '@radix-ui/themes';
+import { Box, Flex } from '@radix-ui/themes';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { FC } from 'react';
 
@@ -6,22 +6,21 @@ import { Sidebar } from '../../components/Sidebar';
 import { TabRail } from '../../components/TabRail';
 import { Toolbar } from '../../components/Toolbar';
 
+import './route.css';
+
 export const RoomsLayout: FC = () => {
   return (
     <>
+      <div className="background" />
       <Toolbar />
-      <Flex>
-        <Box width="440px">
-          <Flex bottom="0" left="0" position="fixed" top="var(--toolbar-height)">
-            <TabRail />
-            <Sidebar />
-          </Flex>
-        </Box>
-        <Flex maxWidth="100%">
-          <Section>
-            <Outlet />
-          </Section>
+      <Flex className="main-body">
+        <Flex width="440px">
+          <TabRail />
+          <Sidebar />
         </Flex>
+        <Box flexGrow="1">
+          <Outlet />
+        </Box>
       </Flex>
     </>
   );

@@ -1,4 +1,4 @@
-import { HamburgerMenuIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { Box, Flex, TextField } from '@radix-ui/themes';
 import type { FC } from 'react';
 
@@ -8,9 +8,6 @@ export const Toolbar: FC = () => {
   return (
     <Box className="toolbar">
       <Flex>
-        <Flex align="center">
-          <HamburgerMenuIcon />
-        </Flex>
         <Flex flexGrow="1" justify="center">
           <Box minWidth="400px">
             <TextField.Root placeholder="Search (not yet implemented)">
