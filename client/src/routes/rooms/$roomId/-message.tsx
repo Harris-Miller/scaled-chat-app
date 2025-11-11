@@ -21,18 +21,18 @@ export const Message: FC<{ chat: Chat }> = ({ chat }) => {
   const timestamp = format(parseISO(chat.updatedAt), 'p');
 
   return (
-    <Flex>
-      <Box>
+    <Flex m="2">
+      <Box mr="2">
         <Avatar fallback={author.data?.displayName[0].toUpperCase() ?? ''} src={`/profile/pic/${profilePicSrc}`} />
       </Box>
       <Box flexGrow="1">
         <Box>
           <Text weight="bold">{author.data?.displayName}</Text>
           &nbsp;&nbsp;
-          <Text>{timestamp}</Text>
+          <Text size="1">{timestamp}</Text>
         </Box>
         <Box>
-          <Text>{chat.text}</Text>
+          <Text size="2">{chat.text}</Text>
         </Box>
       </Box>
     </Flex>

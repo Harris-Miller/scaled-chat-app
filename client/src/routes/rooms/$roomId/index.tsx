@@ -120,7 +120,7 @@ const MessagesComponent = () => {
         <Box flexGrow="1">
           <TextField.Root onChange={handle(setMessage)} value={message} />
         </Box>
-        <Flex align="center" mr="12">
+        <Flex align="center">
           <Button onClick={messageHandler}>Submit</Button>
         </Flex>
       </Flex>
