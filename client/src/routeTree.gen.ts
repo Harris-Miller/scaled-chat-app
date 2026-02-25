@@ -57,7 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rooms': typeof RoomsRouteRouteWithChildren
   '/rooms/$roomId': typeof RoomsRoomIdRouteRouteWithChildren
-  '/profile': typeof ProfileIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
   '/rooms/$roomId/canvas': typeof RoomsRoomIdCanvasRoute
   '/rooms/$roomId/': typeof RoomsRoomIdIndexRoute
@@ -85,7 +85,7 @@ export interface FileRouteTypes {
     | '/'
     | '/rooms'
     | '/rooms/$roomId'
-    | '/profile'
+    | '/profile/'
     | '/rooms/'
     | '/rooms/$roomId/canvas'
     | '/rooms/$roomId/'
@@ -134,7 +134,7 @@ declare module '@tanstack/react-router' {
     '/profile/': {
       id: '/profile/'
       path: '/profile'
-      fullPath: '/profile'
+      fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
