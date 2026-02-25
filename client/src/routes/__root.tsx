@@ -3,9 +3,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
-import { getProfile } from '../api/user';
+// import { getProfile } from '../api/user';
 import { AppWrapper } from '../components/AppWrapper';
-import { store } from '../store';
+// import { store } from '../store';
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -19,14 +19,14 @@ export const Route = createRootRouteWithContext<{
       <TanStackRouterDevtools />
     </>
   ),
-  loader: () => {
-    return getProfile()
-      .then(resp => {
-        store.getState().setUser(resp.data);
-      })
-      .catch((_resp: unknown) => {
-        // TODO
-      });
-  },
+  // loader: () => {
+  //   return getProfile()
+  //     .then(resp => {
+  //       store.getState().setUser(resp.data);
+  //     })
+  //     .catch((_resp: unknown) => {
+  //       // TODO
+  //     });
+  // },
   staleTime: Infinity,
 });

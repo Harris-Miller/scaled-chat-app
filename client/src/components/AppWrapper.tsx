@@ -3,8 +3,6 @@ import { useEffect } from 'react';
 
 import { socket } from '../socket';
 
-// import { Header } from './Header';
-
 export const AppWrapper: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     const onConnect = () => {
