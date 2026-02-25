@@ -1,19 +1,74 @@
 # chat-app
 
-Building a chat app for the express purpose of learning how to deploy a frontend, backend, managed postgres/redis, etc, on _n_-number of Cloud providers
+This project is meant to demonstrate what a typical "Chat App" tutorial you would find online would look like at scale. In addition to a basic react frontend / node backend, this project includes:
+* A fully containerized frontend using nginx to serve the bundle
+* A horizontally scalable backend
+  * Redis used both for Auth tokens and as the backing layer for web-sockets to keep presence across being connected to one of many possible back-end instances
+* A separate micro-service for image processing
+* Full Observability
 
-# CLI Snippets
+# Running and Local Development
 
-# Preinstall
+## Preinstall
 
-## Docker Desktop
+You will need node, bun, and docker, if you don't know how to install these, this project is likely too advanced for you
+
+### Pre-configure docker-desktop
+
+If you plan on using Docker-Desktop to manage your local kubernetes cluster for this project, you will want to update the following configuration options
 - Settings > General
   - Check "Use containerd for pulling and storing images" if not already
     - WARNING: This will switch the image registry that docker uses under the hood, you will lose all active images and containers
     - If you have any containers that your launched from the command line, now is the time to figure out how to re-produce them!
+  - Click "Apply"
 
-Click "Apply", then...
+## Running production locally with Docker Compose
 
+Though a monorepo, I am specifically using a base `package.json` to utilize npm-workspace features. It's more common in Enterprise that FE and BE projects live in separate repos and are owned by separate teams. All of the root directories should be thought of as such.
+
+You can run a full-stack production version of this application locally via docker-compose
+
+```
+docker compose up -d
+```
+
+First time will take a while as it needs to pull all the remote images and build the local ones. It's quicker the next time around.
+
+Manual database migration is needed for the app is usable.
+
+```
+cd server
+bun install
+bun run migrate
+bun run seed # optional
+```
+
+Navigating to http://localhost:80 will let you view the running application
+
+In addition to the frontend, the docker-compose is configured to expose the GUI interfaces for all the different services
+* Postgres - No built-in GUI, run `bun run studio` from `/server` to launch Drizzle's GUI
+  * Alternatively, use pg4Admin, dbBeaver, etc, w/ connection string: postgres://postgres:postgres@postgres:5432/scaled_chat_app
+* Redis - http://localhost:8001
+* MinIO - http://localhost:9000 - user: minioadmin, pass: minioadmin
+* Grafana - http://localhost:3001
+* Prometheus - http://localhost:9090
+
+## Local Development
+
+You can spin up each of the 3 local projects' dev-servers from their own directories. They are all configured to run on ports that don't conflict with the docker-compose and can be launch independently. You do need the docker-compose running regardless, as the dev-serves do still require the running postgres, redis, etc, to work
+
+Note: The `/nginx` project is not a "local" project like the others. It's there simply to act as the public entry to the docker-compose, and is configured to simulate Kubernetes Ingress Controller and Load Balancer to best mimic those behavioral expectations on your local
+
+# Preinstall
+
+# Kubernetes
+
+**WIP: Need to re-view and update this section. Info may be stale**
+
+You can use any choice of local cluster options. Docker Desktop is the easiest, but I find MiniKube is the best for power-users
+
+## Docker Desktop Kubernetes
+From Docker Desktop
 - Settings > Kubernetes
   - Check "Enable Kubernetes"
   - Under Cluster settings
@@ -31,8 +86,9 @@ You can still stop/start it though. you simply need to select and stop the 4 con
 
 I have no idea why DockerDesktop doesn't make this easier. Hopefully in the future.
 
+## MiniKube
 
-## Ingress controller
+### Ingress controller
 
 Add this so ports `80` and `433` for http/https are exposed out
 
@@ -42,7 +98,7 @@ helm upgrade --install ingress-nginx ingress-nginx \
   --namespace ingress-nginx --create-namespace 
 ```
 
-## Dashboard
+### Dashboard
 
 Note: you _must_ use the namespace kubernetes-dashboard for this to work
 ```bash
@@ -57,7 +113,7 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
 Nav to `localhost:8443` and past in the token
 
 
-## Kubeview
+### Kubeview
 
 ```bash
 helm repo add kv2 https://code.benco.io/kubeview/deploy/helm
@@ -65,9 +121,9 @@ helm repo update
 helm install kubeview kv2/kubeview --create-namespace --namespace=kubeview
 ```
 
-Kubeview uses a LoadBalancer to `localhost:8000` so it's immediately accessable
+Kubeview uses a LoadBalancer to `localhost:8000` so it's immediately accessible
 
-## Grafana + friends
+### Grafana + friends
 
 ```bash
 helm repo add grafana https://grafana.github.io/helm-charts
@@ -79,7 +135,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 helm install grafana grafana/grafana -n monitoring
 ```
 
-## Services
+### Services
 
 - `kubectl port-forward svc/chat-svc-postgres 5432:5432`
 - `kubectl port-forward svc/chat-svc-redis 6379:6379`
