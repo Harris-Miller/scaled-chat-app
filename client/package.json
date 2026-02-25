@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.30.2",
   "scripts": {
     "dev": "vite",
-    "dev-local-api": "vite",
+    "dev-local-api": "LOCAL_API=true vite",
     "build": "vite build",
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
