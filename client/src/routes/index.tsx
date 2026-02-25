@@ -25,8 +25,7 @@ const IndexComponent: FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // TODO
-  const _signInHandler = async () => {
+  const signInHandler = async () => {
     try {
       const response = await signIn(email, password).then(getProfile);
       setUser(response.data);
@@ -83,7 +82,7 @@ const IndexComponent: FC = () => {
             </Box>
           </Box>
           <Box sx={{ marginBottom: '12px' }}>
-            <Button sx={{ marginBottom: '12px', width: '100%' }} variant="contained">
+            <Button onClick={signInHandler} sx={{ marginBottom: '12px', width: '100%' }} variant="contained">
               Sign In with Email
             </Button>
             {errorMessage != null ? <Alert severity="error">{errorMessage}</Alert> : null}
