@@ -5,3 +5,10 @@ body {
 :root {
   --toolbar-height: 40px;
 }
+
+
+html,
+body {
+  /* overscroll-behavior: none; */
+  overscroll-behavior-x: none;
+}

@@ -1,5 +1,5 @@
-import { PlusIcon } from '@radix-ui/react-icons';
-import { Box, Button, Dialog, IconButton, Text, TextField } from '@radix-ui/themes';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, Button, Dialog, DialogTitle, IconButton, TextField, Typography } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
 import type { AxiosError } from 'axios';
 import type { FC } from 'react';
@@ -76,19 +76,23 @@ export const CreateChannelDialog: FC = () => {
   };
 
   return (
-    <Dialog.Root open={open}>
+    <>
       <IconButton
         onClick={() => {
           setOpen(true);
         }}
-        size="1"
       >
-        <PlusIcon />
+        <AddIcon />
       </IconButton>
-      <Dialog.Content>
-        <Dialog.Title>Create a Channel</Dialog.Title>
-        <TextField.Root onChange={handle(setRoomName)} value={roomName} />
-        {errorMessage != null && roomName.length > 4 ? <Text color="red">{errorMessage}</Text> : null}
+      <Dialog
+        onClose={() => {
+          setOpen(false);
+        }}
+        open={open}
+      >
+        <DialogTitle>Create a Channel</DialogTitle>
+        <TextField onChange={handle(setRoomName)} value={roomName} />
+        {errorMessage != null && roomName.length > 4 ? <Typography color="red">{errorMessage}</Typography> : null}
         <Box>
           <Button
             onClick={() => {
@@ -102,7 +106,7 @@ export const CreateChannelDialog: FC = () => {
             Create Channel
           </Button>
         </Box>
-      </Dialog.Content>
-    </Dialog.Root>
+      </Dialog>
+    </>
   );
 };

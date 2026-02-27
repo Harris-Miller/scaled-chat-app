@@ -1,12 +1,15 @@
-import { Box, Flex } from '@radix-ui/themes';
+import { Box, Typography } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import type { FC } from 'react';
 
+import { LoremIpsum } from '../../components/LoremIpsum';
+
 export const RoomsIndexComponent: FC = () => {
   return (
-    <Flex justify="center">
-      <Box>Le Chat Rooms</Box>
-    </Flex>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h2">Le Chat Rooms</Typography>
+      <LoremIpsum />
+    </Box>
   );
 };
 

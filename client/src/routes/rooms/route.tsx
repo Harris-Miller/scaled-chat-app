@@ -1,27 +1,39 @@
-import { Flex } from '@radix-ui/themes';
+import { Box, Drawer, Toolbar } from '@mui/material';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { FC } from 'react';
 
-import { Sidebar } from '../../components/Sidebar';
-import { TabRail } from '../../components/TabRail';
-import { Toolbar } from '../../components/Toolbar';
+import { Encapsulate } from '../../components/Encapsulate';
+import { Header } from '../../components/Header';
 
-import './route.css';
+import { SideBar } from './-sideBar';
+import { TabRail } from './-tabRail';
+
+const drawerWidth = 375;
 
 export const RoomsLayout: FC = () => {
   return (
     <>
-      <div className="background" />
-      <Toolbar />
-      <Flex className="rooms-container">
-        <Flex width="440px">
+      <Header />
+      <Drawer
+        sx={{
+          [`& .MuiDrawer-paper`]: { boxSizing: 'border-box', width: drawerWidth },
+          flexShrink: 0,
+          width: drawerWidth,
+        }}
+        variant="permanent"
+      >
+        <Toolbar />
+        <Encapsulate sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
           <TabRail />
-          <Sidebar />
-        </Flex>
-        <Flex className="main" flexGrow="1" p="3">
+          <SideBar />
+        </Encapsulate>
+      </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, overflow: 'hidden', padding: 0 }}>
+        <Toolbar />
+        <Encapsulate>
           <Outlet />
-        </Flex>
-      </Flex>
+        </Encapsulate>
+      </Box>
     </>
   );
 };

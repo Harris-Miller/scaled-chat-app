@@ -1,4 +1,4 @@
-import { Avatar, Box, Flex, Text } from '@radix-ui/themes';
+import { Avatar, Box, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { format, parseISO } from 'date-fns';
@@ -21,20 +21,24 @@ export const Message: FC<{ chat: Chat }> = ({ chat }) => {
   const timestamp = format(parseISO(chat.updatedAt), 'p');
 
   return (
-    <Flex m="2">
-      <Box mr="2">
-        <Avatar fallback={author.data?.displayName[0].toUpperCase() ?? ''} src={`/profile/pic/${profilePicSrc}`} />
+    <Box sx={{ display: 'flex', margin: 2 }}>
+      <Box sx={{ marginRight: 2 }}>
+        <Avatar src={`/profile/pic/${profilePicSrc}`}>{author.data?.displayName[0].toUpperCase() ?? ''}</Avatar>
       </Box>
-      <Box flexGrow="1">
+      <Box sx={{ flexGrow: '1' }}>
         <Box>
-          <Text weight="bold">{author.data?.displayName}</Text>
+          <Typography component="span" sx={{ fontWeight: 'bold' }}>
+            {author.data?.displayName}
+          </Typography>
           &nbsp;&nbsp;
-          <Text size="1">{timestamp}</Text>
+          <Typography component="span" variant="body2">
+            {timestamp}
+          </Typography>
         </Box>
         <Box>
-          <Text size="2">{chat.text}</Text>
+          <Typography>{chat.text}</Typography>
         </Box>
       </Box>
-    </Flex>
+    </Box>
   );
 };

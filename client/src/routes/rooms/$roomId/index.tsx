@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { Box, Button, Flex, Text, TextField } from '@radix-ui/themes';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
@@ -87,44 +87,47 @@ const MessagesComponent = () => {
   };
 
   return (
-    <Flex direction="column" width="100%">
-      <Box flexGrow="1" position="relative">
-        <Box height="80vh" overflow="scroll">
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <Box sx={{ flexGrow: '1', position: 'relative' }}>
+        <Box sx={{ height: '80vh', overflow: 'scroll' }}>
           {isFetchingPreviousPage ? (
-            <Flex align="center" p="10px">
-              <ReloadIcon />
-            </Flex>
+            <Box sx={{ alignItems: 'center', display: 'flex', padding: '10px' }}>
+              <RefreshIcon />
+            </Box>
           ) : null}
           {!isFetchingPreviousPage && !hasPreviousPage && (
-            <Flex align="center" p="10px">
-              <Text>You&apos;re at the top!</Text>
-            </Flex>
+            <Box sx={{ alignItems: 'center', display: 'flex', padding: '10px' }}>
+              <Typography>You&apos;re at the top!</Typography>
+            </Box>
           )}
           {!isFetchingPreviousPage && hasPreviousPage ? (
-            <Flex align="center" p="10px">
+            <Box sx={{ alignItems: 'center', display: 'flex', padding: '10px' }}>
               <Button
                 onClick={() => {
                   fetchPreviousPage();
                 }}
+                variant="contained"
               >
                 Load More
               </Button>
-            </Flex>
+            </Box>
           ) : null}
           {allChats.map(chat => (
             <Message chat={chat} key={chat.id} />
           ))}
         </Box>
       </Box>
-      <Flex direction="row">
-        <Box flexGrow="1">
-          <TextField.Root onChange={handle(setMessage)} value={message} />
+      <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+        <Box sx={{ flexGrow: '1' }}>
+          <TextField fullWidth onChange={handle(setMessage)} value={message} />
         </Box>
-        <Flex align="center">
-          <Button onClick={messageHandler}>Submit</Button>
-        </Flex>
-      </Flex>
-    </Flex>
+        <Box sx={{ alignItems: 'center', display: 'flex' }}>
+          <Button onClick={messageHandler} variant="contained">
+            Submit
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

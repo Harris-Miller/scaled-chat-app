@@ -7,14 +7,14 @@ import {
   quotePlugin,
   thematicBreakPlugin,
 } from '@mdxeditor/editor';
-import { Box } from '@radix-ui/themes';
+import { Box } from '@mui/material';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
 const CanvasComponent = () => {
   const [markdown, setMarkdown] = useState('# Hello world');
   return (
-    <Box flexGrow="1" overflow="auto">
+    <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
       <MDXEditor
         className="dark-theme"
         markdown={markdown}

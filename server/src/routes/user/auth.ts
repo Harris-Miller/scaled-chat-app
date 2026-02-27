@@ -30,7 +30,7 @@ export const authRoutes = new Elysia()
       const { userId } = await db
         .insert(users)
         .values({
-          displayName: '',
+          displayName: email.split('@')[0] ?? '',
           email,
           passwordHash,
         })
@@ -54,9 +54,16 @@ export const authRoutes = new Elysia()
     async function userRoutePostSignIn({ status, body: { email, password }, createAccessToken, createRefreshToken }) {
       const user = await db.query.users.findFirst({ where: eq(users.email, email) });
 
-      if (user == null || !(await Bun.password.verify(password, user.passwordHash)))
-        return status(400, {
-          message: 'Invalid username or password',
+      if (user == null) {
+        return status(404, {
+          message: 'User not found',
+          success: false,
+        });
+      }
+
+      if (!(await Bun.password.verify(password, user.passwordHash)))
+        return status(401, {
+          message: 'Incorrect Password',
           success: false,
         });
 

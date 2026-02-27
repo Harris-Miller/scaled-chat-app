@@ -1,5 +1,5 @@
-import { UploadIcon } from '@radix-ui/react-icons';
-import { Box, Button, Card, Flex, Heading, Text, VisuallyHidden } from '@radix-ui/themes';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { Box, Button, Container, Paper, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { assoc } from 'ramda';
@@ -7,6 +7,7 @@ import type { ChangeEventHandler, FC } from 'react';
 import { useRef } from 'react';
 
 import { uploadPic } from '../../api/user';
+import { FullScreenCenter } from '../../components/FullScreenCenter';
 import { useStore } from '../../store';
 
 const ProfileComponent: FC = () => {
@@ -39,42 +40,40 @@ const ProfileComponent: FC = () => {
   // TODO: make this better
   if (user == null) {
     return (
-      <Flex align="center" justify="center">
-        <Text>Return to homescreen to login</Text>
-      </Flex>
+      <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
+        <Typography>Return to homescreen to login</Typography>
+      </Box>
     );
   }
 
   return (
-    <Flex align="center" justify="center">
-      <Card>
-        <Heading as="h2">Profile</Heading>
-        <Box>
-          <Text>{user.displayName}</Text>
-          <br />
-          <Text>{user.email}</Text>
-          <br />
-        </Box>
-        {user.profilePicId != null && (
-          <Box>
-            <img alt="Profile" loading="eager" src={`/api/user/profile/pic/${user.profilePicId}`} />
-          </Box>
-        )}
-        <Box>
-          <Heading as="h4">Upload Profile Pic</Heading>
+    <FullScreenCenter>
+      <Container maxWidth="sm">
+        <Paper elevation={6} sx={{ alignItems: 'center', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+          <Typography variant="h2">Profile</Typography>
+          <Typography>{user.displayName}</Typography>
+          <Typography>{user.email}</Typography>
+          {user.profilePicId != null && (
+            <Box>
+              <img alt="Profile" loading="eager" src={`/api/user/profile/pic/${user.profilePicId}`} />
+            </Box>
+          )}
+          <Typography variant="h4">Upload Profile Pic</Typography>
           <Button
             onClick={() => {
               inputFileRef.current?.click();
             }}
+            startIcon={<FileUploadIcon />}
+            variant="contained"
           >
-            <UploadIcon /> Uploadfiles
+            Uploadfiles
           </Button>
-          <VisuallyHidden>
+          <Box sx={{ display: 'none' }}>
             <input accept=".png,.jpg,.jpeg" onChange={fileHandler} ref={inputFileRef} type="file" />
-          </VisuallyHidden>
-        </Box>
-      </Card>
-    </Flex>
+          </Box>
+        </Paper>
+      </Container>
+    </FullScreenCenter>
   );
 };
 

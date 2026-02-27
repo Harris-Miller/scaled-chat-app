@@ -23,7 +23,7 @@ export const users = pgTable('users', {
 });
 
 export const profilePics = pgTable('profile_pics', {
-  contentType: varchar('20').notNull(),
+  contentType: varchar({ length: 20 }).notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   id: ulid()
     .primaryKey()

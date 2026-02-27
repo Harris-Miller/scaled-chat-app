@@ -1,0 +1,1 @@
+ALTER TABLE "profile_pics" RENAME COLUMN "20" TO "content_type";

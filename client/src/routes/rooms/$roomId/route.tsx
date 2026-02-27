@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useState } from 'react';
 import type { FC } from 'react';
 
 import { queryClient } from '../../../api/queryClient';
@@ -15,37 +16,40 @@ const RoomComponent: FC = () => {
     data: { description, name },
   } = useSuspenseQuery(getRoomByIdOptions(roomId));
 
+  const [tab, setTab] = useState<'canvas' | 'messages'>('messages');
+
   return (
-    <Flex direction="column" width="100%">
-      <Box>
-        <Text>
-          {name} - {description}
-        </Text>
-      </Box>
-      <Tabs.Root defaultValue="messages">
-        <Tabs.List>
-          <Tabs.Trigger value="messages">Messages</Tabs.Trigger>
-          <Tabs.Trigger value="canvas">Canvas</Tabs.Trigger>
-        </Tabs.List>
-      </Tabs.Root>
-      <Flex flexGrow="1">
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <Typography component="div">
+        {name} - {description}
+      </Typography>
+      <Tabs
+        onChange={(_, newValue: 'canvas' | 'messages') => {
+          setTab(newValue);
+        }}
+        value={tab}
+      >
+        <Tab label="Messages" value="messages" />
+        <Tab label="Canvas" value="canvas" />
+      </Tabs>
+      <Box sx={{ display: 'flex', flexGrow: '1' }}>
         <Outlet />
-      </Flex>
-    </Flex>
+      </Box>
+    </Box>
   );
 };
 
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomComponent,
   errorComponent: () => (
-    <Flex align="center" display="flex" justify="center" overflow="hidden">
-      <Text>There was an error loading the room</Text>
-    </Flex>
+    <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+      <Typography>There was an error loading the room</Typography>
+    </Box>
   ),
   loader: ({ params: { roomId } }) => queryClient.prefetchQuery(getRoomByIdOptions(roomId)),
   pendingComponent: () => (
-    <Flex align="center" justify="center">
-      <Text>Loading Room...</Text>
-    </Flex>
+    <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+      <Typography>Loading Room...</Typography>
+    </Box>
   ),
 });

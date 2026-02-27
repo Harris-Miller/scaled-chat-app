@@ -1,8 +1,0 @@
-.toolbar {
-  height: var(--toolbar-height);
-  left: 0;
-  top: 0;
-  right: 0;
-  position: fixed;
-  z-index: 2;
-}
